@@ -1,0 +1,2903 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>form. — A Training Companion</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if (typeof tailwind !== 'undefined') tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            forest: {
+              950: '#070907',
+              900: '#111713',
+              850: '#161f19',
+              800: '#1b261f',
+              750: '#212f26',
+              700: '#293a2f',
+              600: '#374c3e'
+            },
+            limeform: {
+              300: '#d2f07c',
+              400: '#bce05d',
+              500: '#a8cf45'
+            },
+            plum: {
+              800: '#352b3b',
+              300: '#cbbce0'
+            },
+            cream: {
+              100: '#e9ede7',
+              200: '#d5dcd2'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #070907;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: #f2f5f2;
+      overflow-x: hidden;
+    }
+    .font-num {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.04em;
+    }
+    .phone-shell {
+      background-color: #111713;
+      border: 1.5px solid #263329;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.75), 0 0 0 6px rgba(17, 23, 19, 0.6);
+    }
+    .form-card {
+      background-color: #18221b;
+      border: 1px solid #27362b;
+      border-radius: 24px;
+    }
+    .form-card-active {
+      background-color: #1d2a21;
+      border: 1.5px solid #bce05d;
+      border-radius: 24px;
+    }
+    .form-subcard {
+      background-color: #212e25;
+      border: 1px solid #2e4033;
+      border-radius: 16px;
+    }
+    .nav-rail-pill-active {
+      background-color: #e9ede7;
+      color: #111713;
+      font-weight: 600;
+    }
+    .kicker-text {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #8c9c90;
+      font-weight: 600;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #293a2f;
+      border-radius: 9999px;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4 lg:p-8 selection:bg-limeform-400 selection:text-forest-950">
+
+  <!-- Outer Desktop Wrapper: Left Showcase Rail + Right Phone Companion -->
+  <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+    <!-- ===================================================================
+         LEFT RAIL: "form." BRAND & NUMBERED NAVIGATION PILLS (Desktop/Tablet)
+         =================================================================== -->
+    <aside class="hidden lg:flex lg:col-span-5 flex-col justify-between space-y-8 pr-4">
+      <div class="space-y-5">
+        <div class="text-5xl font-extrabold tracking-tighter text-white">form.</div>
+        <div class="kicker-text leading-relaxed">
+          A TRAINING COMPANION<br />
+          VISUAL DIRECTION / 01
+        </div>
+        <h1 class="font-display text-5xl font-bold tracking-tight text-white leading-[1.05] pt-1">
+          Built on<br />every rep.
+        </h1>
+      </div>
+
+      <!-- Numbered Navigation Pills -->
+      <nav class="space-y-2 w-full max-w-xs" id="desktopNavRail">
+        <button type="button" data-screen="today" class="screen-nav-btn nav-rail-pill-active w-full text-left px-5 py-3.5 rounded-2xl transition flex items-center gap-4 text-sm">
+          <span class="font-mono text-xs opacity-60">01</span>
+          <span>Today</span>
+        </button>
+        <button type="button" data-screen="workout" class="screen-nav-btn text-slate-300 hover:text-white w-full text-left px-5 py-3.5 rounded-2xl transition flex items-center gap-4 text-sm">
+          <span class="font-mono text-xs opacity-50">02</span>
+          <span>Log workout</span>
+        </button>
+        <button type="button" data-screen="progress" class="screen-nav-btn text-slate-300 hover:text-white w-full text-left px-5 py-3.5 rounded-2xl transition flex items-center gap-4 text-sm">
+          <span class="font-mono text-xs opacity-50">03</span>
+          <span>Progress</span>
+        </button>
+        <button type="button" data-screen="programs" class="screen-nav-btn text-slate-300 hover:text-white w-full text-left px-5 py-3.5 rounded-2xl transition flex items-center gap-4 text-sm">
+          <span class="font-mono text-xs opacity-50">04</span>
+          <span>Workout setup</span>
+        </button>
+        <button type="button" data-screen="gyms" class="screen-nav-btn text-slate-300 hover:text-white w-full text-left px-5 py-3.5 rounded-2xl transition flex items-center gap-4 text-sm">
+          <span class="font-mono text-xs opacity-50">05</span>
+          <span>Your gyms</span>
+        </button>
+        <button type="button" data-screen="settings" class="screen-nav-btn text-slate-300 hover:text-white w-full text-left px-5 py-3.5 rounded-2xl transition flex items-center gap-4 text-sm">
+          <span class="font-mono text-xs opacity-50">06</span>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ===================================================================
+         RIGHT COLUMN: THE PHONE APP FRAME
+         =================================================================== -->
+    <div class="lg:col-span-7 flex justify-center w-full">
+      <div class="phone-shell w-full max-w-[440px] min-h-screen sm:min-h-[820px] sm:max-h-[860px] sm:rounded-[44px] flex flex-col justify-between overflow-hidden relative">
+
+        <!-- Phone Top Status Bar & App Header -->
+        <div class="px-6 pt-4 pb-3 bg-forest-900/95 backdrop-blur-md sticky top-0 z-20 border-b border-forest-800/60">
+          <!-- iOS Status Bar + Auto-Sync Status Indicator -->
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-200 mb-3">
+            <div class="flex items-center gap-2">
+              <span>9:41</span>
+              <span id="autoSyncHeaderPill" class="text-[10px] font-mono text-limeform-400/90">● Auto-sync</span>
+            </div>
+            <div class="flex items-center gap-1.5 opacity-80">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="10" width="2" height="4" rx="0.5"/><rect x="5" y="7" width="2" height="7" rx="0.5"/><rect x="9" y="4" width="2" height="10" rx="0.5"/><rect x="13" y="1" width="2" height="13" rx="0.5"/></svg>
+              <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5zm-3.6-2.1a5.2 5.2 0 0 1 7.2 0l1.1-1.1a6.8 6.8 0 0 0-9.4 0l1.1 1.1zm-2.5-2.5a8.8 8.8 0 0 1 12.2 0l1.1-1.1a10.4 10.4 0 0 0-14.4 0l1.1 1.1z"/></svg>
+              <div class="w-5 h-2.5 border border-slate-300 rounded-sm p-0.5 flex items-center"><div class="w-full h-full bg-slate-200 rounded-[1px]"></div></div>
+            </div>
+          </div>
+
+          <!-- App Bar: "form." + Location Gym Selector Pill -->
+          <div class="flex items-center justify-between">
+            <button type="button" id="brandHomeBtn" class="text-2xl font-extrabold tracking-tighter text-white">form.</button>
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5 bg-forest-800 border border-forest-700 rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-200">
+                <svg class="w-3.5 h-3.5 text-limeform-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <select id="globalGymSelect" class="bg-transparent text-white font-medium focus:outline-none cursor-pointer pr-1"></select>
+              </div>
+              <button type="button" id="quickSettingsGearBtn" class="w-8 h-8 rounded-full bg-forest-800 border border-forest-700 flex items-center justify-center text-slate-300 hover:text-white" title="Settings, Estimator & Google Sheet">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone Scrollable Viewport -->
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+
+          <!-- ===============================================================
+               01 TODAY SCREEN
+               =============================================================== -->
+          <section id="screen-today" class="app-screen space-y-6">
+            <div>
+              <div class="kicker-text">MONDAY, 09 NOVEMBER</div>
+              <h2 class="font-display text-3xl font-bold text-white leading-tight mt-1.5">
+                A little stronger.<br />Every session.
+              </h2>
+            </div>
+
+            <!-- Hero Estimated 1RM Card -->
+            <div class="form-card p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="kicker-text">ESTIMATED 1RM</span>
+                <select id="todayHeroLiftSelect" class="bg-forest-850 border border-forest-700 rounded-full px-3 py-1 text-xs text-slate-200 focus:outline-none"></select>
+              </div>
+
+              <div class="grid grid-cols-12 items-end gap-2">
+                <div class="col-span-7">
+                  <div class="flex items-baseline gap-1.5">
+                    <span id="todayHero1RmValue" class="font-num text-6xl font-bold text-white">96</span>
+                    <span id="todayHeroUnit" class="text-xl text-slate-400 font-medium">kg</span>
+                    <span id="todayHeroDelta" class="ml-1 text-xs font-semibold text-limeform-400">↗ 6.7%</span>
+                  </div>
+                  <div id="todayHeroLiftName" class="text-sm text-slate-300 mt-1">Barbell bench press</div>
+                </div>
+                <div class="col-span-5 h-16 flex items-end">
+                  <svg id="todayMiniSparkline" viewBox="0 0 140 60" class="w-full h-16 overflow-visible"></svg>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-forest-700/70 flex items-center justify-between text-xs text-slate-400">
+                <span id="todayWindowSubtext">From your working sets · Last 4 weeks</span>
+                <button type="button" id="todayGoProgressBtn" class="text-limeform-400 hover:underline font-medium">↗</button>
+              </div>
+            </div>
+
+            <!-- Up Next Session Card -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base font-semibold text-white">Up next</h3>
+                <button type="button" id="todayEditSetupLink" class="text-xs text-limeform-400 hover:underline">Edit workout setup →</button>
+              </div>
+
+              <div id="todayUpNextCard" class="form-card p-5 cursor-pointer hover:border-forest-600 transition flex items-center justify-between">
+                <div class="space-y-2">
+                  <span id="todayUpNextBadge" class="inline-block px-3 py-1 rounded-lg bg-plum-800 text-plum-300 text-[11px] font-semibold tracking-wider uppercase">
+                    READY TO LOG
+                  </span>
+                  <div id="todaySessionTitleText" class="text-2xl font-bold text-white">Upper / push</div>
+                  <div id="todayUpNextSub" class="text-xs text-slate-400">Bench (3×8) · Pull-ups (BBB) · Squat (Prilepin)</div>
+                </div>
+                <div class="flex items-end gap-1.5 transform -rotate-12 pr-1">
+                  <div class="w-2.5 h-5 rounded-full bg-limeform-400"></div>
+                  <div class="w-2.5 h-8 rounded-full bg-limeform-400"></div>
+                  <div class="w-2.5 h-6 rounded-full bg-limeform-400/50"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               02 LOG WORKOUT SCREEN (PURE LOGGING PAGE)
+               =============================================================== -->
+          <section id="screen-workout" class="app-screen hidden space-y-5">
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="kicker-text">LOG WORKOUT</div>
+                <h2 id="workoutLoggerHeaderTitle" class="font-display text-3xl font-bold text-white mt-1">Upper / push</h2>
+              </div>
+              <button type="button" id="goToWorkoutSetupBtn" class="px-3.5 py-1.5 rounded-xl bg-plum-800 text-plum-300 text-xs font-semibold hover:opacity-90 transition">
+                Edit setup
+              </button>
+            </div>
+
+            <!-- Active Workout Logging Cards -->
+            <div id="activeWorkoutExercisesList" class="space-y-4">
+              <!-- Populated dynamically by JS -->
+            </div>
+
+            <!-- Finish Session Button -->
+            <button type="button" id="finishAndSyncWorkoutBtn" class="w-full py-4 rounded-2xl bg-limeform-400 hover:bg-limeform-300 text-forest-950 font-bold text-sm transition shadow-lg">
+              Finish session
+            </button>
+          </section>
+
+          <!-- ===============================================================
+               03 PROGRESS SCREEN (1RM CHART + DELETABLE RECORDS)
+               =============================================================== -->
+          <section id="screen-progress" class="app-screen hidden space-y-5">
+            <div>
+              <div class="kicker-text">THE BIGGER PICTURE</div>
+              <h2 class="font-display text-3xl font-bold text-white mt-1">Your work, adding up.</h2>
+            </div>
+
+            <!-- Category Segmented Control (Clean 3 tabs as in screenshot) -->
+            <div class="bg-forest-850 p-1 rounded-2xl border border-forest-750 grid grid-cols-3 gap-1 text-xs font-medium">
+              <button type="button" data-prog-cat="free" class="prog-cat-btn py-2 rounded-xl bg-forest-900 text-white shadow">Free weights</button>
+              <button type="button" data-prog-cat="bodyweight" class="prog-cat-btn py-2 rounded-xl text-slate-400 hover:text-white">Bodyweight</button>
+              <button type="button" data-prog-cat="machine" class="prog-cat-btn py-2 rounded-xl text-slate-400 hover:text-white">Machines</button>
+            </div>
+
+            <!-- Main 1RM Chart Card -->
+            <div id="progressChartPanel" class="form-card p-5 space-y-4">
+              <div class="flex items-center justify-between gap-2">
+                <select id="labExerciseSelect" class="bg-transparent text-sm text-slate-300 font-medium focus:outline-none cursor-pointer truncate max-w-[210px]"></select>
+                <button type="button" id="progressWindowToggleBtn" class="px-3 py-1 rounded-xl border border-forest-600 text-xs text-slate-200 font-medium">
+                  4 weeks
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div class="flex items-baseline gap-1.5">
+                  <span id="progressBig1Rm" class="font-num text-6xl font-bold text-white">96</span>
+                  <span id="progressBigUnit" class="text-xl text-slate-400">kg</span>
+                </div>
+                <div class="px-3 py-1.5 rounded-xl bg-forest-850 border border-forest-700 text-xs font-semibold text-limeform-400">
+                  ↗ 6.7%
+                </div>
+              </div>
+
+              <!-- Direct 1RM Override -->
+              <div class="flex items-center justify-between bg-forest-850 border border-forest-750 rounded-xl px-3 py-2 text-xs">
+                <span class="text-slate-400">Set direct 1RM</span>
+                <div class="flex items-center gap-1.5">
+                  <input id="labDirect1RmInput" type="number" step="2.5" class="w-20 bg-forest-900 border border-forest-700 rounded-lg px-2 py-1 text-right font-mono text-white font-semibold" />
+                  <span class="unit-text text-slate-400">kg</span>
+                  <button type="button" id="labSaveDirect1RmBtn" class="px-2.5 py-1 rounded-lg bg-limeform-400 text-forest-950 font-bold">Save</button>
+                </div>
+              </div>
+
+              <!-- Chart Container -->
+              <div class="relative h-44 w-full pt-2">
+                <canvas id="e1rmHistoryChart"></canvas>
+              </div>
+
+              <!-- Individual 1RM History Records with Remove/Delete buttons -->
+              <div class="pt-2 border-t border-forest-750 space-y-2">
+                <div class="text-[11px] text-slate-400 font-medium">Logged 1RM points (tap × to remove a record)</div>
+                <div id="lift1RmPointsList" class="flex flex-wrap gap-1.5">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Logged Workout Session History (with Remove Record buttons) -->
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-white">Recent session logs</h3>
+                <span class="text-[11px] text-slate-400">Auto-synced</span>
+              </div>
+              <div id="sessionHistoryRecordsList" class="space-y-2">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               04 WORKOUT SETUP SCREEN (BUILD WORKOUT & ASSIGN PER-LIFT PROGRAMS)
+               =============================================================== -->
+          <section id="screen-programs" class="app-screen hidden space-y-5">
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="kicker-text">STRUCTURE, WITH ROOM TO MOVE</div>
+                <h2 class="font-display text-3xl font-bold text-white mt-1">Workout setup.</h2>
+              </div>
+              <button type="button" id="setupGoToLogBtn" class="px-3.5 py-1.5 rounded-xl bg-limeform-400 text-forest-950 text-xs font-bold">
+                Start logging →
+              </button>
+            </div>
+
+            <!-- Session Title & Quick Add Buttons -->
+            <div class="form-card p-4 space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <label class="text-xs text-slate-400">Session name</label>
+                <input id="setupSessionNameInput" type="text" value="Upper / push" class="bg-forest-900 border border-forest-700 rounded-xl px-3 py-1.5 text-xs font-bold text-white text-right w-48 focus:outline-none focus:border-limeform-400" />
+              </div>
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <button type="button" id="openAddExerciseModalBtn" class="py-2.5 rounded-xl bg-forest-850 hover:bg-forest-750 border border-forest-700 text-xs font-semibold text-white">
+                  + Add movement
+                </button>
+                <button type="button" id="openCustomMovementModalBtn" class="py-2.5 rounded-xl bg-plum-800 text-plum-300 text-xs font-semibold hover:opacity-90">
+                  + New custom lift
+                </button>
+              </div>
+            </div>
+
+            <!-- Per-Exercise Setup Cards (Change movement, program scheme, sets count, reps, and % of 1RM) -->
+            <div id="workoutSetupExercisesList" class="space-y-3.5">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Quick Program Rhythm Templates -->
+            <div class="space-y-2.5 pt-2">
+              <div class="text-xs font-semibold text-slate-400">Or apply a rhythm template to all lifts</div>
+              <div id="programCardsGrid" class="space-y-3">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               05 YOUR GYMS SCREEN (DIFFERENT SPACES. YOUR PROGRESS.)
+               =============================================================== -->
+          <section id="screen-gyms" class="app-screen hidden space-y-5">
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="kicker-text">DIFFERENT SPACES. YOUR PROGRESS.</div>
+                <h2 class="font-display text-3xl font-bold text-white mt-1">Make yourself<br />at home.</h2>
+              </div>
+              <button type="button" id="toggleAddGymDrawerBtn" class="px-3.5 py-1.5 rounded-xl bg-limeform-400 text-forest-950 text-xs font-bold">
+                + Add gym
+              </button>
+            </div>
+
+            <!-- New Gym Form -->
+            <div id="newGymDrawer" class="hidden form-card-active p-4 space-y-3">
+              <div class="text-xs font-bold text-limeform-400">Add a gym profile</div>
+              <input id="newGymNameInput" type="text" placeholder="Gym name (e.g. Downtown, Riverside)" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-limeform-400" />
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-400 mb-1">Barbell (<span class="unit-text">kg</span>)</label>
+                  <input id="newGymBarStep" type="number" step="0.5" value="2.5" class="w-full bg-forest-900 border border-forest-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-400 mb-1">Machine (<span class="unit-text">kg</span>)</label>
+                  <input id="newGymMachineStep" type="number" step="0.5" value="5" class="w-full bg-forest-900 border border-forest-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-400 mb-1">Cable (<span class="unit-text">kg</span>)</label>
+                  <input id="newGymCableStep" type="number" step="0.5" value="2.5" class="w-full bg-forest-900 border border-forest-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white" />
+                </div>
+              </div>
+              <input id="newGymNotesInput" type="text" placeholder="Notes (optional)" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+              <button type="button" id="addNewGymBtn" class="w-full py-2.5 rounded-xl bg-limeform-400 text-forest-950 font-bold text-xs">
+                Save &amp; switch to gym
+              </button>
+            </div>
+
+            <!-- Gym Radio Cards -->
+            <div id="gymProfilesList" class="space-y-3">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Equipment Profile Cards for Active Gym -->
+            <div class="space-y-3 pt-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base font-semibold text-white">Equipment profile</h3>
+                <span id="equipmentActiveGymLabel" class="text-xs text-slate-400">General</span>
+              </div>
+              <div id="equipmentProfileCardsList" class="space-y-3">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               06 SETTINGS SCREEN (PARAMETERS, MOVEMENT ESTIMATOR & SHEET SYNC)
+               =============================================================== -->
+          <section id="screen-settings" class="app-screen hidden space-y-5">
+            <div>
+              <div class="kicker-text">CONFIGURATION, ESTIMATOR &amp; SYNC</div>
+              <h2 class="font-display text-3xl font-bold text-white mt-1">Settings.</h2>
+            </div>
+
+            <!-- 1. Athlete & 1RM Engine -->
+            <div class="form-card p-5 space-y-3.5">
+              <div class="text-sm font-bold text-white">Athlete &amp; 1RM Engine</div>
+
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">Units</span>
+                <button id="unitToggleBtn" type="button" class="flex items-center gap-1 bg-forest-900 border border-forest-700 rounded-xl p-1 font-mono text-xs">
+                  <span id="unitPillLbs" class="px-2.5 py-1 rounded-lg text-slate-400">LBS</span>
+                  <span id="unitPillKg" class="px-2.5 py-1 rounded-lg bg-limeform-400 text-forest-950 font-bold">KG</span>
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">Bodyweight (pull-ups &amp; dips)</span>
+                <div class="flex items-center gap-1.5">
+                  <input id="globalBodyweightInput" type="number" step="0.5" value="80" class="w-20 bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 text-right font-mono text-white font-semibold" />
+                  <span id="globalBwUnitLabel" class="text-slate-400 font-mono">kg</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">1RM Source</span>
+                <select id="cfgEstModeSelect" class="bg-forest-900 border border-forest-700 rounded-xl px-3 py-1.5 text-white">
+                  <option value="program_pct">Program-% implied (W ÷ %1RM)</option>
+                  <option value="strict_wxr">Strict 1RM / Rep test (W × Reps)</option>
+                </select>
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">Rolling 1RM Window</span>
+                <select id="cfgRollingWindow" class="bg-forest-900 border border-forest-700 rounded-xl px-3 py-1.5 text-limeform-400 font-medium">
+                  <option value="weekly">7-day weekly average</option>
+                  <option value="monthly">30-day monthly average</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 2. Muscle & Movement Estimator (Moved to Settings!) -->
+            <div id="progressEstimatorPanel" class="form-card p-5 space-y-3.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-white">Movement Estimator</div>
+                  <div class="text-[11px] text-slate-400">Unilateral vs. bilateral &amp; new-lift buffer</div>
+                </div>
+                <select id="equivNewLiftDiscountSelect" class="bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 text-[11px] text-limeform-400 font-medium">
+                  <option value="15" selected>🌱 −15% new lift</option>
+                  <option value="10">🌱 −10% new lift</option>
+                  <option value="20">🌱 −20% new lift</option>
+                  <option value="0">100% familiar</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <select id="equivMuscleFilter" class="bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-xs text-white">
+                  <option value="ALL">All muscles</option>
+                  <option value="Chest">Chest</option>
+                  <option value="Back / Lats">Back / Lats</option>
+                  <option value="Quads">Quads</option>
+                  <option value="Hamstrings / Glutes">Hamstrings</option>
+                  <option value="Shoulders">Shoulders</option>
+                  <option value="Biceps">Biceps</option>
+                  <option value="Triceps">Triceps</option>
+                </select>
+                <select id="equivLateralityFilter" class="bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-xs text-white">
+                  <option value="ALL">Bi &amp; Unilateral</option>
+                  <option value="bilateral">Bilateral (Total)</option>
+                  <option value="unilateral">Unilateral (Side)</option>
+                </select>
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400">Reference lift</span>
+                <select id="equivAnchorSelect" class="bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 text-white max-w-[200px] truncate"></select>
+              </div>
+
+              <div id="equivalenceCardsGrid" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- 3. Google Sheets Auto-Sync & Account -->
+            <div class="form-card p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-bold text-white">Google Sheet Auto-Sync</div>
+                  <div class="text-[11px] text-slate-400">Writes automatically whenever you log or edit</div>
+                </div>
+                <span id="userPageDocStatusBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-limeform-400/15 text-limeform-400">● Linked</span>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-[11px] text-slate-400">Google Sheet URL</label>
+                <input id="gdocUrlInput" type="url" value="https://docs.google.com/spreadsheets/d/1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw/edit?gid=0#gid=0" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-xs font-mono text-limeform-300" />
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-[11px] text-slate-400">Apps Script Web App URL (<code class="text-limeform-400">/exec</code>)</label>
+                <input id="gdocBridgeCredentialInput" type="text" value="https://script.google.com/macros/s/AKfycbyy8e7lAHAN_uiES7sq9zRee1P5TXRYRW8iTtkKGy7UgwApjBzaMP74h2gN3ayr98JW/exec" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-xs font-mono text-white" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <button type="button" id="gdocReadNowBtn" class="py-2 rounded-xl bg-forest-850 border border-forest-700 text-xs text-slate-200 hover:text-white">
+                  ↓ Reload from Sheet
+                </button>
+                <button type="button" id="gdocWriteNowBtn" class="py-2 rounded-xl bg-forest-850 border border-forest-700 text-xs text-limeform-400 font-semibold">
+                  ↑ Force sync now
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-forest-800">
+                <button type="button" id="reopenOnboardingBtn" class="py-2 rounded-xl bg-forest-850 border border-forest-700 text-xs text-slate-300 hover:text-white">
+                  Setup wizard
+                </button>
+                <button type="button" id="logoutGdocBtn" class="py-2 rounded-xl bg-rose-950/50 border border-rose-500/30 text-xs text-rose-300 font-semibold hover:bg-rose-900/40">
+                  Log out Sheet
+                </button>
+              </div>
+
+              <details class="text-xs text-slate-400 pt-1">
+                <summary class="cursor-pointer text-limeform-400 font-medium">Auto-sync log &amp; preview</summary>
+                <div id="gdocSyncActivityLog" class="mt-2 p-2.5 rounded-xl bg-forest-950 font-mono text-[10px] text-slate-400 space-y-1 max-h-24 overflow-y-auto"></div>
+                <textarea id="gdocLiveEditorTextarea" rows="5" class="mt-2 w-full bg-forest-950 border border-forest-800 rounded-xl p-2.5 font-mono text-[10px] text-slate-300"></textarea>
+              </details>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Mobile / Phone Bottom Tab Bar -->
+        <nav class="px-3 py-2.5 bg-forest-900/95 border-t border-forest-800 grid grid-cols-6 gap-1 text-[10px] font-medium text-center sticky bottom-0 z-20">
+          <button type="button" data-screen="today" class="screen-nav-btn py-1.5 rounded-xl text-limeform-400 font-bold">
+            01<span class="block">Today</span>
+          </button>
+          <button type="button" data-screen="workout" class="screen-nav-btn py-1.5 rounded-xl text-slate-400">
+            02<span class="block">Log</span>
+          </button>
+          <button type="button" data-screen="progress" class="screen-nav-btn py-1.5 rounded-xl text-slate-400">
+            03<span class="block">Progress</span>
+          </button>
+          <button type="button" data-screen="programs" class="screen-nav-btn py-1.5 rounded-xl text-slate-400">
+            04<span class="block">Setup</span>
+          </button>
+          <button type="button" data-screen="gyms" class="screen-nav-btn py-1.5 rounded-xl text-slate-400">
+            05<span class="block">Gyms</span>
+          </button>
+          <button type="button" data-screen="settings" class="screen-nav-btn py-1.5 rounded-xl text-slate-400">
+            06<span class="block">Settings</span>
+          </button>
+        </nav>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 0: TWO-STEP ONBOARDING WIZARD
+       ===================================================================== -->
+  <div id="onboardingSetupModal" class="fixed inset-0 z-50 hidden bg-forest-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="phone-shell rounded-[36px] max-w-lg w-full p-6 space-y-5 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <span class="text-2xl font-extrabold tracking-tighter text-white">form.</span>
+        <span id="onboardStepBadge" class="px-3 py-1 rounded-full bg-plum-800 text-plum-300 text-[11px] font-semibold uppercase tracking-wider">Step 1 of 2</span>
+      </div>
+
+      <!-- STEP 1: Link Google Sheet & Auto-Verify Read/Write -->
+      <div id="onboardStep1Panel" class="space-y-4">
+        <div>
+          <h2 class="font-display text-2xl font-bold text-white">Connect your Sheet.</h2>
+          <p class="text-xs text-slate-400 mt-1">
+            We check read &amp; write access first. Once linked, every logged set and workout setup change saves to your Sheet automatically.
+          </p>
+        </div>
+
+        <div class="form-card p-4 space-y-2.5 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">How to enable write access (30s)</span>
+            <button type="button" id="copyOnboardAppsScriptBtn" class="px-2.5 py-1 rounded-lg bg-limeform-400 text-forest-950 font-bold text-[11px]">
+              Copy Script
+            </button>
+          </div>
+          <ol class="text-slate-300 space-y-1 list-decimal list-inside text-[11px]">
+            <li>In your Google Sheet, open <strong>Extensions → Apps Script</strong>.</li>
+            <li>Paste the copied script and click <strong>Deploy → New deployment</strong>.</li>
+            <li>Choose <strong>Web app</strong> (Access: <strong>Anyone</strong>) and paste the Web App URL below.</li>
+          </ol>
+          <pre id="onboardAppsScriptCodeBlock" class="hidden">function doGet(e) {
+  var ss = e.parameter.sheetUrl ? SpreadsheetApp.openByUrl(e.parameter.sheetUrl) : SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var rows = sheet.getDataRange().getValues();
+  var isEmpty = (rows.length <= 1 && String(rows[0][0] || '').trim() === '');
+  var metaSheet = ss.getSheetByName('KINETIC_DATA');
+  var metaJson = metaSheet ? String(metaSheet.getRange('A1').getValue() || '').trim() : '';
+  return ContentService.createTextOutput(JSON.stringify({
+    ok: true, canWrite: true, isEmpty: isEmpty,
+    hasKineticData: metaJson.indexOf('"kineticVersion"') !== -1,
+    kineticJson: metaJson || null, rowCount: rows.length
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+function doPost(e) {
+  var payload = JSON.parse(e.postData.contents);
+  var ss = payload.sheetUrl ? SpreadsheetApp.openByUrl(payload.sheetUrl) : SpreadsheetApp.getActiveSpreadsheet();
+  if (payload.action === 'probe') {
+    return ContentService.createTextOutput(JSON.stringify({ ok: true, canWrite: true })).setMimeType(ContentService.MimeType.JSON);
+  }
+  var sheet = ss.getSheets()[0];
+  sheet.clearContents();
+  if (payload.rows && payload.rows.length > 0) {
+    sheet.getRange(1, 1, payload.rows.length, payload.rows[0].length).setValues(payload.rows);
+  }
+  var metaSheet = ss.getSheetByName('KINETIC_DATA') || ss.insertSheet('KINETIC_DATA');
+  metaSheet.getRange('A1').setValue(JSON.stringify(payload.stateJson));
+  return ContentService.createTextOutput(JSON.stringify({ ok: true, updated: new Date().toISOString() })).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Google Sheet URL</label>
+            <input id="onboardGdocUrlInput" type="url" value="https://docs.google.com/spreadsheets/d/1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw/edit?gid=0#gid=0" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3.5 py-2.5 text-xs font-mono text-limeform-300 focus:outline-none focus:border-limeform-400" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Apps Script Web App URL or OAuth Token</label>
+            <input id="onboardBridgeUrlInput" type="text" value="https://script.google.com/macros/s/AKfycbyy8e7lAHAN_uiES7sq9zRee1P5TXRYRW8iTtkKGy7UgwApjBzaMP74h2gN3ayr98JW/exec" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-limeform-400" />
+          </div>
+        </div>
+
+        <button id="onboardCheckDocBtn" type="button" class="w-full py-3.5 rounded-2xl bg-limeform-400 hover:bg-limeform-300 text-forest-950 font-bold text-xs transition">
+          Verify read/write &amp; check Sheet
+        </button>
+
+        <div id="onboardErrorBox" class="hidden bg-rose-950/50 border border-rose-500/40 rounded-2xl p-4 space-y-3 text-xs">
+          <div class="font-bold text-rose-300">Sheet connection notice</div>
+          <p id="onboardErrorText" class="text-slate-300 leading-relaxed"></p>
+          <button id="onboardForceContinueStep2Btn" type="button" class="w-full py-2.5 rounded-xl bg-forest-850 hover:bg-forest-750 border border-limeform-400/50 text-limeform-400 font-bold text-xs transition">
+            Initialize fresh Sheet via no-cors POST &amp; continue to Step 2 →
+          </button>
+        </div>
+
+        <div id="onboardExistingDataFoundBox" class="hidden form-card-active p-4 space-y-3 text-xs">
+          <div class="font-bold text-limeform-400">✓ Existing training data found</div>
+          <p class="text-slate-300">Load your saved profile and 1RMs, or wipe the sheet to start fresh?</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="onboardLoadExistingAndFinishBtn" type="button" class="py-2.5 rounded-xl bg-limeform-400 text-forest-950 font-bold">
+              Use existing data
+            </button>
+            <button id="onboardWipeAndGoStep2Btn" type="button" class="py-2.5 rounded-xl bg-rose-950/60 text-rose-300 border border-rose-500/30 font-semibold">
+              Wipe &amp; recalibrate
+            </button>
+          </div>
+        </div>
+
+        <div id="onboardIncompatibleDataBox" class="hidden bg-amber-950/40 border border-amber-500/40 rounded-2xl p-4 space-y-3 text-xs">
+          <div class="font-bold text-amber-300">⚠️ Sheet contains incompatible data</div>
+          <p class="text-slate-300">Confirm wiping this sheet to initialize form., or cancel?</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="onboardConfirmIncompatibleWipeBtn" type="button" class="py-2.5 rounded-xl bg-amber-400 text-forest-950 font-bold">
+              Confirm wipe
+            </button>
+            <button id="onboardCancelIncompatibleBtn" type="button" class="py-2.5 rounded-xl bg-forest-850 text-slate-300">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Only shown if Sheet is Empty or User Confirms Wipe -->
+      <div id="onboardStep2Panel" class="hidden space-y-4">
+        <div>
+          <h2 class="font-display text-2xl font-bold text-white">Your starting baseline.</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Enter either your program working weight or your direct 1RM.</p>
+        </div>
+
+        <div class="form-card p-3.5 grid grid-cols-3 gap-2.5 text-xs">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">Units</label>
+            <select id="onboardUnitSelect" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 text-white font-mono">
+              <option value="lbs">lbs</option>
+              <option value="kg">kg</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-limeform-400 font-semibold mb-1">Bodyweight (<span class="unit-text">kg</span>)</label>
+            <input id="onboardBwInput" type="number" step="1" value="80" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 font-mono text-white font-bold" />
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">Default gym</label>
+            <input id="onboardGymNameInput" type="text" value="General" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 text-white font-semibold" />
+          </div>
+        </div>
+
+        <div id="onboardingMovementsTableBody" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+          <!-- Populated by JS -->
+        </div>
+
+        <button id="completeOnboardingBtn" type="button" class="w-full py-3.5 rounded-2xl bg-limeform-400 hover:bg-limeform-300 text-forest-950 font-bold text-xs transition">
+          Save baseline &amp; auto-sync to Sheet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 1: SWAP / ESTIMATE SIMILAR LIFT
+       ===================================================================== -->
+  <div id="swapExerciseModal" class="fixed inset-0 z-50 hidden bg-forest-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="phone-shell rounded-[32px] max-w-md w-full p-5 space-y-4 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white">Swap movement</h3>
+          <p id="swapModalSubtitle" class="text-xs text-slate-400">Calibrated for unilateral/bilateral &amp; −15% new-lift start</p>
+        </div>
+        <button id="closeSwapModalBtn" type="button" class="w-8 h-8 rounded-full bg-forest-800 text-slate-300">✕</button>
+      </div>
+      <div id="swapOptionsList" class="space-y-2.5 overflow-y-auto pr-1 flex-1"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 2: ADD EXERCISE TO WORKOUT SETUP
+       ===================================================================== -->
+  <div id="addExerciseModal" class="fixed inset-0 z-50 hidden bg-forest-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="phone-shell rounded-[32px] max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-white">Add movement</h3>
+        <button id="closeAddExerciseModalBtn" type="button" class="w-8 h-8 rounded-full bg-forest-800 text-slate-300">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Movement</label>
+          <select id="modalAddExerciseSelect" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2.5 text-white"></select>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Program scheme</label>
+          <select id="modalAddSchemeSelect" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2.5 text-white"></select>
+        </div>
+        <button id="confirmAddExerciseToSessionBtn" type="button" class="w-full py-3 rounded-2xl bg-limeform-400 text-forest-950 font-bold">
+          Add to workout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 3: CREATE CUSTOM EXERCISE
+       ===================================================================== -->
+  <div id="customMovementModal" class="fixed inset-0 z-50 hidden bg-forest-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="phone-shell rounded-[32px] max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-white">New custom movement</h3>
+        <button id="closeCustomMovementModalBtn" type="button" class="w-8 h-8 rounded-full bg-forest-800 text-slate-300">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <input id="customExName" type="text" placeholder="Movement name (e.g. Pendulum Squat)" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2.5 text-white" />
+        <div class="grid grid-cols-2 gap-2">
+          <select id="customExMuscle" class="bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-white">
+            <option value="Chest">Chest</option>
+            <option value="Back / Lats">Back / Lats</option>
+            <option value="Quads">Quads</option>
+            <option value="Hamstrings / Glutes">Hamstrings</option>
+            <option value="Shoulders">Shoulders</option>
+            <option value="Biceps">Biceps</option>
+            <option value="Triceps">Triceps</option>
+          </select>
+          <select id="customExPattern" class="bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-white">
+            <option value="Horizontal Push">Horizontal push</option>
+            <option value="Vertical Push">Vertical push</option>
+            <option value="Vertical Pull">Vertical pull</option>
+            <option value="Horizontal Pull">Horizontal pull</option>
+            <option value="Knee-Dominant Squat">Squat</option>
+            <option value="Hip Hinge">Hip hinge</option>
+            <option value="Isolation / Accessory">Isolation</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <select id="customExLaterality" class="bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-2 text-limeform-400 font-medium">
+            <option value="bilateral">Bilateral</option>
+            <option value="unilateral">Unilateral (Side)</option>
+          </select>
+          <select id="customExType" class="bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-2 text-white">
+            <option value="barbell">Barbell</option>
+            <option value="dumbbell">Dumbbell</option>
+            <option value="machine">Machine</option>
+            <option value="cable">Cable</option>
+            <option value="bodyweight">Bodyweight</option>
+          </select>
+          <input id="customExStep" type="number" step="0.5" value="2.5" placeholder="Step" class="bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-2 font-mono text-white" />
+        </div>
+        <input id="customEx1Rm" type="number" step="2.5" placeholder="Direct 1RM (optional — leave blank to auto-estimate −15%)" class="w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2.5 font-mono text-white" />
+        <button id="saveCustomMovementBtn" type="button" class="w-full py-3 rounded-2xl bg-limeform-400 text-forest-950 font-bold">
+          Save &amp; add to workout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minimal Toast -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden bg-forest-850 border border-limeform-400/50 text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-medium">
+    <span class="w-2 h-2 rounded-full bg-limeform-400"></span>
+    <span id="toastMessageText">Saved</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CORE STATE & SAFE SCHEME LOOKUP (Fixes undefined.shortTag permanently!)
+    // =========================================================================
+    const LBS_PER_KG = 2.20462262;
+
+    const SCHEME_CATALOG = {
+      wendler_bbb: {
+        id: 'wendler_bbb',
+        name: 'Boring But Big (Wave + 5×10 @ 50%)',
+        shortTag: 'Boring But Big',
+        setsCount: 8,
+        refPctOf1Rm: 50,
+        refReps: 10
+      },
+      prilepin_optimal: {
+        id: 'prilepin_optimal',
+        name: "Prilepin's Chart (4×6 @ 70%)",
+        shortTag: 'Prilepin 70%',
+        setsCount: 4,
+        refPctOf1Rm: 70,
+        refReps: 6
+      },
+      normal_3x8: {
+        id: 'normal_3x8',
+        name: 'Standard 3×8 (75%)',
+        shortTag: '3×8 @ 75%',
+        setsCount: 3,
+        refPctOf1Rm: 75,
+        refReps: 8
+      },
+      normal_4x10: {
+        id: 'normal_4x10',
+        name: 'Volume 4×10 (70%)',
+        shortTag: '4×10 @ 70%',
+        setsCount: 4,
+        refPctOf1Rm: 70,
+        refReps: 10
+      },
+      dropset_3: {
+        id: 'dropset_3',
+        name: 'Drop-set focus (75%→60%→48%)',
+        shortTag: 'Drop-set',
+        setsCount: 3,
+        refPctOf1Rm: 75,
+        refReps: 8
+      },
+      strength_5x5: {
+        id: 'strength_5x5',
+        name: '5×5 Strength (80%)',
+        shortTag: '5×5 @ 80%',
+        setsCount: 5,
+        refPctOf1Rm: 80,
+        refReps: 5
+      },
+      gzclp_t1: {
+        id: 'gzclp_t1',
+        name: 'GZCLP Tier 1 (5×3 @ 85%)',
+        shortTag: 'GZCLP 5×3',
+        setsCount: 5,
+        refPctOf1Rm: 85,
+        refReps: 3
+      },
+      gzclp_t2: {
+        id: 'gzclp_t2',
+        name: 'GZCLP Tier 2 (3×10 @ 65%)',
+        shortTag: 'GZCLP 3×10',
+        setsCount: 3,
+        refPctOf1Rm: 65,
+        refReps: 10
+      },
+      gvt_10x10: {
+        id: 'gvt_10x10',
+        name: 'German Volume 10×10 (60%)',
+        shortTag: 'GVT 10×10',
+        setsCount: 10,
+        refPctOf1Rm: 60,
+        refReps: 10
+      }
+    };
+
+    function getScheme(schemeId) {
+      return SCHEME_CATALOG[schemeId] || SCHEME_CATALOG.normal_3x8;
+    }
+
+    const defaultState = {
+      activeScreen: 'today',
+      sessionTitle: 'Upper / push',
+      unit: 'kg',
+      estimationMode: 'program_pct',
+      rollingWindow: 'weekly',
+      newMovementDiscountPct: 15,
+      bodyweightLbs: 176.4,
+      activeGymId: 'gym_general',
+      activeProgramId: 'wendler_531_bbb',
+      progressCategory: 'free',
+      onboardingCompleted: false,
+      gdoc: {
+        isLoggedIn: false,
+        url: 'https://docs.google.com/spreadsheets/d/1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw/edit?gid=0#gid=0',
+        docId: '1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw',
+        credential: 'https://script.google.com/macros/s/AKfycbyy8e7lAHAN_uiES7sq9zRee1P5TXRYRW8iTtkKGy7UgwApjBzaMP74h2gN3ayr98JW/exec',
+        lastSynced: 'Ready',
+        logs: ['Auto-sync writes to your Sheet whenever you log sets or update setup.']
+      },
+      gyms: [
+        {
+          id: 'gym_general',
+          name: 'General',
+          barStepLbs: 5,
+          machineStepLbs: 10,
+          cableStepLbs: 5,
+          notes: 'Default equipment profile'
+        }
+      ],
+      exercises: [
+        {
+          id: 'ex_bench',
+          name: 'Barbell bench press',
+          muscle: 'Chest',
+          secondary: 'Chest · Triceps / Horizontal push',
+          pattern: 'Horizontal Push',
+          type: 'barbell',
+          laterality: 'bilateral',
+          isNewMovement: false,
+          defaultScheme: 'normal_3x8',
+          carryoverFactor: 1.00,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 211.6 },
+          history: [198.4, 200.6, 205.0, 211.6]
+        },
+        {
+          id: 'ex_pullups',
+          name: 'Weighted pull-ups',
+          muscle: 'Back / Lats',
+          secondary: 'Lats · Biceps / Vertical pull',
+          pattern: 'Vertical Pull',
+          type: 'bodyweight',
+          laterality: 'bilateral',
+          isNewMovement: false,
+          defaultScheme: 'wendler_bbb',
+          carryoverFactor: 1.00,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 235 },
+          history: [222, 226, 230, 235]
+        },
+        {
+          id: 'ex_squat',
+          name: 'Barbell back squat',
+          muscle: 'Quads',
+          secondary: 'Quads · Glutes / Squat',
+          pattern: 'Knee-Dominant Squat',
+          type: 'barbell',
+          laterality: 'bilateral',
+          isNewMovement: false,
+          defaultScheme: 'prilepin_optimal',
+          carryoverFactor: 1.00,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 315 },
+          history: [295, 302, 308, 315]
+        },
+        {
+          id: 'ex_lat_pulldown',
+          name: 'Lat pulldown',
+          muscle: 'Back / Lats',
+          secondary: 'Vertical pull · Lats / Biceps',
+          pattern: 'Vertical Pull',
+          type: 'cable',
+          laterality: 'bilateral',
+          isNewMovement: false,
+          defaultScheme: 'dropset_3',
+          carryoverFactor: 0.86,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 190 },
+          history: [178, 182, 186, 190]
+        },
+        {
+          id: 'ex_db_bench',
+          name: 'Dumbbell bench press (Per hand)',
+          muscle: 'Chest',
+          secondary: 'Unilateral · Chest / Triceps',
+          pattern: 'Horizontal Push',
+          type: 'dumbbell',
+          laterality: 'unilateral',
+          isNewMovement: true,
+          defaultScheme: 'normal_3x8',
+          carryoverFactor: 0.41,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 88 },
+          history: [84, 88]
+        },
+        {
+          id: 'ex_ohp',
+          name: 'Overhead barbell press',
+          muscle: 'Shoulders',
+          secondary: 'Shoulders · Triceps / Vertical push',
+          pattern: 'Vertical Push',
+          type: 'barbell',
+          laterality: 'bilateral',
+          isNewMovement: false,
+          defaultScheme: 'prilepin_optimal',
+          carryoverFactor: 1.00,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 145 },
+          history: [135, 138, 142, 145]
+        },
+        {
+          id: 'ex_db_row',
+          name: 'Single-arm DB row (Per arm)',
+          muscle: 'Back / Lats',
+          secondary: 'Unilateral · Horizontal pull',
+          pattern: 'Horizontal Pull',
+          type: 'dumbbell',
+          laterality: 'unilateral',
+          isNewMovement: true,
+          defaultScheme: 'normal_3x8',
+          carryoverFactor: 0.46,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 95 },
+          history: [90, 95]
+        },
+        {
+          id: 'ex_split_squat',
+          name: 'Bulgarian split squat (Per leg)',
+          muscle: 'Quads',
+          secondary: 'Unilateral · Glutes / Quads',
+          pattern: 'Knee-Dominant Squat',
+          type: 'dumbbell',
+          laterality: 'unilateral',
+          isNewMovement: true,
+          defaultScheme: 'normal_3x8',
+          carryoverFactor: 0.36,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 115 },
+          history: [110, 115]
+        },
+        {
+          id: 'ex_machine_chest',
+          name: 'Converging chest press',
+          muscle: 'Chest',
+          secondary: 'Machine · Horizontal push',
+          pattern: 'Horizontal Push',
+          type: 'machine',
+          laterality: 'bilateral',
+          isNewMovement: true,
+          defaultScheme: 'normal_3x8',
+          carryoverFactor: 0.92,
+          stepLbs: 10,
+          e1rmByGym: { gym_general: 195 },
+          history: [188, 195]
+        },
+        {
+          id: 'ex_deadlift',
+          name: 'Barbell deadlift',
+          muscle: 'Hamstrings / Glutes',
+          secondary: 'Posterior chain / Hinge',
+          pattern: 'Hip Hinge',
+          type: 'barbell',
+          laterality: 'bilateral',
+          isNewMovement: false,
+          defaultScheme: 'gzclp_t1',
+          carryoverFactor: 1.00,
+          stepLbs: 5,
+          e1rmByGym: { gym_general: 385 },
+          history: [365, 372, 380, 385]
+        }
+      ],
+      programs: [
+        {
+          id: 'wendler_531_bbb',
+          tag: 'STRENGTH + VOLUME',
+          name: 'Boring But Big',
+          sub1: 'Wave sets + 5×10 @ 50% 1RM',
+          sub2: 'Applies BBB to all movements in setup',
+          bars: 'asc',
+          schemeApply: 'wendler_bbb'
+        },
+        {
+          id: 'prilepin_program',
+          tag: 'OPTIMAL VOLUME',
+          name: "Prilepin's Chart",
+          sub1: '4 sets × 6 reps @ 70% 1RM',
+          sub2: 'Applies Prilepin 70% to all movements',
+          bars: 'mid',
+          schemeApply: 'prilepin_optimal'
+        },
+        {
+          id: 'dropset_hypertrophy',
+          tag: 'SESSION BUILDER',
+          name: 'Drop-set focus',
+          sub1: 'Descending loads · 75% → 60% → 48%',
+          sub2: 'Applies drop-sets to all movements',
+          bars: 'desc',
+          schemeApply: 'dropset_3'
+        }
+      ],
+      workoutHistory: [
+        {
+          id: 'rec_1',
+          date: '2026-11-07',
+          gym: 'General',
+          program: 'Upper / push',
+          summary: 'Bench press 80 kg × 6 · Pull-ups BBB 5×10'
+        }
+      ],
+      activeSessionExercises: []
+    };
+
+    let state = JSON.parse(JSON.stringify(defaultState));
+    try {
+      const saved = localStorage.getItem('form_workout_app_v7');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.exercises && parsed.gyms) {
+          state = Object.assign(defaultState, parsed);
+        }
+      }
+    } catch (e) {}
+
+    function saveState() {
+      try {
+        localStorage.setItem('form_workout_app_v7', JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // UNIT & 1RM HELPERS
+    // =========================================================================
+    function toDisplayWeight(lbs) {
+      if (state.unit === 'kg') {
+        return Math.round((lbs / LBS_PER_KG) * 10) / 10;
+      }
+      return Math.round(lbs * 10) / 10;
+    }
+
+    function fromDisplayWeight(val) {
+      const num = parseFloat(val) || 0;
+      return state.unit === 'kg' ? num * LBS_PER_KG : num;
+    }
+
+    function getUnitStr() {
+      return state.unit === 'kg' ? 'kg' : 'lbs';
+    }
+
+    function getActiveGym() {
+      return state.gyms.find(g => g.id === state.activeGymId) || state.gyms[0];
+    }
+
+    function getExerciseById(id) {
+      return state.exercises.find(e => e.id === id) || state.exercises[0];
+    }
+
+    function getRollingAveragesLbs(ex) {
+      if (!ex) return { currentLbs: 135, weeklyAvgLbs: 135, monthlyAvgLbs: 135 };
+      const base = (ex.e1rmByGym && ex.e1rmByGym[state.activeGymId] !== undefined)
+        ? ex.e1rmByGym[state.activeGymId]
+        : (Object.values(ex.e1rmByGym || {})[0] || 135);
+      const hist = Array.isArray(ex.history) && ex.history.length > 0 ? ex.history : [base];
+      const latest = hist[hist.length - 1] || base;
+      const scale = latest > 0 ? (base / latest) : 1;
+      const scaled = hist.map(v => v * scale);
+      const wSlice = scaled.slice(-3);
+      const mSlice = scaled.slice(-7);
+      return {
+        currentLbs: base,
+        weeklyAvgLbs: wSlice.reduce((a, b) => a + b, 0) / wSlice.length,
+        monthlyAvgLbs: mSlice.reduce((a, b) => a + b, 0) / mSlice.length
+      };
+    }
+
+    function getExerciseE1RmLbs(ex) {
+      const avgs = getRollingAveragesLbs(ex);
+      return state.rollingWindow === 'monthly' ? avgs.monthlyAvgLbs : avgs.weeklyAvgLbs;
+    }
+
+    function getEffectiveStepLbs(ex) {
+      const gym = getActiveGym();
+      if (!ex) return gym.barStepLbs || 5;
+      if (ex.type === 'machine') return gym.machineStepLbs || 10;
+      if (ex.type === 'cable') return gym.cableStepLbs || 5;
+      return gym.barStepLbs || ex.stepLbs || 5;
+    }
+
+    function snapLoadLbs(rawLbs, ex) {
+      const stepLbs = getEffectiveStepLbs(ex);
+      if (state.unit === 'kg') {
+        // Snap in clean KG increments (e.g., 2.5 kg or 5 kg) so metric never shows 70.3 kg or 49.9 kg!
+        const rawKg = rawLbs / LBS_PER_KG;
+        const rawStepKg = stepLbs / LBS_PER_KG;
+        const cleanStepKg = rawStepKg >= 4 ? 5 : (rawStepKg >= 2 ? 2.5 : 1);
+        const snappedKg = Math.max(0, Math.round(rawKg / cleanStepKg) * cleanStepKg);
+        return snappedKg * LBS_PER_KG;
+      }
+      return stepLbs > 0 ? Math.max(0, Math.round(rawLbs / stepLbs) * stepLbs) : Math.round(rawLbs);
+    }
+
+    function computeImplied1RmFromSet(totalLoadLbs, actualReps, targetReps, prescribedPct) {
+      const rAct = Math.max(1, parseFloat(actualReps) || 1);
+      const rTarg = Math.max(1, parseFloat(targetReps) || rAct);
+      const pct = Math.min(100, Math.max(30, parseFloat(prescribedPct) || 75)) / 100;
+      if (state.estimationMode === 'strict_wxr') {
+        return rAct <= 1 ? totalLoadLbs : totalLoadLbs * (1 + rAct / 30);
+      }
+      return Math.max(totalLoadLbs, (totalLoadLbs / pct) * (1 + (rAct - rTarg) / 30));
+    }
+
+    function computePrescribedWeightForExercise(ex, pctOf1Rm) {
+      const base1RmLbs = getExerciseE1RmLbs(ex);
+      const newFactor = ex.isNewMovement ? (1 - ((state.newMovementDiscountPct || 15) / 100)) : 1.0;
+      const effPct = pctOf1Rm * newFactor;
+      const rawTotalLbs = base1RmLbs * (effPct / 100);
+
+      if (ex.type === 'bodyweight') {
+        const rawExt = rawTotalLbs - state.bodyweightLbs;
+        return {
+          isBodyweight: true,
+          externalLbs: snapLoadLbs(Math.max(0, rawExt), ex),
+          effectivePct: Math.round(effPct * 10) / 10
+        };
+      }
+      return {
+        isBodyweight: false,
+        externalLbs: snapLoadLbs(rawTotalLbs, ex),
+        effectivePct: Math.round(effPct * 10) / 10
+      };
+    }
+
+    function generateSetsForScheme(ex, schemeId, customCount = null, customReps = null, customPct = null) {
+      const sc = getScheme(schemeId);
+      const sets = [];
+      function makeSet(pct, reps) {
+        const presc = computePrescribedWeightForExercise(ex, pct);
+        return {
+          prescribedPctOf1Rm: presc.effectivePct,
+          actualExternalLbs: presc.externalLbs,
+          targetRepsNum: reps,
+          actualReps: reps,
+          includeIn1Rm: true,
+          completed: false
+        };
+      }
+
+      if (customCount !== null) {
+        const c = Math.max(1, parseInt(customCount, 10) || 3);
+        const r = Math.max(1, parseInt(customReps, 10) || sc.refReps || 8);
+        const p = Math.min(100, Math.max(30, parseFloat(customPct) || sc.refPctOf1Rm || 75));
+        for (let i = 0; i < c; i++) sets.push(makeSet(p, r));
+        return sets;
+      }
+
+      if (schemeId === 'wendler_bbb') {
+        [65, 75, 85].forEach(p => sets.push(makeSet(p, 5)));
+        [50, 50, 50, 50, 50].forEach(p => sets.push(makeSet(p, 10)));
+      } else if (schemeId === 'dropset_3') {
+        [75, 60, 48].forEach((p, idx) => sets.push(makeSet(p, idx === 0 ? 8 : 10)));
+      } else {
+        const count = sc.setsCount || 3;
+        for (let i = 0; i < count; i++) {
+          sets.push(makeSet(sc.refPctOf1Rm || 75, sc.refReps || 8));
+        }
+      }
+      return sets;
+    }
+
+    function createSessionBlock(exId, schemeId, customCount = null, customReps = null, customPct = null) {
+      const ex = getExerciseById(exId);
+      const chosen = (schemeId && SCHEME_CATALOG[schemeId]) ? schemeId : (ex.defaultScheme && SCHEME_CATALOG[ex.defaultScheme] ? ex.defaultScheme : 'normal_3x8');
+      const sc = getScheme(chosen);
+      const hasCustomOverride = (customCount !== null);
+      return {
+        exerciseId: ex.id,
+        schemeId: chosen,
+        isCustomSets: hasCustomOverride,
+        customSetsCount: hasCustomOverride ? customCount : null,
+        customReps: customReps || sc.refReps || 8,
+        customPct: customPct || sc.refPctOf1Rm || 75,
+        sets: generateSetsForScheme(ex, chosen, customCount, customReps, customPct)
+      };
+    }
+
+    function buildProgramSession() {
+      state.activeSessionExercises = [
+        createSessionBlock('ex_bench', 'normal_3x8'),
+        createSessionBlock('ex_pullups', 'wendler_bbb'),
+        createSessionBlock('ex_squat', 'prilepin_optimal'),
+        createSessionBlock('ex_lat_pulldown', 'dropset_3')
+      ];
+      saveState();
+    }
+
+    function refreshActiveSessionWeights() {
+      if (!state.activeSessionExercises || state.activeSessionExercises.length === 0) {
+        buildProgramSession();
+        return;
+      }
+      state.activeSessionExercises = state.activeSessionExercises.map(b =>
+        createSessionBlock(
+          b.exerciseId,
+          b.schemeId,
+          b.isCustomSets ? b.customSetsCount : null,
+          b.isCustomSets ? b.customReps : null,
+          b.isCustomSets ? b.customPct : null
+        )
+      );
+      saveState();
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toastBanner');
+      document.getElementById('toastMessageText').textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+    }
+
+    // =========================================================================
+    // AUTOMATIC GOOGLE SHEETS WRITE ENGINE
+    // Automatically triggers on every logged set, workout edit, or record removal
+    // =========================================================================
+    function extractGoogleDocId(url) {
+      const m = (url || '').match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+      return (m && m[1]) ? m[1] : '1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw';
+    }
+
+    function appendGdocLog(msg) {
+      const ts = new Date().toTimeString().slice(0, 8);
+      if (!Array.isArray(state.gdoc.logs)) state.gdoc.logs = [];
+      state.gdoc.logs.unshift(`[${ts}] ${msg}`);
+      if (state.gdoc.logs.length > 25) state.gdoc.logs.pop();
+      state.gdoc.lastSynced = ts;
+      saveState();
+    }
+
+    async function handleWriteToGoogleDoc(summaryNote = null, isAuto = false) {
+      const u = getUnitStr();
+      const gym = getActiveGym();
+      if (summaryNote && !isAuto) {
+        state.workoutHistory.unshift({
+          id: 'rec_' + Date.now(),
+          date: new Date().toISOString().slice(0, 10),
+          gym: gym.name,
+          program: state.sessionTitle || 'Session',
+          summary: summaryNote
+        });
+      }
+
+      const pill = document.getElementById('autoSyncHeaderPill');
+      if (pill) pill.textContent = '↻ Syncing...';
+
+      const rows = [
+        ['FORM_WORKOUT_SHEET', 'BW: ' + toDisplayWeight(state.bodyweightLbs) + ' ' + u, 'Gym: ' + gym.name, 'Updated: ' + new Date().toISOString()],
+        ['MOVEMENT', 'MUSCLE', 'PROGRAM', 'ESTIMATED 1RM (' + u + ')']
+      ];
+      state.exercises.forEach(ex => {
+        const sc = getScheme(ex.defaultScheme);
+        rows.push([ex.name, ex.muscle, sc.shortTag, String(toDisplayWeight(getExerciseE1RmLbs(ex)))]);
+      });
+      state.workoutHistory.forEach(h => {
+        rows.push(['SESSION_LOG', h.date, h.gym, h.summary]);
+      });
+
+      const cred = (state.gdoc.credential || '').trim();
+      if (cred.startsWith('https://script.google.com/')) {
+        const postBody = JSON.stringify({
+          action: 'sync',
+          sheetUrl: state.gdoc.url,
+          rows,
+          stateJson: {
+            kineticVersion: 6,
+            unit: state.unit,
+            bodyweightLbs: state.bodyweightLbs,
+            gyms: state.gyms,
+            exercises: state.exercises,
+            workoutHistory: state.workoutHistory
+          }
+        });
+        try {
+          const resp = await fetch(cred, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: postBody
+          });
+          if (resp.ok) {
+            appendGdocLog(`Auto-wrote ${rows.length} rows to Google Sheet.`);
+            if (pill) pill.textContent = '✓ Sheet synced';
+          }
+        } catch (e) {
+          // Fallback to mode: 'no-cors' so sandboxed iframe 302 redirects still deliver the POST body to Google Apps Script!
+          try {
+            await fetch(cred, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: postBody
+            });
+            appendGdocLog(`Dispatched ${rows.length} rows to Google Sheet (no-cors POST).`);
+            if (pill) pill.textContent = '✓ Sheet synced';
+          } catch (err2) {
+            appendGdocLog(`Auto-sync note: ${err2.message}`);
+            if (pill) pill.textContent = '● Local saved';
+          }
+        }
+      } else {
+        appendGdocLog(`Auto-saved state (${summaryNote || 'update'}).`);
+        if (pill) pill.textContent = '✓ Auto-saved';
+      }
+      saveState();
+      renderGoogleDocHub();
+    }
+
+    function triggerAutoWrite(reason) {
+      clearTimeout(window.__autoSyncTimer);
+      window.__autoSyncTimer = setTimeout(() => {
+        handleWriteToGoogleDoc(reason, true);
+      }, 350);
+    }
+
+    // =========================================================================
+    // SCREEN SWITCHING
+    // =========================================================================
+    function switchScreen(screenId) {
+      state.activeScreen = screenId;
+      document.querySelectorAll('.app-screen').forEach(s => s.classList.add('hidden'));
+      const target = document.getElementById(`screen-${screenId}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('#desktopNavRail .screen-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-screen') === screenId) {
+          btn.classList.add('nav-rail-pill-active');
+          btn.classList.remove('text-slate-300');
+        } else {
+          btn.classList.remove('nav-rail-pill-active');
+          btn.classList.add('text-slate-300');
+        }
+      });
+
+      document.querySelectorAll('nav.grid-cols-6 .screen-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-screen') === screenId) {
+          btn.className = 'screen-nav-btn py-1.5 rounded-xl text-limeform-400 font-bold';
+        } else {
+          btn.className = 'screen-nav-btn py-1.5 rounded-xl text-slate-400';
+        }
+      });
+
+      if (screenId === 'progress') renderProgressScreen();
+    }
+
+    // =========================================================================
+    // RENDERERS FOR ALL 6 SCREENS
+    // =========================================================================
+    function renderTopBarAndSettings() {
+      const u = getUnitStr();
+      document.querySelectorAll('.unit-text').forEach(el => { el.textContent = u; });
+
+      const gymSel = document.getElementById('globalGymSelect');
+      gymSel.innerHTML = state.gyms.map(g =>
+        `<option value="${g.id}" ${g.id === state.activeGymId ? 'selected' : ''} class="bg-forest-900 text-white">${g.name}</option>`
+      ).join('');
+
+      document.getElementById('globalBodyweightInput').value = toDisplayWeight(state.bodyweightLbs);
+      document.getElementById('globalBwUnitLabel').textContent = u;
+
+      const pillLbs = document.getElementById('unitPillLbs');
+      const pillKg = document.getElementById('unitPillKg');
+      if (state.unit === 'lbs') {
+        pillLbs.className = 'px-2.5 py-1 rounded-lg bg-limeform-400 text-forest-950 font-bold';
+        pillKg.className = 'px-2.5 py-1 rounded-lg text-slate-400';
+      } else {
+        pillKg.className = 'px-2.5 py-1 rounded-lg bg-limeform-400 text-forest-950 font-bold';
+        pillLbs.className = 'px-2.5 py-1 rounded-lg text-slate-400';
+      }
+
+      document.getElementById('cfgEstModeSelect').value = state.estimationMode;
+      document.getElementById('cfgRollingWindow').value = state.rollingWindow;
+      document.getElementById('gdocUrlInput').value = state.gdoc.url || '';
+      document.getElementById('gdocBridgeCredentialInput').value = state.gdoc.credential || '';
+
+      const statusBadge = document.getElementById('userPageDocStatusBadge');
+      if (state.gdoc.isLoggedIn && state.gdoc.url) {
+        statusBadge.textContent = '● Linked';
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-limeform-400/15 text-limeform-400';
+      } else {
+        statusBadge.textContent = '○ Unlinked';
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-rose-500/15 text-rose-300';
+      }
+    }
+
+    function renderTodayScreen() {
+      const u = getUnitStr();
+      const heroSel = document.getElementById('todayHeroLiftSelect');
+      const curId = heroSel.value || 'ex_bench';
+      heroSel.innerHTML = state.exercises.map(ex =>
+        `<option value="${ex.id}" ${ex.id === curId ? 'selected' : ''}>${ex.name}</option>`
+      ).join('');
+
+      const ex = getExerciseById(heroSel.value || 'ex_bench');
+      const valDisp = Math.round(toDisplayWeight(getExerciseE1RmLbs(ex)));
+      document.getElementById('todayHero1RmValue').textContent = valDisp;
+      document.getElementById('todayHeroUnit').textContent = ex.laterality === 'unilateral' ? `${u}/side` : u;
+      document.getElementById('todayHeroLiftName').textContent = ex.name;
+
+      const hist = (ex.history && ex.history.length > 1) ? ex.history : [190, 198, 204, 211];
+      const minV = Math.min(...hist) * 0.96;
+      const maxV = Math.max(...hist) * 1.02 || 1;
+      const pts = hist.map((v, i) => {
+        const x = 10 + (i / (hist.length - 1)) * 120;
+        const y = 52 - ((v - minV) / (maxV - minV)) * 42;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+      const lastPt = pts[pts.length - 1].split(',');
+      const areaPts = `10,55 ${pts.join(' ')} ${lastPt[0]},55`;
+      document.getElementById('todayMiniSparkline').innerHTML = `
+        <line x1="10" y1="15" x2="130" y2="15" stroke="#26352a" stroke-width="1" />
+        <line x1="10" y1="35" x2="130" y2="35" stroke="#26352a" stroke-width="1" />
+        <line x1="10" y1="55" x2="130" y2="55" stroke="#26352a" stroke-width="1" />
+        <polygon points="${areaPts}" fill="rgba(188, 224, 93, 0.14)" />
+        <polyline fill="none" stroke="#bce05d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts.join(' ')}" />
+        <circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="4" fill="#bce05d" />
+      `;
+
+      document.getElementById('todaySessionTitleText').textContent = state.sessionTitle || 'Upper / push';
+      const names = state.activeSessionExercises.slice(0, 3).map(b => {
+        const e = getExerciseById(b.exerciseId);
+        const sc = getScheme(b.schemeId);
+        return `${e.name.split(' ')[0]} (${sc.shortTag})`;
+      });
+      document.getElementById('todayUpNextSub').textContent = names.join(' · ');
+    }
+
+    // 02 LOG WORKOUT SCREEN (Pure distraction-free logging!)
+    function renderWorkoutScreen() {
+      const container = document.getElementById('activeWorkoutExercisesList');
+      const u = getUnitStr();
+      document.getElementById('workoutLoggerHeaderTitle').textContent = state.sessionTitle || 'Upper / push';
+
+      if (!state.activeSessionExercises || state.activeSessionExercises.length === 0) {
+        buildProgramSession();
+      }
+
+      container.innerHTML = state.activeSessionExercises.map((block, bIdx) => {
+        const ex = getExerciseById(block.exerciseId);
+        const sc = getScheme(block.schemeId);
+        const isBw = ex.type === 'bodyweight';
+        const isUni = ex.laterality === 'unilateral';
+        const cur1RmLbs = getExerciseE1RmLbs(ex);
+
+        const setsRowsHtml = block.sets.map((s, sIdx) => {
+          const numStr = String(sIdx + 1).padStart(2, '0');
+          const countIn1Rm = s.includeIn1Rm !== false;
+          return `
+            <div class="grid grid-cols-12 items-center py-2.5 border-t border-forest-750/80 text-xs">
+              <div class="col-span-2 flex items-center gap-1 font-mono text-slate-400">
+                <button type="button" data-block="${bIdx}" data-set="${sIdx}" class="del-set-btn text-slate-600 hover:text-rose-400 pr-0.5" title="Remove set">×</button>
+                <span>${numStr}</span>
+              </div>
+              <div class="col-span-3 flex justify-center">
+                <div class="flex items-center bg-forest-850 border border-forest-700 rounded-xl px-2 py-1.5 w-20 justify-center">
+                  ${isBw ? `<span class="text-[10px] text-slate-400 mr-0.5">+</span>` : ''}
+                  <input type="number" step="0.5" data-block="${bIdx}" data-set="${sIdx}" data-field="actualWeight"
+                    value="${toDisplayWeight(s.actualExternalLbs)}"
+                    class="workout-set-input w-full bg-transparent text-center font-mono text-white font-semibold focus:outline-none" />
+                </div>
+              </div>
+              <div class="col-span-3 flex justify-center">
+                <div class="flex items-center bg-forest-850 border border-forest-700 rounded-xl px-2 py-1.5 w-16 justify-center">
+                  <input type="number" step="1" min="1" max="50" data-block="${bIdx}" data-set="${sIdx}" data-field="actualReps"
+                    value="${s.actualReps}"
+                    class="workout-set-input w-full bg-transparent text-center font-mono text-white font-semibold focus:outline-none" />
+                </div>
+              </div>
+              <div class="col-span-2 flex justify-center">
+                <button type="button" data-block="${bIdx}" data-set="${sIdx}"
+                  class="toggle-set-1rm-btn px-2 py-1 rounded-lg text-[10px] font-mono transition ${
+                    countIn1Rm ? 'text-slate-300 bg-forest-850' : 'text-amber-300 bg-amber-950/40'
+                  }" title="Tap to toggle off-day mode (logs set without changing your 1RM)">
+                  ${countIn1Rm ? `${s.prescribedPctOf1Rm}%` : 'Off'}
+                </button>
+              </div>
+              <div class="col-span-2 flex justify-end">
+                <button type="button" data-block="${bIdx}" data-set="${sIdx}"
+                  class="toggle-set-done-btn w-9 h-9 rounded-xl flex items-center justify-center transition ${
+                    s.completed
+                      ? 'bg-limeform-400 text-forest-950 font-bold shadow'
+                      : 'bg-forest-850 border border-forest-700 text-slate-400 hover:text-white'
+                  }">
+                  ✓
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="form-card p-5 space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="text-lg font-bold text-white">${ex.name}</div>
+                <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 mt-0.5">
+                  <span>${ex.secondary}</span>
+                  <span class="px-2 py-0.5 rounded-md bg-plum-800 text-plum-300 text-[10px] font-semibold">${sc.shortTag}</span>
+                  ${isUni ? `<span class="px-2 py-0.5 rounded-md bg-forest-800 text-limeform-400 text-[10px]">Per side</span>` : ''}
+                </div>
+              </div>
+              <button type="button" data-block="${bIdx}" class="open-swap-modal-btn w-9 h-9 rounded-xl bg-forest-850 border border-forest-700 flex items-center justify-center text-slate-300 hover:text-white" title="Swap movement">
+                ⇄
+              </button>
+            </div>
+
+            <div class="grid grid-cols-12 text-[10px] font-mono uppercase tracking-wider text-slate-400 pt-2">
+              <div class="col-span-2">SET</div>
+              <div class="col-span-3 text-center">${isBw ? `+${u.toUpperCase()}` : (isUni ? `${u.toUpperCase()}/SIDE` : u.toUpperCase())}</div>
+              <div class="col-span-3 text-center">REPS</div>
+              <div class="col-span-2 text-center">1RM</div>
+              <div class="col-span-2 text-right">LOG</div>
+            </div>
+
+            <div>${setsRowsHtml}</div>
+
+            <div class="form-subcard px-3.5 py-2.5 flex items-center justify-between text-xs">
+              <div class="text-slate-300">
+                Est. 1RM <strong class="text-white font-mono">${toDisplayWeight(cur1RmLbs)} ${isUni ? `${u}/side` : u}</strong>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" data-block="${bIdx}" class="add-set-btn px-2.5 py-1 rounded-lg bg-forest-800 hover:bg-forest-700 text-slate-200">+ Set</button>
+                <button type="button" data-block="${bIdx}" class="add-drop-btn px-2.5 py-1 rounded-lg bg-forest-800 hover:bg-forest-700 text-limeform-400">+ Drop</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('.workout-set-input').forEach(inp => {
+        inp.addEventListener('change', e => {
+          const bIdx = parseInt(e.target.getAttribute('data-block'), 10);
+          const sIdx = parseInt(e.target.getAttribute('data-set'), 10);
+          const f = e.target.getAttribute('data-field');
+          const setObj = state.activeSessionExercises[bIdx].sets[sIdx];
+          if (f === 'actualWeight') setObj.actualExternalLbs = fromDisplayWeight(e.target.value);
+          else setObj.actualReps = parseInt(e.target.value, 10) || 1;
+          triggerAutoWrite('Updated set input');
+        });
+      });
+
+      container.querySelectorAll('.toggle-set-1rm-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bIdx = parseInt(btn.getAttribute('data-block'), 10);
+          const sIdx = parseInt(btn.getAttribute('data-set'), 10);
+          const setObj = state.activeSessionExercises[bIdx].sets[sIdx];
+          setObj.includeIn1Rm = !(setObj.includeIn1Rm !== false);
+          saveState();
+          renderWorkoutScreen();
+          showToast(setObj.includeIn1Rm ? 'Included in 1RM' : 'Off-day: skipped from 1RM');
+        });
+      });
+
+      container.querySelectorAll('.toggle-set-done-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bIdx = parseInt(btn.getAttribute('data-block'), 10);
+          const sIdx = parseInt(btn.getAttribute('data-set'), 10);
+          const blk = state.activeSessionExercises[bIdx];
+          const setObj = blk.sets[sIdx];
+          const ex = getExerciseById(blk.exerciseId);
+          setObj.completed = !setObj.completed;
+
+          if (setObj.completed && setObj.includeIn1Rm !== false) {
+            const sysLoad = ex.type === 'bodyweight' ? (state.bodyweightLbs + setObj.actualExternalLbs) : setObj.actualExternalLbs;
+            const implied = computeImplied1RmFromSet(sysLoad, setObj.actualReps, setObj.targetRepsNum, setObj.prescribedPctOf1Rm);
+            const rounded = Math.round(implied * 10) / 10;
+            ex.e1rmByGym[state.activeGymId] = rounded;
+            ex.history.push(rounded);
+            if (ex.history.length > 8) ex.history.shift();
+            ex.isNewMovement = false;
+            showToast(`Logged · 1RM ${toDisplayWeight(rounded)} ${u} (Auto-synced)`);
+          } else if (setObj.completed) {
+            showToast(`Logged (Off-day · 1RM unchanged)`);
+          }
+          renderAll();
+          triggerAutoWrite(`Logged set on ${ex.name}`);
+        });
+      });
+
+      container.querySelectorAll('.add-set-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bIdx = parseInt(btn.getAttribute('data-block'), 10);
+          const blk = state.activeSessionExercises[bIdx];
+          const last = blk.sets[blk.sets.length - 1];
+          blk.sets.push(Object.assign({}, last, { completed: false }));
+          renderWorkoutScreen();
+          triggerAutoWrite('Added set');
+        });
+      });
+
+      container.querySelectorAll('.add-drop-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bIdx = parseInt(btn.getAttribute('data-block'), 10);
+          const blk = state.activeSessionExercises[bIdx];
+          const ex = getExerciseById(blk.exerciseId);
+          const last = blk.sets[blk.sets.length - 1];
+          const dropLoad = snapLoadLbs((last ? last.actualExternalLbs : 100) * 0.8, ex);
+          const dropPct = Math.round((last ? last.prescribedPctOf1Rm : 75) * 0.8);
+          blk.sets.push({
+            prescribedPctOf1Rm: dropPct,
+            actualExternalLbs: dropLoad,
+            targetRepsNum: 10,
+            actualReps: 10,
+            includeIn1Rm: true,
+            completed: false
+          });
+          renderWorkoutScreen();
+          triggerAutoWrite('Added drop set');
+        });
+      });
+
+      container.querySelectorAll('.del-set-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bIdx = parseInt(btn.getAttribute('data-block'), 10);
+          const sIdx = parseInt(btn.getAttribute('data-set'), 10);
+          const blk = state.activeSessionExercises[bIdx];
+          if (blk.sets.length > 1) {
+            blk.sets.splice(sIdx, 1);
+            renderWorkoutScreen();
+            triggerAutoWrite('Removed set');
+          }
+        });
+      });
+
+      container.querySelectorAll('.open-swap-modal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          openSwapExerciseModal(parseInt(btn.getAttribute('data-block'), 10));
+        });
+      });
+    }
+
+    // =========================================================================
+    // 03 PROGRESS SCREEN (1RM CHART + REMOVE 1RM POINTS & SESSION RECORDS)
+    // =========================================================================
+    let e1rmChartInstance = null;
+
+    function renderProgressScreen() {
+      const u = getUnitStr();
+      const cat = state.progressCategory || 'free';
+
+      document.querySelectorAll('.prog-cat-btn').forEach(b => {
+        if (b.getAttribute('data-prog-cat') === cat) {
+          b.className = 'prog-cat-btn py-2 rounded-xl bg-forest-900 text-white shadow';
+        } else {
+          b.className = 'prog-cat-btn py-2 rounded-xl text-slate-400 hover:text-white';
+        }
+      });
+
+      const pool = state.exercises.filter(ex => {
+        if (cat === 'bodyweight') return ex.type === 'bodyweight';
+        if (cat === 'machine') return ex.type === 'machine' || ex.type === 'cable';
+        return ex.type === 'barbell' || ex.type === 'dumbbell';
+      });
+      const list = pool.length > 0 ? pool : state.exercises;
+
+      const sel = document.getElementById('labExerciseSelect');
+      const curId = list.some(e => e.id === sel.value) ? sel.value : list[0].id;
+      sel.innerHTML = list.map(ex =>
+        `<option value="${ex.id}" ${ex.id === curId ? 'selected' : ''} class="bg-forest-900">${ex.name} · Estimated 1RM</option>`
+      ).join('');
+
+      const ex = getExerciseById(curId);
+      const valDisp = Math.round(toDisplayWeight(getExerciseE1RmLbs(ex)));
+      document.getElementById('progressBig1Rm').textContent = valDisp;
+      document.getElementById('progressBigUnit').textContent = ex.laterality === 'unilateral' ? `${u}/side` : u;
+      document.getElementById('labDirect1RmInput').value = toDisplayWeight(getExerciseE1RmLbs(ex));
+      document.getElementById('progressWindowToggleBtn').textContent = state.rollingWindow === 'weekly' ? '7 days' : '4 weeks';
+
+      // Render removable 1RM data points
+      const ptsContainer = document.getElementById('lift1RmPointsList');
+      const histArr = Array.isArray(ex.history) ? ex.history : [getExerciseE1RmLbs(ex)];
+      ptsContainer.innerHTML = histArr.map((valLbs, idx) => `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-forest-850 border border-forest-700 text-xs font-mono text-slate-200">
+          <span>W${idx + 1}: ${toDisplayWeight(valLbs)} ${u}</span>
+          ${histArr.length > 1 ? `<button type="button" data-del-pt-idx="${idx}" class="del-1rm-pt-btn text-slate-400 hover:text-rose-400 font-bold">×</button>` : ''}
+        </span>
+      `).join('');
+
+      ptsContainer.querySelectorAll('.del-1rm-pt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ptIdx = parseInt(btn.getAttribute('data-del-pt-idx'), 10);
+          if (ex.history && ex.history.length > 1) {
+            ex.history.splice(ptIdx, 1);
+            ex.e1rmByGym[state.activeGymId] = ex.history[ex.history.length - 1];
+            refreshActiveSessionWeights();
+            renderAll();
+            triggerAutoWrite(`Removed 1RM record on ${ex.name}`);
+            showToast('Removed 1RM record');
+          }
+        });
+      });
+
+      // Render removable workout session history logs
+      const recContainer = document.getElementById('sessionHistoryRecordsList');
+      if (!state.workoutHistory || state.workoutHistory.length === 0) {
+        recContainer.innerHTML = `<div class="form-card p-4 text-xs text-slate-400">No session records yet.</div>`;
+      } else {
+        recContainer.innerHTML = state.workoutHistory.map((rec, rIdx) => `
+          <div class="form-card p-3.5 flex items-center justify-between gap-2 text-xs">
+            <div class="min-w-0">
+              <div class="font-bold text-white">${rec.program} <span class="text-slate-400 font-normal">· ${rec.date} (${rec.gym})</span></div>
+              <div class="text-slate-400 truncate mt-0.5">${rec.summary}</div>
+            </div>
+            <button type="button" data-del-rec="${rIdx}" class="del-session-rec-btn px-2.5 py-1 rounded-lg bg-rose-950/50 border border-rose-500/30 text-rose-300 hover:bg-rose-900/40 shrink-0">
+              Remove
+            </button>
+          </div>
+        `).join('');
+
+        recContainer.querySelectorAll('.del-session-rec-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const rIdx = parseInt(btn.getAttribute('data-del-rec'), 10);
+            state.workoutHistory.splice(rIdx, 1);
+            renderAll();
+            triggerAutoWrite('Removed session record');
+            showToast('Removed session record');
+          });
+        });
+      }
+
+      // Update Chart.js
+      const ctx = document.getElementById('e1rmHistoryChart');
+      if (ctx && window.Chart) {
+        const rawHist = histArr.slice(-6);
+        const dataPts = rawHist.map(v => Math.round(toDisplayWeight(v)));
+        const labels = dataPts.map((_, i) => `W${i + 1}`);
+
+        if (e1rmChartInstance) {
+          e1rmChartInstance.data.labels = labels;
+          e1rmChartInstance.data.datasets[0].data = dataPts;
+          e1rmChartInstance.update();
+        } else {
+          e1rmChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                data: dataPts,
+                borderColor: '#bce05d',
+                backgroundColor: 'rgba(188, 224, 93, 0.14)',
+                borderWidth: 3,
+                pointBackgroundColor: '#bce05d',
+                pointRadius: 4,
+                fill: true,
+                tension: 0.25
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: '#8c9c90', font: { size: 11 } }, grid: { display: false } },
+                y: { ticks: { color: '#8c9c90', font: { size: 11 }, maxTicksLimit: 4 }, grid: { color: 'rgba(41, 58, 47, 0.6)' } }
+              }
+            }
+          });
+        }
+      }
+    }
+
+    // =========================================================================
+    // 04 WORKOUT SETUP SCREEN (CONFIGURE EXERCISES, PROGRAMS, SETS & REPS)
+    // =========================================================================
+    function renderWorkoutSetupScreen() {
+      const u = getUnitStr();
+      document.getElementById('setupSessionNameInput').value = state.sessionTitle || 'Upper / push';
+
+      const setupList = document.getElementById('workoutSetupExercisesList');
+      setupList.innerHTML = state.activeSessionExercises.map((block, bIdx) => {
+        const ex = getExerciseById(block.exerciseId);
+        const sc = getScheme(block.schemeId);
+        const isUni = ex.laterality === 'unilateral';
+        const cur1RmLbs = getExerciseE1RmLbs(ex);
+        const firstSet = block.sets[0] || { targetRepsNum: sc.refReps, prescribedPctOf1Rm: sc.refPctOf1Rm };
+
+        const exOptions = state.exercises.map(item =>
+          `<option value="${item.id}" ${item.id === ex.id ? 'selected' : ''} class="bg-forest-900">${item.name}</option>`
+        ).join('');
+
+        const schemeOptions = Object.values(SCHEME_CATALOG).map(sOpt =>
+          `<option value="${sOpt.id}" ${sOpt.id === block.schemeId ? 'selected' : ''} class="bg-forest-900">${sOpt.name}</option>`
+        ).join('');
+
+        return `
+          <div class="form-card p-4 space-y-3 text-xs">
+            <div class="flex items-center justify-between gap-2">
+              <select data-setup-block="${bIdx}" class="setup-ex-select bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-sm font-bold text-white flex-1">
+                ${exOptions}
+              </select>
+              <button type="button" data-setup-block="${bIdx}" class="setup-remove-ex-btn w-8 h-8 rounded-xl bg-forest-850 text-slate-400 hover:text-rose-400" title="Remove exercise">
+                ✕
+              </button>
+            </div>
+
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">Program scheme for this movement</label>
+              <select data-setup-block="${bIdx}" class="setup-scheme-select w-full bg-forest-900 border border-forest-700 rounded-xl px-3 py-2 text-limeform-400 font-semibold">
+                ${schemeOptions}
+              </select>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-1">
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-1">Sets</label>
+                <input type="number" min="1" max="15" data-setup-block="${bIdx}" value="${block.sets.length}"
+                  class="setup-sets-input w-full bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 font-mono text-white text-center font-bold" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-1">Reps / set</label>
+                <input type="number" min="1" max="30" data-setup-block="${bIdx}" value="${firstSet.targetRepsNum || 8}"
+                  class="setup-reps-input w-full bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 font-mono text-white text-center font-bold" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-1">Direct 1RM (${isUni ? `${u}/side` : u})</label>
+                <input type="number" step="2.5" data-setup-block="${bIdx}" data-ex-id="${ex.id}" value="${toDisplayWeight(cur1RmLbs)}"
+                  class="setup-1rm-input w-full bg-forest-900 border border-limeform-400/50 rounded-xl px-2.5 py-1.5 font-mono text-limeform-400 text-center font-bold" />
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      setupList.querySelectorAll('.setup-ex-select').forEach(sel => {
+        sel.addEventListener('change', e => {
+          const bIdx = parseInt(e.target.getAttribute('data-setup-block'), 10);
+          const newEx = getExerciseById(e.target.value);
+          state.activeSessionExercises[bIdx] = createSessionBlock(newEx.id, newEx.defaultScheme);
+          renderAll();
+          triggerAutoWrite('Changed workout setup movement');
+        });
+      });
+
+      setupList.querySelectorAll('.setup-scheme-select').forEach(sel => {
+        sel.addEventListener('change', e => {
+          const bIdx = parseInt(e.target.getAttribute('data-setup-block'), 10);
+          const scId = e.target.value;
+          const blk = state.activeSessionExercises[bIdx];
+          const ex = getExerciseById(blk.exerciseId);
+          ex.defaultScheme = scId;
+          state.activeSessionExercises[bIdx] = createSessionBlock(ex.id, scId);
+          renderAll();
+          triggerAutoWrite(`Changed ${ex.name} scheme to ${getScheme(scId).shortTag}`);
+          showToast(`${ex.name} → ${getScheme(scId).shortTag}`);
+        });
+      });
+
+      setupList.querySelectorAll('.setup-sets-input').forEach(inp => {
+        inp.addEventListener('change', e => {
+          const bIdx = parseInt(e.target.getAttribute('data-setup-block'), 10);
+          const blk = state.activeSessionExercises[bIdx];
+          const newCount = Math.max(1, parseInt(e.target.value, 10) || 3);
+          state.activeSessionExercises[bIdx] = createSessionBlock(blk.exerciseId, blk.schemeId, newCount, blk.customReps, blk.customPct);
+          renderAll();
+          triggerAutoWrite('Updated set count');
+        });
+      });
+
+      setupList.querySelectorAll('.setup-reps-input').forEach(inp => {
+        inp.addEventListener('change', e => {
+          const bIdx = parseInt(e.target.getAttribute('data-setup-block'), 10);
+          const blk = state.activeSessionExercises[bIdx];
+          const newReps = Math.max(1, parseInt(e.target.value, 10) || 8);
+          state.activeSessionExercises[bIdx] = createSessionBlock(blk.exerciseId, blk.schemeId, blk.sets.length, newReps, blk.customPct);
+          renderAll();
+          triggerAutoWrite('Updated target reps');
+        });
+      });
+
+      setupList.querySelectorAll('.setup-1rm-input').forEach(inp => {
+        inp.addEventListener('change', e => {
+          const ex = getExerciseById(e.target.getAttribute('data-ex-id'));
+          const bIdx = parseInt(e.target.getAttribute('data-setup-block'), 10);
+          const new1Rm = Math.max(10, fromDisplayWeight(e.target.value));
+          ex.e1rmByGym[state.activeGymId] = new1Rm;
+          ex.history.push(new1Rm);
+          const blk = state.activeSessionExercises[bIdx];
+          state.activeSessionExercises[bIdx] = createSessionBlock(ex.id, blk.schemeId, blk.sets.length, blk.customReps, blk.customPct);
+          renderAll();
+          triggerAutoWrite(`Updated ${ex.name} direct 1RM`);
+        });
+      });
+
+      setupList.querySelectorAll('.setup-remove-ex-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bIdx = parseInt(btn.getAttribute('data-setup-block'), 10);
+          if (state.activeSessionExercises.length > 1) {
+            state.activeSessionExercises.splice(bIdx, 1);
+            renderAll();
+            triggerAutoWrite('Removed movement from workout setup');
+          } else {
+            showToast('Keep at least 1 movement in workout');
+          }
+        });
+      });
+
+      // Render Rhythm Templates
+      const grid = document.getElementById('programCardsGrid');
+      grid.innerHTML = state.programs.map(p => {
+        const isCurrent = p.id === state.activeProgramId;
+        return `
+          <div data-prog-id="${p.id}" class="${isCurrent ? 'form-card-active' : 'form-card'} p-4 cursor-pointer flex items-center justify-between transition">
+            <div>
+              <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${isCurrent ? 'bg-limeform-400 text-forest-950' : 'bg-plum-800 text-plum-300'}">${p.tag}</span>
+              <div class="font-display text-lg font-bold text-white mt-1">${p.name}</div>
+              <div class="text-xs text-slate-400">${p.sub1}</div>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-forest-850 border border-forest-700 flex items-center justify-center text-limeform-400">↗</div>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('[data-prog-id]').forEach(card => {
+        card.addEventListener('click', () => {
+          const pid = card.getAttribute('data-prog-id');
+          state.activeProgramId = pid;
+          const progObj = state.programs.find(x => x.id === pid);
+          if (progObj && progObj.schemeApply) {
+            state.activeSessionExercises = state.activeSessionExercises.map(b =>
+              createSessionBlock(b.exerciseId, progObj.schemeApply)
+            );
+          }
+          renderAll();
+          triggerAutoWrite(`Applied template ${progObj.name}`);
+          showToast(`Applied ${progObj.name} to setup`);
+        });
+      });
+    }
+
+    // =========================================================================
+    // 05 YOUR GYMS SCREEN (WORKING ADD GYM + REMOVE GYM)
+    // =========================================================================
+    function renderGymsScreen() {
+      const u = getUnitStr();
+      const gymList = document.getElementById('gymProfilesList');
+      gymList.innerHTML = state.gyms.map(g => {
+        const isCurrent = g.id === state.activeGymId;
+        return `
+          <div data-gym-id="${g.id}" class="${isCurrent ? 'form-card-active' : 'form-card'} p-4 cursor-pointer flex items-center justify-between transition">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-forest-850 border border-forest-700 flex items-center justify-center text-slate-300">
+                🏢
+              </div>
+              <div>
+                <div class="text-sm font-bold text-white">${g.name}</div>
+                <div class="text-xs text-slate-400">Bar ${toDisplayWeight(g.barStepLbs)} ${u} · Machine ${toDisplayWeight(g.machineStepLbs)} ${u} · Cable ${toDisplayWeight(g.cableStepLbs)} ${u}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              ${state.gyms.length > 1 ? `<button type="button" data-del-gym="${g.id}" class="del-gym-btn px-2 py-1 rounded text-xs text-slate-500 hover:text-rose-400" title="Remove gym">✕</button>` : ''}
+              <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center ${isCurrent ? 'border-limeform-400' : 'border-slate-500'}">
+                ${isCurrent ? `<div class="w-2.5 h-2.5 rounded-full bg-limeform-400"></div>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      gymList.querySelectorAll('[data-gym-id]').forEach(card => {
+        card.addEventListener('click', () => {
+          state.activeGymId = card.getAttribute('data-gym-id');
+          refreshActiveSessionWeights();
+          renderAll();
+          triggerAutoWrite(`Switched gym to ${getActiveGym().name}`);
+          showToast(`Active gym: ${getActiveGym().name}`);
+        });
+      });
+
+      gymList.querySelectorAll('.del-gym-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const gId = btn.getAttribute('data-del-gym');
+          if (state.gyms.length > 1) {
+            state.gyms = state.gyms.filter(g => g.id !== gId);
+            if (state.activeGymId === gId) state.activeGymId = state.gyms[0].id;
+            refreshActiveSessionWeights();
+            renderAll();
+            triggerAutoWrite('Removed gym profile');
+            showToast('Removed gym profile');
+          }
+        });
+      });
+
+      document.getElementById('equipmentActiveGymLabel').textContent = getActiveGym().name;
+      const eqList = document.getElementById('equipmentProfileCardsList');
+      const machExercises = state.exercises.filter(e => e.type === 'cable' || e.type === 'machine');
+      eqList.innerHTML = machExercises.map((ex, idx) => `
+        <div class="form-card p-4 flex items-center justify-between">
+          <div class="space-y-1">
+            <span class="px-2.5 py-0.5 rounded-md bg-plum-800 text-plum-300 text-[10px] font-semibold uppercase">
+              ${ex.type.toUpperCase()} 0${idx + 1}
+            </span>
+            <div class="text-base font-bold text-white pt-0.5">${ex.name}</div>
+            <div class="text-xs text-slate-400">${ex.secondary}</div>
+          </div>
+          <div class="text-right space-y-1">
+            <div class="text-[10px] text-slate-400">Gym 1RM (${u})</div>
+            <input type="number" step="2.5" data-eq-ex="${ex.id}" value="${toDisplayWeight(getExerciseE1RmLbs(ex))}"
+              class="eq-1rm-input w-20 bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1 text-right font-mono text-white font-bold text-xs" />
+          </div>
+        </div>
+      `).join('');
+
+      eqList.querySelectorAll('.eq-1rm-input').forEach(inp => {
+        inp.addEventListener('change', e => {
+          const ex = getExerciseById(e.target.getAttribute('data-eq-ex'));
+          const valLbs = Math.max(10, fromDisplayWeight(e.target.value));
+          ex.e1rmByGym[state.activeGymId] = valLbs;
+          ex.history.push(valLbs);
+          refreshActiveSessionWeights();
+          renderAll();
+          triggerAutoWrite(`Updated ${ex.name} equipment 1RM`);
+        });
+      });
+    }
+
+    // =========================================================================
+    // 06 SETTINGS: ESTIMATOR & GOOGLE SHEET HUB
+    // =========================================================================
+    function renderEquivalenceEstimator() {
+      const muscleFilter = document.getElementById('equivMuscleFilter').value;
+      const latFilter = document.getElementById('equivLateralityFilter').value;
+      const discountEl = document.getElementById('equivNewLiftDiscountSelect');
+      state.newMovementDiscountPct = parseInt(discountEl.value, 10) || 0;
+      const newFactor = 1 - (state.newMovementDiscountPct / 100);
+      const u = getUnitStr();
+
+      const matching = state.exercises.filter(ex => muscleFilter === 'ALL' || ex.muscle === muscleFilter);
+      const pool = matching.length > 0 ? matching : state.exercises;
+
+      const anchorSel = document.getElementById('equivAnchorSelect');
+      const curAnchorId = pool.some(e => e.id === anchorSel.value) ? anchorSel.value : pool[0].id;
+      anchorSel.innerHTML = pool.map(ex =>
+        `<option value="${ex.id}" ${ex.id === curAnchorId ? 'selected' : ''} class="bg-forest-900">${ex.name}</option>`
+      ).join('');
+
+      const anchorEx = getExerciseById(curAnchorId);
+      const bilateralBase1Rm = getExerciseE1RmLbs(anchorEx) / (anchorEx.carryoverFactor || 1.0);
+
+      const filtered = pool.filter(ex => latFilter === 'ALL' || ex.laterality === latFilter);
+      const grid = document.getElementById('equivalenceCardsGrid');
+
+      grid.innerHTML = filtered.map(ex => {
+        const isUni = ex.laterality === 'unilateral';
+        const suffix = isUni ? `${u}/side` : u;
+        const full1Rm = bilateralBase1Rm * (ex.carryoverFactor || (isUni ? 0.42 : 0.88));
+        const start1Rm = ex.id === anchorEx.id ? full1Rm : full1Rm * newFactor;
+        const sc = getScheme(ex.defaultScheme);
+        const startWorkLoad = snapLoadLbs(start1Rm * (sc.refPctOf1Rm / 100), ex);
+
+        return `
+          <div class="form-subcard p-3.5 flex items-center justify-between gap-3">
+            <div class="space-y-0.5 min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-plum-800 text-plum-300 text-[9px] font-semibold uppercase">
+                  ${isUni ? 'Unilateral · Side' : 'Bilateral'}
+                </span>
+                ${ex.id !== anchorEx.id && state.newMovementDiscountPct > 0 ? `<span class="text-[10px] text-limeform-400">−${state.newMovementDiscountPct}% new</span>` : ''}
+              </div>
+              <div class="text-xs font-bold text-white truncate">${ex.name}</div>
+              <div class="text-[11px] text-slate-400">
+                Start ${sc.shortTag}: <strong class="text-limeform-400">${toDisplayWeight(startWorkLoad)} ${suffix}</strong> · 1RM ${toDisplayWeight(start1Rm)} ${suffix}
+              </div>
+            </div>
+            <button type="button" data-ex-id="${ex.id}" class="quick-add-est-btn w-8 h-8 rounded-full bg-limeform-400 text-forest-950 font-bold shrink-0">
+              +
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.quick-add-est-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ex = getExerciseById(btn.getAttribute('data-ex-id'));
+          ex.isNewMovement = true;
+          state.activeSessionExercises.push(createSessionBlock(ex.id, ex.defaultScheme));
+          renderAll();
+          triggerAutoWrite(`Added ${ex.name} from estimator`);
+          showToast(`Added ${ex.name} to workout`);
+        });
+      });
+    }
+
+    function renderGoogleDocHub() {
+      const logBox = document.getElementById('gdocSyncActivityLog');
+      if (logBox && Array.isArray(state.gdoc.logs)) {
+        logBox.innerHTML = state.gdoc.logs.map(l => `<div>${l}</div>`).join('');
+      }
+      const ta = document.getElementById('gdocLiveEditorTextarea');
+      if (ta) {
+        const u = getUnitStr();
+        ta.value = state.exercises.map(ex => {
+          const sc = getScheme(ex.defaultScheme);
+          return `${ex.name}\t${sc.shortTag}\t1RM: ${toDisplayWeight(getExerciseE1RmLbs(ex))} ${u}`;
+        }).join('\n');
+      }
+    }
+
+    // =========================================================================
+    // SWAP MODAL & ONBOARDING
+    // =========================================================================
+    let activeSwapBlockIdx = 0;
+
+    function openSwapExerciseModal(bIdx) {
+      activeSwapBlockIdx = bIdx;
+      const blk = state.activeSessionExercises[bIdx];
+      const curEx = getExerciseById(blk.exerciseId);
+      const baseBilateral = getExerciseE1RmLbs(curEx) / (curEx.carryoverFactor || 1.0);
+      const newFactor = 1 - ((state.newMovementDiscountPct || 15) / 100);
+      const u = getUnitStr();
+
+      const candidates = state.exercises.filter(e => e.id !== curEx.id).sort((a, b) => {
+        const sA = (a.muscle === curEx.muscle ? 2 : 0) + (a.pattern === curEx.pattern ? 1 : 0);
+        const sB = (b.muscle === curEx.muscle ? 2 : 0) + (b.pattern === curEx.pattern ? 1 : 0);
+        return sB - sA;
+      });
+
+      const listEl = document.getElementById('swapOptionsList');
+      listEl.innerHTML = candidates.map(cand => {
+        const isUni = cand.laterality === 'unilateral';
+        const suffix = isUni ? `${u}/side` : u;
+        const rawEst = (cand.muscle === curEx.muscle || cand.pattern === curEx.pattern)
+          ? baseBilateral * (cand.carryoverFactor || (isUni ? 0.42 : 0.88))
+          : getExerciseE1RmLbs(cand);
+        const start1Rm = cand.isNewMovement ? rawEst * newFactor : rawEst;
+        const work8 = snapLoadLbs(start1Rm * 0.75, cand);
+
+        return `
+          <div class="form-card p-3.5 flex items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-white">${cand.name}</span>
+                <span class="px-1.5 py-0.5 rounded bg-plum-800 text-plum-300 text-[9px] uppercase">${isUni ? 'Per side' : 'Bilateral'}</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5">
+                Start load: <strong class="text-limeform-400">${toDisplayWeight(work8)} ${suffix}</strong> ${cand.isNewMovement ? `(−${state.newMovementDiscountPct}% new)` : ''}
+              </div>
+            </div>
+            <button type="button" data-swap-id="${cand.id}" class="confirm-swap-btn px-3 py-1.5 rounded-xl bg-limeform-400 text-forest-950 font-bold text-xs">
+              Swap
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      listEl.querySelectorAll('.confirm-swap-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const newEx = getExerciseById(btn.getAttribute('data-swap-id'));
+          state.activeSessionExercises[activeSwapBlockIdx] = createSessionBlock(newEx.id, blk.schemeId);
+          document.getElementById('swapExerciseModal').classList.add('hidden');
+          renderAll();
+          triggerAutoWrite(`Swapped to ${newEx.name}`);
+          showToast(`Swapped to ${newEx.name}`);
+        });
+      });
+
+      document.getElementById('swapExerciseModal').classList.remove('hidden');
+    }
+
+    const BENCHMARK_ONBOARD_IDS = [
+      { id: 'ex_bench', scheme: 'normal_3x8' },
+      { id: 'ex_pullups', scheme: 'wendler_bbb' },
+      { id: 'ex_squat', scheme: 'prilepin_optimal' },
+      { id: 'ex_deadlift', scheme: 'gzclp_t1' }
+    ];
+
+    function renderOnboardingModalTable() {
+      const u = getUnitStr();
+      const container = document.getElementById('onboardingMovementsTableBody');
+      document.getElementById('onboardUnitSelect').value = state.unit;
+      document.getElementById('onboardBwInput').value = toDisplayWeight(state.bodyweightLbs);
+      document.getElementById('onboardGymNameInput').value = getActiveGym().name || 'General';
+
+      container.innerHTML = BENCHMARK_ONBOARD_IDS.map(item => {
+        const ex = getExerciseById(item.id);
+        const sc = getScheme(ex.defaultScheme || item.scheme);
+        const isBw = ex.type === 'bodyweight';
+        const cur1RmLbs = getExerciseE1RmLbs(ex);
+        const workTotal = cur1RmLbs * (sc.refPctOf1Rm / 100);
+        const workExt = isBw ? snapLoadLbs(Math.max(0, workTotal - state.bodyweightLbs), ex) : snapLoadLbs(workTotal, ex);
+
+        const schemeOpts = Object.values(SCHEME_CATALOG).map(s =>
+          `<option value="${s.id}" ${s.id === sc.id ? 'selected' : ''} class="bg-forest-900">${s.name}</option>`
+        ).join('');
+
+        return `
+          <div class="form-card p-3.5 space-y-2 text-xs">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-white">${ex.name}</span>
+              <select data-onboard-ex="${ex.id}" data-onboard-field="scheme" class="onboard-input bg-forest-900 border border-forest-700 rounded-lg px-2 py-1 text-[11px] text-limeform-400">
+                ${schemeOpts}
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">${isBw ? `Added weight (+${u})` : `Working weight (${u})`}</label>
+                <input type="number" step="2.5" data-onboard-ex="${ex.id}" data-onboard-field="weight" value="${toDisplayWeight(workExt)}"
+                  class="onboard-input w-full bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-limeform-400 mb-0.5">Direct 1RM (${u})</label>
+                <input type="number" step="2.5" data-onboard-ex="${ex.id}" data-onboard-field="direct1rm" value="${toDisplayWeight(cur1RmLbs)}"
+                  class="onboard-input w-full bg-forest-900 border border-limeform-400/50 rounded-xl px-2.5 py-1.5 font-mono text-limeform-400 font-bold" />
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('.onboard-input').forEach(inp => {
+        inp.addEventListener('input', e => {
+          const exId = e.target.getAttribute('data-onboard-ex');
+          const field = e.target.getAttribute('data-onboard-field');
+          const bwLbs = Math.max(60, fromDisplayWeight(document.getElementById('onboardBwInput').value || 176));
+          state.bodyweightLbs = bwLbs;
+
+          const ex = getExerciseById(exId);
+          const wEl = container.querySelector(`[data-onboard-ex="${exId}"][data-onboard-field="weight"]`);
+          const dEl = container.querySelector(`[data-onboard-ex="${exId}"][data-onboard-field="direct1rm"]`);
+          const sEl = container.querySelector(`[data-onboard-ex="${exId}"][data-onboard-field="scheme"]`);
+          const sc = getScheme(sEl.value);
+          const pct = sc.refPctOf1Rm / 100;
+          const effBw = ex.type === 'bodyweight' ? bwLbs : 0;
+
+          if (field === 'direct1rm') {
+            const dLbs = fromDisplayWeight(dEl.value);
+            const wLbs = Math.max(0, (dLbs * pct) - effBw);
+            wEl.value = toDisplayWeight(snapLoadLbs(wLbs, ex));
+          } else {
+            const wLbs = fromDisplayWeight(wEl.value);
+            const dLbs = (effBw + wLbs) / pct;
+            dEl.value = toDisplayWeight(dLbs);
+          }
+        });
+      });
+    }
+
+    async function verifyAndInspectGoogleSheet(sheetUrl, bridgeOrToken) {
+      const sheetId = extractGoogleDocId(sheetUrl);
+      const cleanBridge = (bridgeOrToken || '').trim();
+      if (!sheetUrl || !sheetUrl.includes('docs.google.com/spreadsheets/d/')) {
+        return { ok: false, error: 'Enter a valid Google Sheets URL (https://docs.google.com/spreadsheets/d/...).' };
+      }
+      if (!cleanBridge) {
+        return {
+          ok: false,
+          error: `Write access is not connected yet for Sheet (${sheetId.slice(0, 12)}...). Complete the 30-second Extensions → Apps Script Web App step above and paste the /exec URL so form. can read and write to your Sheet.`
+        };
+      }
+      if (cleanBridge.startsWith('https://script.google.com/')) {
+        try {
+          const getResp = await fetch(`${cleanBridge}?sheetUrl=${encodeURIComponent(sheetUrl)}`, { redirect: 'follow' });
+          const rawText = await getResp.text();
+          let data = null;
+          try {
+            data = JSON.parse(rawText);
+          } catch (parseErr) {
+            return {
+              ok: false,
+              error: `Apps Script returned an HTML page instead of JSON (usually means the script needs "Who has access: Anyone" or uses doGet/doPost). Click below to initialize via no-cors POST or update your script.`
+            };
+          }
+
+          // Verify write capability: try standard CORS POST first, and fall back to no-cors POST if sandboxed iframe blocks 302 redirect CORS headers
+          try {
+            await fetch(cleanBridge, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'probe', sheetUrl })
+            });
+          } catch (postCorsErr) {
+            await fetch(cleanBridge, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'probe', sheetUrl })
+            });
+          }
+
+          if (data.isEmpty) return { ok: true, status: 'empty' };
+          if (data.hasKineticData && data.kineticJson) return { ok: true, status: 'compatible', kineticJson: data.kineticJson };
+          return { ok: true, status: 'incompatible', rowCount: data.rowCount || 1 };
+        } catch (err) {
+          return {
+            ok: false,
+            error: `Browser iframe blocked reading response from Apps Script (${err.message}). If your script is deployed with "Who has access: Anyone", click below to send writes via no-cors POST and continue to Step 2.`
+          };
+        }
+      }
+      return { ok: false, error: 'Paste a deployed Google Apps Script Web App URL (https://script.google.com/macros/s/.../exec).' };
+    }
+
+    // =========================================================================
+    // MASTER RENDER & EVENT INIT
+    // =========================================================================
+    function renderAll() {
+      try { renderTopBarAndSettings(); } catch (e) {}
+      try { renderTodayScreen(); } catch (e) {}
+      try { renderWorkoutScreen(); } catch (e) {}
+      try { renderProgressScreen(); } catch (e) {}
+      try { renderWorkoutSetupScreen(); } catch (e) {}
+      try { renderGymsScreen(); } catch (e) {}
+      try { renderEquivalenceEstimator(); } catch (e) {}
+      try { renderGoogleDocHub(); } catch (e) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!state.activeSessionExercises || state.activeSessionExercises.length === 0) {
+        buildProgramSession();
+      }
+      renderAll();
+
+      if (!state.onboardingCompleted || !state.gdoc.isLoggedIn) {
+        renderOnboardingModalTable();
+        document.getElementById('onboardingSetupModal').classList.remove('hidden');
+      }
+
+      // Navigation buttons
+      document.querySelectorAll('.screen-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchScreen(btn.getAttribute('data-screen')));
+      });
+      document.getElementById('brandHomeBtn').addEventListener('click', () => switchScreen('today'));
+      document.getElementById('quickSettingsGearBtn').addEventListener('click', () => switchScreen('settings'));
+      document.getElementById('todayGoProgressBtn').addEventListener('click', () => switchScreen('progress'));
+      document.getElementById('todayUpNextCard').addEventListener('click', () => switchScreen('workout'));
+      document.getElementById('todayEditSetupLink').addEventListener('click', () => switchScreen('programs'));
+      document.getElementById('goToWorkoutSetupBtn').addEventListener('click', () => switchScreen('programs'));
+      document.getElementById('setupGoToLogBtn').addEventListener('click', () => switchScreen('workout'));
+      document.getElementById('todayHeroLiftSelect').addEventListener('change', renderTodayScreen);
+
+      // Session name in Workout Setup
+      document.getElementById('setupSessionNameInput').addEventListener('change', e => {
+        state.sessionTitle = e.target.value.trim() || 'Upper / push';
+        renderAll();
+        triggerAutoWrite('Renamed workout session');
+      });
+
+      // Gym & Bodyweight & Unit controls
+      document.getElementById('globalGymSelect').addEventListener('change', e => {
+        state.activeGymId = e.target.value;
+        refreshActiveSessionWeights();
+        renderAll();
+        triggerAutoWrite(`Switched active gym to ${getActiveGym().name}`);
+      });
+
+      document.getElementById('globalBodyweightInput').addEventListener('change', e => {
+        state.bodyweightLbs = Math.max(60, fromDisplayWeight(e.target.value));
+        refreshActiveSessionWeights();
+        renderAll();
+        triggerAutoWrite('Updated athlete bodyweight');
+      });
+
+      document.getElementById('unitToggleBtn').addEventListener('click', () => {
+        state.unit = state.unit === 'lbs' ? 'kg' : 'lbs';
+        renderAll();
+        triggerAutoWrite(`Switched units to ${state.unit}`);
+      });
+
+      document.getElementById('cfgEstModeSelect').addEventListener('change', e => {
+        state.estimationMode = e.target.value;
+        renderAll();
+        triggerAutoWrite('Changed 1RM source');
+      });
+
+      document.getElementById('cfgRollingWindow').addEventListener('change', e => {
+        state.rollingWindow = e.target.value;
+        refreshActiveSessionWeights();
+        renderAll();
+        triggerAutoWrite('Changed rolling window');
+      });
+
+      // Progress screen controls
+      document.querySelectorAll('.prog-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.progressCategory = btn.getAttribute('data-prog-cat');
+          renderProgressScreen();
+        });
+      });
+
+      document.getElementById('labExerciseSelect').addEventListener('change', renderProgressScreen);
+      document.getElementById('progressWindowToggleBtn').addEventListener('click', () => {
+        state.rollingWindow = state.rollingWindow === 'weekly' ? 'monthly' : 'weekly';
+        refreshActiveSessionWeights();
+        renderAll();
+      });
+
+      document.getElementById('labSaveDirect1RmBtn').addEventListener('click', () => {
+        const ex = getExerciseById(document.getElementById('labExerciseSelect').value);
+        const val = fromDisplayWeight(document.getElementById('labDirect1RmInput').value);
+        if (val > 0) {
+          ex.e1rmByGym[state.activeGymId] = val;
+          ex.history.push(val);
+          refreshActiveSessionWeights();
+          renderAll();
+          triggerAutoWrite(`Set direct 1RM on ${ex.name}`);
+          showToast(`Saved ${ex.name} 1RM`);
+        }
+      });
+
+      // Estimator in Settings
+      ['equivMuscleFilter', 'equivLateralityFilter', 'equivAnchorSelect', 'equivNewLiftDiscountSelect'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', renderEquivalenceEstimator);
+      });
+
+      // Gyms screen: Add Gym Drawer & Save Gym
+      document.getElementById('toggleAddGymDrawerBtn').addEventListener('click', () => {
+        const drawer = document.getElementById('newGymDrawer');
+        drawer.classList.toggle('hidden');
+        if (!drawer.classList.contains('hidden')) {
+          document.getElementById('newGymNameInput').focus();
+        }
+      });
+
+      document.getElementById('addNewGymBtn').addEventListener('click', () => {
+        const rawName = document.getElementById('newGymNameInput').value.trim();
+        const name = rawName || `Gym ${state.gyms.length + 1}`;
+        const newId = 'gym_' + Date.now();
+        state.gyms.push({
+          id: newId,
+          name,
+          barStepLbs: Math.max(0.5, fromDisplayWeight(document.getElementById('newGymBarStep').value || 2.5)),
+          machineStepLbs: Math.max(0.5, fromDisplayWeight(document.getElementById('newGymMachineStep').value || 5)),
+          cableStepLbs: Math.max(0.5, fromDisplayWeight(document.getElementById('newGymCableStep').value || 2.5)),
+          notes: document.getElementById('newGymNotesInput').value.trim() || 'Saved equipment profile'
+        });
+        state.exercises.forEach(ex => { ex.e1rmByGym[newId] = getExerciseE1RmLbs(ex); });
+        state.activeGymId = newId;
+        document.getElementById('newGymNameInput').value = '';
+        document.getElementById('newGymDrawer').classList.add('hidden');
+        refreshActiveSessionWeights();
+        renderAll();
+        triggerAutoWrite(`Added gym ${name}`);
+        showToast(`Added & activated ${name}`);
+      });
+
+      // Modals
+      document.getElementById('closeSwapModalBtn').addEventListener('click', () => {
+        document.getElementById('swapExerciseModal').classList.add('hidden');
+      });
+
+      document.getElementById('openAddExerciseModalBtn').addEventListener('click', () => {
+        document.getElementById('modalAddExerciseSelect').innerHTML = state.exercises.map(e =>
+          `<option value="${e.id}" class="bg-forest-900">${e.name}</option>`
+        ).join('');
+        document.getElementById('modalAddSchemeSelect').innerHTML = Object.values(SCHEME_CATALOG).map(sc =>
+          `<option value="${sc.id}" class="bg-forest-900">${sc.name}</option>`
+        ).join('');
+        document.getElementById('addExerciseModal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeAddExerciseModalBtn').addEventListener('click', () => {
+        document.getElementById('addExerciseModal').classList.add('hidden');
+      });
+
+      document.getElementById('confirmAddExerciseToSessionBtn').addEventListener('click', () => {
+        const exId = document.getElementById('modalAddExerciseSelect').value;
+        const scId = document.getElementById('modalAddSchemeSelect').value;
+        state.activeSessionExercises.push(createSessionBlock(exId, scId));
+        document.getElementById('addExerciseModal').classList.add('hidden');
+        renderAll();
+        triggerAutoWrite('Added movement to workout setup');
+        showToast('Added movement to setup');
+      });
+
+      document.getElementById('openCustomMovementModalBtn').addEventListener('click', () => {
+        document.getElementById('customMovementModal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeCustomMovementModalBtn').addEventListener('click', () => {
+        document.getElementById('customMovementModal').classList.add('hidden');
+      });
+
+      document.getElementById('saveCustomMovementBtn').addEventListener('click', () => {
+        const name = document.getElementById('customExName').value.trim();
+        if (!name) {
+          showToast('Enter a movement name first');
+          return;
+        }
+        const muscle = document.getElementById('customExMuscle').value;
+        const pattern = document.getElementById('customExPattern').value;
+        const laterality = document.getElementById('customExLaterality').value;
+        const type = document.getElementById('customExType').value;
+        const stepLbs = Math.max(0.5, fromDisplayWeight(document.getElementById('customExStep').value));
+        const raw1Rm = document.getElementById('customEx1Rm').value.trim();
+
+        const carryover = laterality === 'unilateral' ? 0.42 : 0.88;
+        let init1RmLbs = 135;
+        if (raw1Rm) {
+          init1RmLbs = fromDisplayWeight(raw1Rm);
+        } else {
+          const ref = state.exercises.find(e => e.muscle === muscle) || state.exercises[0];
+          init1RmLbs = Math.round((getExerciseE1RmLbs(ref) / (ref.carryoverFactor || 1)) * carryover);
+        }
+
+        const newId = 'ex_custom_' + Date.now();
+        const map = {};
+        state.gyms.forEach(g => { map[g.id] = init1RmLbs; });
+        state.exercises.push({
+          id: newId,
+          name,
+          muscle,
+          secondary: `${laterality === 'unilateral' ? 'Unilateral' : 'Bilateral'} · ${pattern}`,
+          pattern,
+          type,
+          laterality,
+          isNewMovement: true,
+          defaultScheme: 'normal_3x8',
+          carryoverFactor: carryover,
+          stepLbs,
+          e1rmByGym: map,
+          history: [init1RmLbs]
+        });
+        state.activeSessionExercises.push(createSessionBlock(newId, 'normal_3x8'));
+        document.getElementById('customExName').value = '';
+        document.getElementById('customMovementModal').classList.add('hidden');
+        renderAll();
+        triggerAutoWrite(`Created custom movement ${name}`);
+        showToast(`Created ${name}`);
+      });
+
+      // Finish workout button (Logs session record & auto-writes to Sheet)
+      document.getElementById('finishAndSyncWorkoutBtn').addEventListener('click', () => {
+        const u = getUnitStr();
+        const summaryParts = [];
+        state.activeSessionExercises.forEach(blk => {
+          const ex = getExerciseById(blk.exerciseId);
+          blk.sets.forEach(s => { s.completed = true; });
+          const inc = blk.sets.filter(s => s.includeIn1Rm !== false);
+          if (inc.length > 0) {
+            const last = inc[inc.length - 1];
+            const sys = ex.type === 'bodyweight' ? (state.bodyweightLbs + last.actualExternalLbs) : last.actualExternalLbs;
+            const imp = Math.round(computeImplied1RmFromSet(sys, last.actualReps, last.targetRepsNum, last.prescribedPctOf1Rm) * 10) / 10;
+            ex.e1rmByGym[state.activeGymId] = imp;
+            ex.history.push(imp);
+            ex.isNewMovement = false;
+            summaryParts.push(`${ex.name}: ${toDisplayWeight(last.actualExternalLbs)} ${u} × ${last.actualReps}`);
+          } else {
+            summaryParts.push(`${ex.name}: Off-day`);
+          }
+        });
+        handleWriteToGoogleDoc(summaryParts.slice(0, 3).join(' · '), false);
+        renderAll();
+        switchScreen('progress');
+      });
+
+      // Onboarding events
+      document.getElementById('copyOnboardAppsScriptBtn').addEventListener('click', () => {
+        const ta = document.createElement('textarea');
+        ta.value = document.getElementById('onboardAppsScriptCodeBlock').textContent;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('Copied Google Sheet script'); } catch (e) {}
+        document.body.removeChild(ta);
+      });
+
+      document.getElementById('onboardCheckDocBtn').addEventListener('click', async () => {
+        const url = document.getElementById('onboardGdocUrlInput').value.trim();
+        const bridge = document.getElementById('onboardBridgeUrlInput').value.trim();
+        const errBox = document.getElementById('onboardErrorBox');
+        const compatBox = document.getElementById('onboardExistingDataFoundBox');
+        const incompatBox = document.getElementById('onboardIncompatibleDataBox');
+        const step2 = document.getElementById('onboardStep2Panel');
+
+        errBox.classList.add('hidden');
+        compatBox.classList.add('hidden');
+        incompatBox.classList.add('hidden');
+        step2.classList.add('hidden');
+
+        const res = await verifyAndInspectGoogleSheet(url, bridge);
+        if (!res.ok) {
+          document.getElementById('onboardErrorText').textContent = res.error;
+          errBox.classList.remove('hidden');
+          return;
+        }
+
+        state.gdoc.url = url;
+        state.gdoc.docId = extractGoogleDocId(url);
+        state.gdoc.credential = bridge;
+
+        if (res.status === 'empty') {
+          document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
+          renderOnboardingModalTable();
+          step2.classList.remove('hidden');
+        } else if (res.status === 'compatible') {
+          window.__pendingKineticJson = res.kineticJson;
+          compatBox.classList.remove('hidden');
+        } else {
+          incompatBox.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('onboardLoadExistingAndFinishBtn').addEventListener('click', () => {
+        if (window.__pendingKineticJson) {
+          try {
+            const p = JSON.parse(window.__pendingKineticJson);
+            if (p.exercises) state.exercises = p.exercises;
+            if (p.gyms) state.gyms = p.gyms;
+            if (p.workoutHistory) state.workoutHistory = p.workoutHistory;
+          } catch (e) {}
+        }
+        state.gdoc.isLoggedIn = true;
+        state.onboardingCompleted = true;
+        saveState();
+        document.getElementById('onboardingSetupModal').classList.add('hidden');
+        renderAll();
+      });
+
+      document.getElementById('onboardWipeAndGoStep2Btn').addEventListener('click', () => {
+        document.getElementById('onboardExistingDataFoundBox').classList.add('hidden');
+        document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
+        renderOnboardingModalTable();
+        document.getElementById('onboardStep2Panel').classList.remove('hidden');
+      });
+
+      document.getElementById('onboardConfirmIncompatibleWipeBtn').addEventListener('click', () => {
+        document.getElementById('onboardIncompatibleDataBox').classList.add('hidden');
+        document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
+        renderOnboardingModalTable();
+        document.getElementById('onboardStep2Panel').classList.remove('hidden');
+      });
+
+            document.getElementById('onboardForceContinueStep2Btn').addEventListener('click', () => {
+        state.gdoc.url = document.getElementById('onboardGdocUrlInput').value.trim();
+        state.gdoc.docId = extractGoogleDocId(state.gdoc.url);
+        state.gdoc.credential = document.getElementById('onboardBridgeUrlInput').value.trim();
+        document.getElementById('onboardErrorBox').classList.add('hidden');
+        document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
+        renderOnboardingModalTable();
+        document.getElementById('onboardStep2Panel').classList.remove('hidden');
+      });
+
+      document.getElementById('onboardCancelIncompatibleBtn').addEventListener('click', () => {
+        document.getElementById('onboardIncompatibleDataBox').classList.add('hidden');
+      });
+
+      document.getElementById('onboardUnitSelect').addEventListener('change', e => {
+        const bwEl = document.getElementById('onboardBwInput');
+        const curLbs = fromDisplayWeight(bwEl.value);
+        state.unit = e.target.value;
+        bwEl.value = toDisplayWeight(curLbs);
+        renderOnboardingModalTable();
+        renderAll();
+      });
+
+      document.getElementById('onboardBwInput').addEventListener('input', e => {
+        state.bodyweightLbs = Math.max(60, fromDisplayWeight(e.target.value));
+        const container = document.getElementById('onboardingMovementsTableBody');
+        BENCHMARK_ONBOARD_IDS.forEach(item => {
+          const ex = getExerciseById(item.id);
+          if (ex.type === 'bodyweight') {
+            const wEl = container.querySelector(`[data-onboard-ex="${ex.id}"][data-onboard-field="weight"]`);
+            const dEl = container.querySelector(`[data-onboard-ex="${ex.id}"][data-onboard-field="direct1rm"]`);
+            const sEl = container.querySelector(`[data-onboard-ex="${ex.id}"][data-onboard-field="scheme"]`);
+            if (wEl && dEl && sEl) {
+              const sc = getScheme(sEl.value);
+              const wLbs = fromDisplayWeight(wEl.value);
+              const dLbs = (state.bodyweightLbs + wLbs) / (sc.refPctOf1Rm / 100);
+              dEl.value = toDisplayWeight(dLbs);
+            }
+          }
+        });
+      });
+
+      document.getElementById('completeOnboardingBtn').addEventListener('click', () => {
+        state.bodyweightLbs = Math.max(60, fromDisplayWeight(document.getElementById('onboardBwInput').value));
+        getActiveGym().name = document.getElementById('onboardGymNameInput').value.trim() || 'General';
+
+        const container = document.getElementById('onboardingMovementsTableBody');
+        BENCHMARK_ONBOARD_IDS.forEach(item => {
+          const ex = getExerciseById(item.id);
+          const dEl = container.querySelector(`[data-onboard-ex="${ex.id}"][data-onboard-field="direct1rm"]`);
+          const sEl = container.querySelector(`[data-onboard-ex="${ex.id}"][data-onboard-field="scheme"]`);
+          const new1Rm = Math.max(10, fromDisplayWeight(dEl.value));
+          ex.defaultScheme = sEl.value;
+          ex.e1rmByGym[state.activeGymId] = new1Rm;
+          ex.history = [new1Rm * 0.95, new1Rm * 0.98, new1Rm];
+        });
+
+        state.onboardingCompleted = true;
+        state.gdoc.isLoggedIn = true;
+        buildProgramSession();
+        handleWriteToGoogleDoc('Initial baseline calibration', false);
+        document.getElementById('onboardingSetupModal').classList.add('hidden');
+        saveState();
+        renderAll();
+      });
+
+      // Settings Sheet Sync & Log Out
+      document.getElementById('gdocWriteNowBtn').addEventListener('click', () => {
+        state.gdoc.url = document.getElementById('gdocUrlInput').value.trim();
+        state.gdoc.credential = document.getElementById('gdocBridgeCredentialInput').value.trim();
+        handleWriteToGoogleDoc('Manual sync', true);
+      });
+
+      document.getElementById('gdocReadNowBtn').addEventListener('click', async () => {
+        const url = document.getElementById('gdocUrlInput').value.trim();
+        const cred = document.getElementById('gdocBridgeCredentialInput').value.trim();
+        const res = await verifyAndInspectGoogleSheet(url, cred);
+        if (res.ok && res.kineticJson) {
+          try {
+            const p = JSON.parse(res.kineticJson);
+            if (p.exercises) state.exercises = p.exercises;
+            if (p.workoutHistory) state.workoutHistory = p.workoutHistory;
+            renderAll();
+            showToast('Loaded from Sheet');
+          } catch (e) {}
+        } else {
+          showToast(res.error || 'Sheet read complete');
+        }
+      });
+
+      document.getElementById('reopenOnboardingBtn').addEventListener('click', () => {
+        document.getElementById('onboardStepBadge').textContent = 'Step 1 of 2';
+        document.getElementById('onboardStep2Panel').classList.add('hidden');
+        document.getElementById('onboardingSetupModal').classList.remove('hidden');
+      });
+
+      document.getElementById('logoutGdocBtn').addEventListener('click', () => {
+        state.gdoc.isLoggedIn = false;
+        state.onboardingCompleted = false;
+        state.gdoc.credential = '';
+        saveState();
+        renderAll();
+        document.getElementById('onboardStepBadge').textContent = 'Step 1 of 2';
+        document.getElementById('onboardStep2Panel').classList.add('hidden');
+        document.getElementById('onboardingSetupModal').classList.remove('hidden');
+        showToast('Logged out of Google Sheet');
+      });
+    });
+  </script>
+</body>
+</html>
