@@ -756,7 +756,7 @@
                   <span id="equipmentActiveGymLabel" class="px-2 py-0.5 rounded bg-limeform-400/15 text-limeform-400 font-mono text-[11px] font-bold">General</span>
                 </div>
                 <p class="text-[11px] text-slate-300 leading-relaxed">
-                  <strong>Barbells, dumbbells &amp; bodyweight</strong> keep the same 1RM everywhere. <strong>Machines &amp; cables</strong> vary by pulley ratio (e.g. 2:1 vs 1:1 stacks) — log a workout at this gym or enter 1 working set below to calibrate this gym's stack.
+                  <strong>Barbells, dumbbells &amp; bodyweight</strong> share the same 1RM everywhere. <strong>Machines &amp; cables</strong> auto-recalibrate across gyms: logging consecutive sessions at the same gym transfers your <span class="text-limeform-400 font-semibold">% strength gain</span> to all other gyms, while switching gyms auto-calibrates the pulley ratio between stacks without distorting your other gyms.
                 </p>
               </div>
               <div id="equipmentProfileCardsList" class="space-y-3"></div>
@@ -1470,6 +1470,37 @@ function doPost(e) {
           }
         ],
         setPattern: Array.from({ length: 3 }, () => ({ pct: 70, reps: 10, role: 'work' }))
+      },
+
+      dropset_triple: {
+        id: 'dropset_triple',
+        name: 'Drop Sets (Top 80%×8 → Drop 67.5%×10 → Drop 55%×12)',
+        shortTag: 'Drop Sets',
+        progressionCadence: 'single',
+        formulaType: 'prilepin_zone',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        setsCount: 3,
+        refPctOf1Rm: 80,
+        refReps: 8,
+        defaultDayIdx: 0,
+        days: [
+          {
+            dayLabel: 'Drop Set Strip · Top 80%×8 → Drop 1 67.5%×10 → Drop 2 55%×12',
+            shortDay: 'Drop: 80/67.5/55%',
+            zonePct: 80,
+            optimalTotalReps: 30,
+            setPattern: [
+              { pct: 80, reps: 8, role: 'work', label: 'Top 80%' },
+              { pct: 67.5, reps: 10, role: 'work', label: 'Drop 1 (67.5%)' },
+              { pct: 55, reps: 12, role: 'work', label: 'Drop 2 (55%)' }
+            ]
+          }
+        ],
+        setPattern: [
+          { pct: 80, reps: 8, role: 'work', label: 'Top 80%' },
+          { pct: 67.5, reps: 10, role: 'work', label: 'Drop 1 (67.5%)' },
+          { pct: 55, reps: 12, role: 'work', label: 'Drop 2 (55%)' }
+        ]
       },
 
       prilepin_optimal: {
@@ -2428,6 +2459,171 @@ function doPost(e) {
       return ex && (ex.type === 'machine' || ex.type === 'cable');
     }
 
+    // =========================================================================
+    // 3-RULE AUTO-RECALIBRATION ENGINE FOR MULTI-GYM MACHINES & CABLES
+    // =========================================================================
+    // Rule 1 (Same Gym -> Same Gym): Logging at the same gym as the previous session measures true relative strength delta (deltaRatio = new1Rm / prev1Rm at that gym) and scales all other gyms by that exact % gain!
+    // Rule 2 (First Time at a New Gym): Logging at a gym for the first time after training elsewhere sets this gym's 1RM and auto-calibrates its pulley ratio relative to the anchor gym without altering other gyms!
+    // Rule 3 (Switching Back to Another Gym): Logging after a gym switch updates this gym's 1RM directly and auto-corrects the pulley ratio between the gyms without falsely inflating the other gym!
+
+    function getGymIdByName(gymName) {
+      if (!gymName) return 'gym_general';
+      const found = (state.gyms || []).find(g => g.name.toLowerCase() === String(gymName).trim().toLowerCase());
+      return found ? found.id : 'gym_general';
+    }
+
+    function getMachineAnchorGymId(ex) {
+      if (!ex || !isMachineOrCable(ex)) return 'gym_general';
+      if (ex.anchorGymId && (state.gyms || []).some(g => g.id === ex.anchorGymId)) {
+        return ex.anchorGymId;
+      }
+      const firstLog = (state.calendarLogs || []).find(l => l.exerciseId === ex.id && l.includeIn1Rm && l.implied1RmLbs > 0);
+      if (firstLog && firstLog.gymName) {
+        const gId = getGymIdByName(firstLog.gymName);
+        ex.anchorGymId = gId;
+        return gId;
+      }
+      return state.activeGymId || 'gym_general';
+    }
+
+    function getGymPulleyRatio(ex, gymId = state.activeGymId) {
+      if (!ex || !isMachineOrCable(ex) || !gymId) return 1.0;
+      const anchorId = getMachineAnchorGymId(ex);
+      if (gymId === anchorId) return 1.0;
+      if (ex.gymRatioByGym && ex.gymRatioByGym[gymId] > 0) {
+        return ex.gymRatioByGym[gymId];
+      }
+      const anchorVal = (ex.e1rmByGym && ex.e1rmByGym[anchorId] > 0) ? ex.e1rmByGym[anchorId] : ((ex.e1rmByGym && ex.e1rmByGym.gym_general > 0) ? ex.e1rmByGym.gym_general : 0);
+      const gymVal = (ex.e1rmByGym && ex.e1rmByGym[gymId] > 0) ? ex.e1rmByGym[gymId] : 0;
+      if (anchorVal > 0 && gymVal > 0) {
+        return Math.round((gymVal / anchorVal) * 1000) / 1000;
+      }
+      return 1.0;
+    }
+
+    function recomputeMachineAutoCalibrationFromHistory(ex) {
+      if (!ex) return null;
+      if (!ex.e1rmByGym) ex.e1rmByGym = {};
+      if (!ex.gymRatioByGym) ex.gymRatioByGym = {};
+
+      const matchingLogs = (state.calendarLogs || []).filter(log =>
+        log.exerciseId === ex.id && log.includeIn1Rm && log.implied1RmLbs > 0
+      );
+
+      if (matchingLogs.length === 0) {
+        return null;
+      }
+
+      const sessionBuckets = [];
+      const bucketMap = {};
+      matchingLogs.forEach(l => {
+        const sKey = `${l.date}__${l.sessionId || l.routineName || 'default'}`;
+        if (!bucketMap[sKey]) {
+          bucketMap[sKey] = {
+            date: l.date,
+            gymId: getGymIdByName(l.gymName),
+            routineName: l.routineName || '',
+            vals: []
+          };
+          sessionBuckets.push(bucketMap[sKey]);
+        }
+        bucketMap[sKey].vals.push(l.implied1RmLbs);
+      });
+
+      sessionBuckets.sort((a, b) => a.date.localeCompare(b.date));
+
+      const gymEst = {};
+      (state.gyms || []).forEach(g => {
+        gymEst[g.id] = getOriginalBaselineForGymLbs(ex, g.id) || getBaseline1RmForGymLbs(ex, g.id) || 100;
+      });
+      if (!gymEst.gym_general) gymEst.gym_general = 100;
+
+      // Preserve any manual 05 Gyms stack calibrations as starting ratios
+      const manualRatios = Object.assign({}, ex.manualGymRatioByGym || {});
+      let anchorGymId = null;
+      let prevSessionGymId = null;
+      const dateCounts = {};
+      const snapshots = [];
+
+      sessionBuckets.forEach((b, idx) => {
+        const gId = b.gymId || 'gym_general';
+        const val = b.vals.reduce((x, y) => x + y, 0) / b.vals.length;
+        dateCounts[b.date] = (dateCounts[b.date] || 0) + 1;
+        const baseLbl = b.date.slice(5);
+        const sameDayTotal = sessionBuckets.filter(x => x.date === b.date).length;
+        const label = sameDayTotal > 1 ? `${baseLbl} #${dateCounts[b.date]}` : baseLbl;
+
+        if (idx === 0) {
+          // First real session anchors true baseline across gyms (applying any manual stack ratios if set)
+          anchorGymId = gId;
+          gymEst[gId] = val;
+          gymEst.gym_general = val;
+          (state.gyms || []).forEach(g => {
+            if (g.id !== gId) {
+              const mRatio = manualRatios[g.id] || 1.0;
+              gymEst[g.id] = Math.round(val * mRatio * 100) / 100;
+            }
+          });
+        } else if (gId === prevSessionGymId) {
+          // RULE 1: Consecutive sessions at the SAME gym -> True relative strength gain (% delta transfers to all gyms!)
+          const prevValAtGym = gymEst[gId] > 0 ? gymEst[gId] : val;
+          const deltaRatio = prevValAtGym > 0 ? (val / prevValAtGym) : 1.0;
+          gymEst[gId] = val;
+          Object.keys(gymEst).forEach(otherGymId => {
+            if (otherGymId !== gId) {
+              gymEst[otherGymId] = Math.round(gymEst[otherGymId] * deltaRatio * 100) / 100;
+            }
+          });
+        } else {
+          // RULE 2 & RULE 3: Switched gyms (either 1st time at a new gym OR returning to a previous gym)
+          // Auto-recalibrate this gym's 1RM & pulley ratio to `val` WITHOUT falsely scaling the other gyms!
+          gymEst[gId] = val;
+          if (gId === anchorGymId) {
+            gymEst.gym_general = val;
+          }
+        }
+
+        prevSessionGymId = gId;
+        snapshots.push({
+          label,
+          date: b.date,
+          sourceGymId: gId,
+          rawLbs: val,
+          gymEstSnapshot: Object.assign({}, gymEst)
+        });
+      });
+
+      ex.anchorGymId = anchorGymId || 'gym_general';
+      const anchorFinalLbs = gymEst[ex.anchorGymId] || gymEst.gym_general || 100;
+      ex.e1rmByGym.gym_general = Math.round(anchorFinalLbs * 100) / 100;
+      ex.gymRatioByGym[ex.anchorGymId] = 1.0;
+
+      (state.gyms || []).forEach(g => {
+        const gFinal = gymEst[g.id] !== undefined ? gymEst[g.id] : anchorFinalLbs;
+        ex.e1rmByGym[g.id] = Math.round(gFinal * 100) / 100;
+        ex.gymRatioByGym[g.id] = anchorFinalLbs > 0
+          ? Math.round((gFinal / anchorFinalLbs) * 1000) / 1000
+          : 1.0;
+      });
+
+      return {
+        anchorGymId: ex.anchorGymId,
+        loggedCount: matchingLogs.length,
+        snapshots
+      };
+    }
+
+    function syncMachineStrengthAcrossGymsFromLog(ex, logged1RmAtGymLbs, sourceGymId = state.activeGymId) {
+      if (!ex) return;
+      if (!ex.e1rmByGym) ex.e1rmByGym = {};
+      if (!isMachineOrCable(ex)) {
+        ex.e1rmByGym.gym_general = logged1RmAtGymLbs;
+        (state.gyms || []).forEach(g => { ex.e1rmByGym[g.id] = logged1RmAtGymLbs; });
+        return;
+      }
+      recomputeMachineAutoCalibrationFromHistory(ex);
+    }
+
     // Returns the original/immutable baseline for an exercise (used when all logs/overrides are deleted!)
     function getOriginalBaselineForGymLbs(ex, gymId = state.activeGymId) {
       if (!ex) return 0;
@@ -2449,10 +2645,6 @@ function doPost(e) {
       return firstVal !== undefined ? firstVal : 0;
     }
 
-    // Provisional 1RM Estimator for untested movements within the same muscle group:
-    // - Uses the -15% conservative buffer silently when estimating an untested exercise from its muscle group's reference lift.
-    // - If the muscle group has no reference (or reference 1RM === 0), sets provisional 1RM to 0!
-    // Returns true ONLY when an exercise's 1RM is auto-deduced from another lift (its muscle group reference)
     function isAutoDeducedProvisional(ex) {
       if (!ex || !ex.isNewMovement) return false;
       const refId = state.muscleGroupReferences && state.muscleGroupReferences[ex.muscle];
@@ -2502,8 +2694,6 @@ function doPost(e) {
       muscles.forEach(m => recalculateDeduced1RmsForMuscleGroup(m));
     }
 
-    // Priority 3: Setting a Direct 1RM preserves ex.originalBaselineByGym so if the user deletes an erroneous 200 kg entry in 03 Records,
-    // recomputeExercise1RmFromCalendarLogs reverts to originalBaselineByGym instead of staying stuck at 200 kg!
     function setDirect1RmForExerciseLbs(ex, new1RmLbs, gymId = state.activeGymId, recordInCalendar = true, sourceNote = 'Direct 1RM Input', isInitialBaseline = false) {
       if (!ex) return;
       if (recordInCalendar) {
@@ -2518,8 +2708,43 @@ function doPost(e) {
       ex.isNewMovement = false;
 
       if (isMachineOrCable(ex)) {
-        ex.e1rmByGym[gymId] = cleanLbs;
-        if (isInitialBaseline) ex.originalBaselineByGym[gymId] = cleanLbs;
+        if (!ex.gymRatioByGym) ex.gymRatioByGym = {};
+        if (!ex.manualGymRatioByGym) ex.manualGymRatioByGym = {};
+        const wasUntested = !ex.anchorGymId && !(state.calendarLogs || []).some(l => l.exerciseId === ex.id && l.includeIn1Rm);
+        if (wasUntested) {
+          // First real calibration/input on this machine: replace the initial guess and make this gym the Anchor Gym (1.0x)!
+          ex.anchorGymId = gymId || state.activeGymId || 'gym_general';
+          ex.gymRatioByGym[ex.anchorGymId] = 1.0;
+          ex.e1rmByGym.gym_general = cleanLbs;
+          ex.originalBaselineByGym.gym_general = cleanLbs;
+          (state.gyms || []).forEach(g => {
+            const r = getGymPulleyRatio(ex, g.id);
+            ex.e1rmByGym[g.id] = Math.round(cleanLbs * r * 100) / 100;
+            ex.originalBaselineByGym[g.id] = ex.e1rmByGym[g.id];
+          });
+        } else {
+          const anchorId = getMachineAnchorGymId(ex);
+          const isGymStackCalibration = String(sourceNote || '').startsWith('Gym ');
+          if (isGymStackCalibration && gymId !== anchorId) {
+            // Calibrating or re-calibrating a gym's stack in 05 Gyms: update this gym's 1RM & ratio without altering other gyms!
+            const curAnchorLbs = getExerciseE1RmLbs(ex, anchorId) || ex.e1rmByGym[anchorId] || ex.e1rmByGym.gym_general || cleanLbs;
+            const newRatio = curAnchorLbs > 0 ? Math.max(0.25, Math.min(3.0, cleanLbs / curAnchorLbs)) : 1.0;
+            ex.gymRatioByGym[gymId] = Math.round(newRatio * 1000) / 1000;
+            ex.manualGymRatioByGym[gymId] = ex.gymRatioByGym[gymId];
+            ex.e1rmByGym[gymId] = cleanLbs;
+          } else {
+            // Updating true strength at the Anchor Gym (or from Setup/Settings): scale all gyms proportionally!
+            const activeRatio = getGymPulleyRatio(ex, gymId);
+            const newAnchorLbs = activeRatio > 0 ? (cleanLbs / activeRatio) : cleanLbs;
+            ex.e1rmByGym.gym_general = Math.round(newAnchorLbs * 100) / 100;
+            if (isInitialBaseline) ex.originalBaselineByGym.gym_general = ex.e1rmByGym.gym_general;
+            (state.gyms || []).forEach(g => {
+              const r = getGymPulleyRatio(ex, g.id);
+              ex.e1rmByGym[g.id] = Math.round(newAnchorLbs * r * 100) / 100;
+              if (isInitialBaseline) ex.originalBaselineByGym[g.id] = ex.e1rmByGym[g.id];
+            });
+          }
+        }
       } else {
         ex.e1rmByGym.gym_general = cleanLbs;
         if (isInitialBaseline) ex.originalBaselineByGym.gym_general = cleanLbs;
@@ -2561,6 +2786,10 @@ function doPost(e) {
         state.selectedCalendarDate = todayStr;
       }
 
+      if (isMachineOrCable(ex)) {
+        recomputeMachineAutoCalibrationFromHistory(ex);
+      }
+
       if (!state.muscleGroupReferences) state.muscleGroupReferences = {};
       if (!state.muscleGroupReferences[ex.muscle] || state.muscleGroupReferences[ex.muscle] === ex.id) {
         state.muscleGroupReferences[ex.muscle] = ex.id;
@@ -2576,10 +2805,35 @@ function doPost(e) {
       const baseLbs = getBaseline1RmForGymLbs(ex, gymId);
       if (!ex) return { baselineLbs: baseLbs, loggedCount: 0, points: [{ label: 'Baseline', date: null, lbs: baseLbs }] };
 
-      const activeGymName = ((state.gyms || []).find(g => g.id === gymId) || getActiveGym()).name;
+      if (isMachineOrCable(ex)) {
+        const autoCal = recomputeMachineAutoCalibrationFromHistory(ex);
+        if (!autoCal || autoCal.snapshots.length === 0) {
+          return {
+            baselineLbs: baseLbs,
+            loggedCount: 0,
+            points: [{ label: 'Baseline', date: null, lbs: baseLbs }]
+          };
+        }
+        const targetGymId = gymId || state.activeGymId || 'gym_general';
+        const datedPoints = autoCal.snapshots.map(snap => {
+          const estAtTarget = snap.gymEstSnapshot[targetGymId] !== undefined
+            ? snap.gymEstSnapshot[targetGymId]
+            : (snap.gymEstSnapshot[autoCal.anchorGymId] || snap.rawLbs);
+          return {
+            label: snap.label,
+            date: snap.date,
+            lbs: estAtTarget
+          };
+        });
+        return {
+          baselineLbs: datedPoints[0].lbs,
+          loggedCount: autoCal.loggedCount,
+          points: datedPoints
+        };
+      }
+
       const matchingLogs = (state.calendarLogs || []).filter(log => {
         if (log.exerciseId !== ex.id || !log.includeIn1Rm || !(log.implied1RmLbs > 0)) return false;
-        if (isMachineOrCable(ex) && log.gymName && log.gymName !== activeGymName) return false;
         return true;
       });
 
@@ -4060,33 +4314,22 @@ function doPost(e) {
     function recomputeExercise1RmFromCalendarLogs(exId) {
       const ex = getExerciseById(exId);
       if (!ex) return;
-      const activeGymName = getActiveGym().name;
       const matchingLogs = (state.calendarLogs || []).filter(log => {
         if (log.exerciseId !== ex.id || !log.includeIn1Rm || !(log.implied1RmLbs > 0)) return false;
-        if (isMachineOrCable(ex) && log.gymName && log.gymName !== activeGymName) return false;
         return true;
       });
 
       if (matchingLogs.length > 0) {
-        const series = getDatedSession1RmSeries(ex);
-        ex.history = series.points.map(p => p.lbs);
-        const latest = series.points[series.points.length - 1].lbs;
-        if (isMachineOrCable(ex)) {
-          ex.e1rmByGym[state.activeGymId] = latest;
-        } else {
-          ex.e1rmByGym.gym_general = latest;
-          (state.gyms || []).forEach(g => { ex.e1rmByGym[g.id] = latest; });
-        }
+        const genSeries = getDatedSession1RmSeries(ex, 'gym_general');
+        const latestGenLbs = genSeries.points[genSeries.points.length - 1].lbs;
+        syncMachineStrengthAcrossGymsFromLog(ex, latestGenLbs, 'gym_general');
+        const activeSeries = getDatedSession1RmSeries(ex, state.activeGymId);
+        ex.history = activeSeries.points.map(p => p.lbs);
       } else {
         // Revert to original pre-override baseline!
-        const origBase = getOriginalBaselineForGymLbs(ex, state.activeGymId);
-        if (isMachineOrCable(ex)) {
-          ex.e1rmByGym[state.activeGymId] = origBase;
-        } else {
-          ex.e1rmByGym.gym_general = origBase;
-          (state.gyms || []).forEach(g => { ex.e1rmByGym[g.id] = origBase; });
-        }
-        ex.history = [origBase];
+        const origGenBase = getOriginalBaselineForGymLbs(ex, 'gym_general');
+        syncMachineStrengthAcrossGymsFromLog(ex, origGenBase, 'gym_general');
+        ex.history = [getBaseline1RmForGymLbs(ex, state.activeGymId)];
       }
 
       if (state.muscleGroupReferences && state.muscleGroupReferences[ex.muscle] === ex.id) {
@@ -5353,12 +5596,17 @@ function doPost(e) {
       const machExercises = state.exercises.filter(e => e.type === 'cable' || e.type === 'machine');
 
       eqList.innerHTML = machExercises.map((ex, idx) => {
-        const general1RmLbs = getBaseline1RmForGymLbs(ex, 'gym_general');
+        const anchorGymId = getMachineAnchorGymId(ex);
+        const anchorGymObj = (state.gyms || []).find(g => g.id === anchorGymId) || getActiveGym();
+        const anchor1RmLbs = getExerciseE1RmLbs(ex, anchorGymId);
         const thisGym1RmLbs = getExerciseE1RmLbs(ex, activeGym.id);
-        const ratioPct = general1RmLbs > 0 ? Math.round(((thisGym1RmLbs - general1RmLbs) / general1RmLbs) * 100) : 0;
-        const ratioTag = activeGym.id === 'gym_general'
-          ? 'Baseline stack'
-          : (ratioPct === 0 ? 'Same as General' : (ratioPct > 0 ? `+${ratioPct}% vs General (lighter pulley)` : `${ratioPct}% vs General (heavier stack)`));
+        const hasBeenTested = Boolean(ex.anchorGymId) || (state.calendarLogs || []).some(l => l.exerciseId === ex.id && l.includeIn1Rm);
+        const ratioPct = anchor1RmLbs > 0 ? Math.round(((thisGym1RmLbs - anchor1RmLbs) / anchor1RmLbs) * 100) : 0;
+        const ratioTag = !hasBeenTested
+          ? 'Unanchored (1st calibration sets true baseline)'
+          : (activeGym.id === anchorGymId
+              ? `Reference stack (${anchorGymObj.name})`
+              : (ratioPct === 0 ? `1.00× vs ${anchorGymObj.name}` : (ratioPct > 0 ? `+${ratioPct}% vs ${anchorGymObj.name} (lighter pulley)` : `${ratioPct}% vs ${anchorGymObj.name} (heavier stack)`)));
         const sc = getScheme(ex.defaultScheme);
         const sampleWorkDisp = toDisplayWeight(snapLoadLbs(thisGym1RmLbs * ((sc.refPctOf1Rm || 75) / 100), ex));
 
@@ -5373,7 +5621,7 @@ function doPost(e) {
                   <span class="text-[10px] font-mono text-limeform-400 truncate">${ratioTag}</span>
                 </div>
                 <div class="text-base font-bold text-white mt-1 truncate">${ex.name}</div>
-                <div class="text-[11px] text-slate-400">General 1RM: ${toDisplayWeight(general1RmLbs)} ${u} · ${sc.shortTag} work weight here: <strong class="text-white">${sampleWorkDisp} ${u}</strong></div>
+                <div class="text-[11px] text-slate-400">${anchorGymObj.name} 1RM: ${toDisplayWeight(anchor1RmLbs)} ${u} · ${sc.shortTag} work weight here: <strong class="text-white">${sampleWorkDisp} ${u}</strong></div>
               </div>
 
               <div class="text-right shrink-0">
@@ -6764,12 +7012,7 @@ function doPost(e) {
             // Reset completed flag so clicking Finish again won't re-submit!
             row.completed = false;
 
-            if (isMachineOrCable(ex)) {
-              ex.e1rmByGym[state.activeGymId] = formula1Rm;
-            } else {
-              ex.e1rmByGym.gym_general = formula1Rm;
-              (state.gyms || []).forEach(g => { ex.e1rmByGym[g.id] = formula1Rm; });
-            }
+            syncMachineStrengthAcrossGymsFromLog(ex, formula1Rm, state.activeGymId);
             ex.isNewMovement = false;
             const series = getDatedSession1RmSeries(ex);
             ex.history = series.points.map(p => p.lbs);
@@ -6845,12 +7088,7 @@ function doPost(e) {
           });
 
           if (includeBlock && !dayObj.isDeload && !dayObj.isRecovery) {
-            if (isMachineOrCable(ex)) {
-              ex.e1rmByGym[state.activeGymId] = schemeSession1RmLbs;
-            } else {
-              ex.e1rmByGym.gym_general = schemeSession1RmLbs;
-              (state.gyms || []).forEach(g => { ex.e1rmByGym[g.id] = schemeSession1RmLbs; });
-            }
+            syncMachineStrengthAcrossGymsFromLog(ex, schemeSession1RmLbs, state.activeGymId);
             const series = getDatedSession1RmSeries(ex);
             ex.history = series.points.map(p => p.lbs);
             ex.isNewMovement = false;
