@@ -3056,6 +3056,7 @@ function doPost(e) {
         const asstW = toDisplayWeight(log.assistanceWeightLbs || 0);
         const asstEq = encodeURIComponent(log.assistanceEquipment || 'None');
         const wkLblEnc = encodeURIComponent(log.schemeWeekLabel || '');
+        const targR = log.targetReps || log.reps || 5;
         rows.push(padRow8([
           'LOG',
           log.date,
@@ -3064,7 +3065,7 @@ function doPost(e) {
           toDisplayWeight(log.weightLbs),
           log.reps,
           log.includeIn1Rm ? toDisplayWeight(log.implied1RmLbs) : 'SKIP_1RM',
-          `${log.exerciseId}|${log.setNumber}|${log.prescribedPct}|${log.routineName}|${log.setLogId}|${encNote}|${sessId}|${sessTime}|${sessBw}|${addW}|${asstW}|${asstEq}|${wkLblEnc}`
+          `${log.exerciseId}|${log.setNumber}|${log.prescribedPct}|${log.routineName}|${log.setLogId}|${encNote}|${sessId}|${sessTime}|${sessBw}|${addW}|${asstW}|${asstEq}|${wkLblEnc}|${targR}`
         ]));
       });
 
@@ -3177,12 +3178,14 @@ function doPost(e) {
             return { exerciseId: parts[0], schemeId: parts[1] || 'normal_3x8', dayIdx: parseInt(parts[2], 10) || 0 };
           });
           if (blocks.length > 0) {
+            const rIdStr = String(r[2] || ('routine_' + parsedRoutines.length));
             parsedRoutines.push({
-              id: String(r[2] || ('routine_' + parsedRoutines.length)),
+              id: rIdStr,
               name: String(r[1] || 'Saved Routine'),
-              blocks
+              blocks,
+              isActiveRow: String(r[6]) === 'ACTIVE'
             });
-            if (String(r[6]) === 'ACTIVE') state.activeRoutineId = String(r[2]);
+            if (String(r[6]) === 'ACTIVE') state.activeRoutineId = rIdStr;
           }
         } else if (type === 'SCHEME') {
           const scId = String(r[2] || '');
@@ -3266,6 +3269,7 @@ function doPost(e) {
             exerciseId: meta[0] || 'ex_bench',
             setNumber: parseInt(meta[1], 10) || 1,
             prescribedPct: pct,
+            targetReps: parseInt(meta[13], 10) || reps,
             routineName: meta[3] || 'Workout',
             schemeWeekLabel: decWkLbl,
             note: decNote
@@ -3273,12 +3277,6 @@ function doPost(e) {
         }
       });
 
-      if (parsedRoutines.length > 0) {
-        state.savedRoutines = parsedRoutines;
-      }
-      if (sessionTitleFromSheet) {
-        state.sessionTitle = sessionTitleFromSheet;
-      }
       if (Object.keys(parsedSchemes).length > 0) {
         state.customSchemes = Object.assign(state.customSchemes || {}, parsedSchemes);
       }
@@ -3286,6 +3284,42 @@ function doPost(e) {
       if (parsedLogs.length > 0) {
         state.selectedCalendarDate = parsedLogs[parsedLogs.length - 1].date;
       }
+
+      // Rebuild exercise 1RMs from calendarLogs when logs exist so Sheet logs drive latest 1RM
+      (state.exercises || []).forEach(ex => {
+        const hasLogsForEx = parsedLogs.some(l => l.exerciseId === ex.id && l.includeIn1Rm && l.implied1RmLbs > 0);
+        if (hasLogsForEx) {
+          recomputeExercise1RmFromCalendarLogs(ex.id);
+        }
+      });
+
+      if (parsedRoutines.length > 0) {
+        state.savedRoutines = parsedRoutines;
+        // Ensure activeRoutineId matches the ACTIVE routine from the Sheet (or routine matching sessionTitleFromSheet, or first routine)
+        let matchedActive = parsedRoutines.find(r => r.id === state.activeRoutineId);
+        if (!matchedActive && sessionTitleFromSheet) {
+          matchedActive = parsedRoutines.find(r => r.name.toLowerCase() === sessionTitleFromSheet.toLowerCase());
+        }
+        if (!matchedActive) {
+          matchedActive = parsedRoutines[0];
+        }
+        state.activeRoutineId = matchedActive.id;
+        state.sessionTitle = matchedActive.name;
+      } else if (sessionTitleFromSheet) {
+        state.sessionTitle = sessionTitleFromSheet;
+      }
+
+      // Immediately load the active routine into activeSessionExercises unless the user has completed/modified sets in progress
+      const hasTouchedSetsInSession = (state.activeSessionExercises || []).some(
+        b => b.swappedToday || (b.sets || []).some(s => s.completed || s.userModified)
+      );
+      if (!hasTouchedSetsInSession) {
+        state.unfinishedSessionsByRoutine = {};
+        loadRoutineIntoActiveSession(state.activeRoutineId, false, true);
+      } else {
+        refreshActiveSessionWeights();
+      }
+
       saveState();
       return true;
     }
@@ -4158,6 +4192,30 @@ function doPost(e) {
       renderTrainingCalendar();
     }
 
+    let editingRecordMovementKey = null;
+    let recordMovementEditDraft = null;
+
+    // Helper to compute a movement's single implied 1RM from its sets in a logged session
+    function computeMovement1RmFromLoggedSetsLbs(setsList, exObj) {
+      if (!Array.isArray(setsList) || setsList.length === 0) return 0;
+      const isBw = exObj && exObj.type === 'bodyweight';
+      const setEstimates = setsList.map(s => {
+        const bwLbs = s.bodyweightLbs || state.bodyweightLbs;
+        const sysLoad = isBw ? Math.max(20, bwLbs + (parseFloat(s.weightLbs) || 0)) : Math.max(0, parseFloat(s.weightLbs) || 0);
+        const reps = Math.max(1, parseInt(s.reps, 10) || 1);
+        const isFormulaTest = String(s.routineName || '').startsWith('1RM Formula Test') || String(s.schemeWeekLabel || '').startsWith('1RM Formula Test');
+        const isDirect1Rm = String(s.routineName || '').startsWith('1RM Input') || (s.prescribedPct === 100 && reps === 1);
+        if (isDirect1Rm) return sysLoad;
+        if (isFormulaTest) return computeDirectFormulaTest1RmLbs(sysLoad, reps);
+        const pct = parseFloat(s.prescribedPct) || 75;
+        const targR = parseInt(s.targetReps, 10) || reps;
+        return computeImplied1RmFromSet(sysLoad, reps, targR, pct);
+      }).filter(v => v > 0);
+      if (setEstimates.length === 0) return 0;
+      const avg = setEstimates.reduce((a, b) => a + b, 0) / setEstimates.length;
+      return Math.round(avg * 10) / 10;
+    }
+
     function renderTrainingCalendar() {
       const u = getUnitStr();
       const year = state.calendarYear || new Date().getFullYear();
@@ -4206,6 +4264,8 @@ function doPost(e) {
 
       grid.querySelectorAll('.cal-day-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          editingRecordMovementKey = null;
+          recordMovementEditDraft = null;
           state.selectedCalendarDate = btn.getAttribute('data-cal-date');
           saveState();
           renderTrainingCalendar();
@@ -4249,6 +4309,8 @@ function doPost(e) {
             }
           }
           sess.exercisesMap[exKey] = {
+            groupKey: `${sKey}__${exKey}`,
+            sessionId: sKey,
             exerciseId: item.exerciseId,
             exerciseName: item.exerciseName,
             schemeWeekLabel: inferredWkLbl,
@@ -4280,42 +4342,102 @@ function doPost(e) {
           const exObj = getExerciseById(group.exerciseId);
           const isBw = exObj && exObj.type === 'bodyweight';
           const isUni = exObj && exObj.laterality === 'unilateral';
-          const colWeightLabel = isBw ? `BW / ±LOAD` : (isUni ? `${u.toUpperCase()}/SIDE` : u.toUpperCase());
+          const colWeightLabel = isBw ? `BW / ±LOAD (${u.toUpperCase()})` : (isUni ? `${u.toUpperCase()}/SIDE` : `WEIGHT (${u.toUpperCase()})`);
+          const isEditingThisMovement = (editingRecordMovementKey === group.groupKey && recordMovementEditDraft);
 
-          const rowsHtml = group.sets.map((s, idx) => {
+          const activeSets = isEditingThisMovement ? recordMovementEditDraft.sets : group.sets;
+          const includeIn1Rm = isEditingThisMovement
+            ? recordMovementEditDraft.includeIn1Rm
+            : group.sets.some(s => s.includeIn1Rm);
+
+          // Single 1RM per movement (recalculated live when editing!)
+          const movement1RmLbs = isEditingThisMovement
+            ? computeMovement1RmFromLoggedSetsLbs(activeSets, exObj)
+            : (group.sets.find(s => s.includeIn1Rm && s.implied1RmLbs > 0)
+                ? group.sets.filter(s => s.includeIn1Rm && s.implied1RmLbs > 0).reduce((acc, s) => acc + s.implied1RmLbs, 0) /
+                  group.sets.filter(s => s.includeIn1Rm && s.implied1RmLbs > 0).length
+                : computeMovement1RmFromLoggedSetsLbs(group.sets, exObj));
+
+          const movement1RmBadgeHtml = includeIn1Rm
+            ? `<div class="px-2.5 py-1 rounded-xl bg-forest-900 border border-limeform-400/50 font-mono text-xs text-limeform-400 font-bold shrink-0">
+                 1RM: <span id="recMovPreview1Rm_${group.groupKey.replace(/[^a-zA-Z0-9_]/g, '_')}">${toDisplayWeight(movement1RmLbs)}</span> ${isUni ? `${u}/side` : u}
+               </div>`
+            : `<div class="px-2.5 py-1 rounded-xl bg-amber-950/50 border border-amber-500/40 font-mono text-[10px] text-amber-300 font-semibold shrink-0">
+                 Off-day (Skip 1RM)
+               </div>`;
+
+          const rowsHtml = activeSets.map((s, idx) => {
             const numStr = String(idx + 1).padStart(2, '0');
             const wDisp = toDisplayWeight(s.weightLbs);
-            let wStr = `${wDisp}`;
+
+            if (isEditingThisMovement) {
+              return `
+                <div class="grid grid-cols-12 items-center gap-1.5 py-2 border-t border-forest-750/80 text-xs font-mono">
+                  <div class="col-span-2 text-slate-300 font-bold">${numStr}</div>
+                  <div class="col-span-5">
+                    <div class="flex items-center gap-1 bg-forest-900 border border-limeform-400/60 rounded-lg px-2 py-1">
+                      <input type="number" step="0.5" data-rec-edit-idx="${idx}" data-rec-edit-field="weight" value="${wDisp}"
+                        class="rec-mov-edit-input w-full min-w-0 bg-transparent text-center text-white font-bold focus:outline-none text-xs" />
+                      <span class="text-[9px] text-slate-400 shrink-0">${u}</span>
+                    </div>
+                  </div>
+                  <div class="col-span-3">
+                    <div class="flex items-center gap-1 bg-forest-900 border border-limeform-400/60 rounded-lg px-2 py-1">
+                      <input type="number" step="1" min="1" max="50" data-rec-edit-idx="${idx}" data-rec-edit-field="reps" value="${s.reps}"
+                        class="rec-mov-edit-input w-full min-w-0 bg-transparent text-center text-white font-bold focus:outline-none text-xs" />
+                    </div>
+                  </div>
+                  <div class="col-span-2 flex justify-end">
+                    ${activeSets.length > 1 ? `
+                      <button type="button" data-rec-edit-drop-set="${idx}" class="rec-edit-drop-set-btn btn-danger !px-2 !py-1 !text-[10px]" title="Drop this set">
+                        ✕
+                      </button>
+                    ` : `<span class="text-[9px] text-slate-500">Set 1</span>`}
+                  </div>
+                </div>
+              `;
+            }
+
+            let wStr = `${wDisp} ${u}`;
             if (isBw) {
               const bwDisp = toDisplayWeight(s.bodyweightLbs || state.bodyweightLbs);
               const addDisp = toDisplayWeight(s.addedWeightLbs || (s.weightLbs > 0 ? s.weightLbs : 0));
               const asstDisp = toDisplayWeight(s.assistanceWeightLbs || (s.weightLbs < 0 ? Math.abs(s.weightLbs) : 0));
               const eqStr = (s.assistanceEquipment && s.assistanceEquipment !== 'None') ? ` (${s.assistanceEquipment})` : '';
-              if (addDisp > 0) wStr = `BW ${bwDisp} + ${addDisp}`;
-              else if (asstDisp > 0) wStr = `BW ${bwDisp} − ${asstDisp}${eqStr}`;
-              else wStr = `BW ${bwDisp}`;
+              if (addDisp > 0) wStr = `BW ${bwDisp} + ${addDisp} ${u}`;
+              else if (asstDisp > 0) wStr = `BW ${bwDisp} − ${asstDisp} ${u}${eqStr}`;
+              else wStr = `BW ${bwDisp} ${u}`;
             }
-            const e1rmStr = s.includeIn1Rm
-              ? `<span class="text-limeform-400 font-bold">${toDisplayWeight(s.implied1RmLbs)} ${u}</span>`
-              : `<span class="text-amber-300">Off-day</span>`;
 
             return `
               <div class="grid grid-cols-12 items-center gap-1 py-2 border-t border-forest-750/80 text-xs font-mono">
-                <div class="col-span-2 text-slate-300">${numStr}</div>
-                <div class="col-span-4 text-center text-white font-bold text-[10px] truncate" title="${wStr}">${wStr}</div>
-                <div class="col-span-2 text-center text-white font-bold">${s.reps}</div>
-                <div class="col-span-2 text-center text-[11px]">${e1rmStr}</div>
-                <div class="col-span-2 flex justify-end">
-                  <button type="button" data-del-setlog="${s.setLogId}" class="del-calendar-set-btn btn-danger !px-2 !py-0.5 !text-[10px]" title="Remove this record">
-                    ✕
-                  </button>
-                </div>
+                <div class="col-span-3 text-slate-300 font-bold">Set ${numStr}</div>
+                <div class="col-span-5 text-center text-white font-bold truncate" title="${wStr}">${wStr}</div>
+                <div class="col-span-4 text-right text-white font-bold">${s.reps} reps</div>
               </div>
             `;
           }).join('');
 
+          const actionButtonsHtml = isEditingThisMovement
+            ? `
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-forest-750">
+                <button type="button" data-del-rec-mov="${group.groupKey}" class="del-rec-mov-btn btn-danger !py-1.5 !px-2.5 !text-[11px]">
+                  🗑️ Remove Movement
+                </button>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" data-cancel-rec-mov="${group.groupKey}" class="cancel-rec-mov-btn btn-pill !py-1.5 !px-2.5 !text-[11px]">
+                    ✕ Cancel
+                  </button>
+                  <button type="button" data-save-rec-mov="${group.groupKey}" class="save-rec-mov-btn btn-lime !py-1.5 !px-3 !text-[11px]">
+                    ✓ Save &amp; Update 1RM
+                  </button>
+                </div>
+              </div>
+            `
+            : '';
+
           return `
-            <div class="form-subcard p-3.5 space-y-2 overflow-hidden">
+            <div class="form-subcard p-3.5 space-y-2.5 overflow-hidden ${isEditingThisMovement ? 'border border-limeform-400/60' : ''}">
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
                   <div class="text-sm font-bold text-white truncate">${group.exerciseName}</div>
@@ -4325,22 +4447,43 @@ function doPost(e) {
                     </div>
                   ` : ''}
                 </div>
-                <span class="text-[10px] font-mono text-slate-400 shrink-0">${group.sets.length} record${group.sets.length === 1 ? '' : 's'}</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  ${movement1RmBadgeHtml}
+                  ${!isEditingThisMovement ? `
+                    <button type="button" data-edit-rec-mov="${group.groupKey}" class="edit-rec-mov-btn btn-pill !py-1 !px-2.5 !text-[11px] !text-limeform-400">
+                      ✎ Edit
+                    </button>
+                  ` : ''}
+                </div>
               </div>
-              ${group.note ? `
+
+              ${isEditingThisMovement ? `
+                <div>
+                  <input type="text" id="recMovNoteInput" value="${(recordMovementEditDraft.note || '').replace(/"/g, '&quot;')}"
+                    placeholder="Movement note (optional)..."
+                    class="w-full bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 text-[11px] text-white" />
+                </div>
+              ` : (group.note ? `
                 <div class="bg-forest-900 border border-forest-700 rounded-xl px-2.5 py-1.5 text-[11px] text-cream-100 flex items-start gap-1.5">
                   <span class="text-limeform-400 shrink-0">📝</span>
                   <span>${group.note}</span>
                 </div>
-              ` : ''}
+              ` : '')}
+
               <div class="grid grid-cols-12 text-[10px] font-mono uppercase tracking-wider text-slate-400 pt-0.5">
-                <div class="col-span-2">SET</div>
-                <div class="col-span-4 text-center">${colWeightLabel}</div>
-                <div class="col-span-2 text-center">REPS</div>
-                <div class="col-span-2 text-center">1RM</div>
-                <div class="col-span-2 text-right">REMOVE</div>
+                ${isEditingThisMovement ? `
+                  <div class="col-span-2">SET</div>
+                  <div class="col-span-5 text-center">${colWeightLabel}</div>
+                  <div class="col-span-3 text-center">REPS</div>
+                  <div class="col-span-2 text-right">DROP</div>
+                ` : `
+                  <div class="col-span-3">SET</div>
+                  <div class="col-span-5 text-center">${colWeightLabel}</div>
+                  <div class="col-span-4 text-right">REPS</div>
+                `}
               </div>
               <div>${rowsHtml}</div>
+              ${actionButtonsHtml}
             </div>
           `;
         }).join('');
@@ -4370,22 +4513,169 @@ function doPost(e) {
         </button>
       `;
 
-      listEl.querySelectorAll('.del-calendar-set-btn').forEach(btn => {
+      // Per-Movement Edit Button in 03 Records
+      listEl.querySelectorAll('.edit-rec-mov-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-del-setlog');
-          const target = (state.calendarLogs || []).find(l => l.setLogId === id);
+          const gKey = btn.getAttribute('data-edit-rec-mov');
+          let foundGroup = null;
+          sessionsList.forEach(sess => {
+            Object.values(sess.exercisesMap).forEach(g => {
+              if (g.groupKey === gKey) foundGroup = g;
+            });
+          });
+          if (!foundGroup) return;
+          editingRecordMovementKey = gKey;
+          recordMovementEditDraft = {
+            groupKey: gKey,
+            sessionId: foundGroup.sessionId,
+            exerciseId: foundGroup.exerciseId,
+            exerciseName: foundGroup.exerciseName,
+            includeIn1Rm: foundGroup.sets.some(s => s.includeIn1Rm),
+            note: foundGroup.note || '',
+            sets: JSON.parse(JSON.stringify(foundGroup.sets))
+          };
+          renderTrainingCalendar();
+        });
+      });
+
+      // Live input changes inside Per-Movement Edit Mode
+      listEl.querySelectorAll('.rec-mov-edit-input').forEach(inp => {
+        inp.addEventListener('input', e => {
+          if (!recordMovementEditDraft) return;
+          const idx = parseInt(e.target.getAttribute('data-rec-edit-idx'), 10);
+          const field = e.target.getAttribute('data-rec-edit-field');
+          const setObj = recordMovementEditDraft.sets[idx];
+          const exObj = getExerciseById(recordMovementEditDraft.exerciseId);
+          if (!setObj) return;
+          if (field === 'weight') {
+            const rawVal = parseFloat(e.target.value);
+            if (!isNaN(rawVal)) {
+              const lbs = fromDisplayWeight(rawVal);
+              setObj.weightLbs = (exObj && exObj.type === 'bodyweight') ? lbs : Math.max(0, lbs);
+              if (exObj && exObj.type === 'bodyweight') {
+                setObj.addedWeightLbs = lbs > 0 ? lbs : 0;
+                setObj.assistanceWeightLbs = lbs < 0 ? Math.abs(lbs) : 0;
+              }
+            }
+          } else if (field === 'reps') {
+            setObj.reps = Math.max(1, parseInt(e.target.value, 10) || 1);
+          }
+          const previewId = `recMovPreview1Rm_${recordMovementEditDraft.groupKey.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+          const previewEl = document.getElementById(previewId);
+          if (previewEl) {
+            const new1RmLbs = computeMovement1RmFromLoggedSetsLbs(recordMovementEditDraft.sets, exObj);
+            previewEl.textContent = toDisplayWeight(new1RmLbs);
+          }
+        });
+      });
+
+      const noteInputEl = document.getElementById('recMovNoteInput');
+      if (noteInputEl) {
+        noteInputEl.addEventListener('input', e => {
+          if (recordMovementEditDraft) recordMovementEditDraft.note = e.target.value;
+        });
+      }
+
+      // Drop a single set inside Per-Movement Edit Mode (with confirmation)
+      listEl.querySelectorAll('.rec-edit-drop-set-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!recordMovementEditDraft || recordMovementEditDraft.sets.length <= 1) return;
+          const idx = parseInt(btn.getAttribute('data-rec-edit-drop-set'), 10);
           requestRemovalConfirmation(
-            'Remove this logged record?',
-            `Are you sure you want to remove this ${target ? target.exerciseName : 'logged'} set from ${selDate}? Your 1RM will be recalculated.`,
-            '🗑️ Remove Record',
+            'Remove this set?',
+            `Remove Set ${idx + 1} from ${recordMovementEditDraft.exerciseName}? (Tap ✓ Save afterward to apply)`,
+            '🗑️ Remove Set',
             () => {
-              pushUndoSnapshot(`Removed ${target ? target.exerciseName : 'record'}`);
-              state.calendarLogs = (state.calendarLogs || []).filter(l => l.setLogId !== id);
-              if (target) recomputeExercise1RmFromCalendarLogs(target.exerciseId);
+              recordMovementEditDraft.sets.splice(idx, 1);
+              renderTrainingCalendar();
+            }
+          );
+        });
+      });
+
+      // Cancel Per-Movement Edit Mode
+      listEl.querySelectorAll('.cancel-rec-mov-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          editingRecordMovementKey = null;
+          recordMovementEditDraft = null;
+          renderTrainingCalendar();
+        });
+      });
+
+      // Save Per-Movement Edit Mode & Recalculate Movement 1RM!
+      listEl.querySelectorAll('.save-rec-mov-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!recordMovementEditDraft) return;
+          const draft = recordMovementEditDraft;
+          const exObj = getExerciseById(draft.exerciseId);
+          const newMov1RmLbs = computeMovement1RmFromLoggedSetsLbs(draft.sets, exObj);
+
+          pushUndoSnapshot(`Edited ${draft.exerciseName} record`);
+
+          // Replace original sets for this movement in this session on selDate with the edited sets & new implied1RmLbs
+          const updatedSets = draft.sets.map((s, idx) => Object.assign({}, s, {
+            setNumber: idx + 1,
+            note: draft.note || '',
+            implied1RmLbs: s.includeIn1Rm ? newMov1RmLbs : 0
+          }));
+
+          const nextLogs = [];
+          let inserted = false;
+          (state.calendarLogs || []).forEach(l => {
+            const lSessKey = l.sessionId || l.routineName || 'Session';
+            const lExKey = l.exerciseId || l.exerciseName;
+            const isMatch = (l.date === selDate && `${lSessKey}__${lExKey}` === draft.groupKey);
+            if (isMatch) {
+              if (!inserted) {
+                nextLogs.push(...updatedSets);
+                inserted = true;
+              }
+            } else {
+              nextLogs.push(l);
+            }
+          });
+
+          state.calendarLogs = nextLogs;
+          editingRecordMovementKey = null;
+          recordMovementEditDraft = null;
+
+          if (draft.exerciseId) {
+            recomputeExercise1RmFromCalendarLogs(draft.exerciseId);
+          }
+          refreshActiveSessionWeights();
+          saveState();
+          handleWriteToGoogleSheet(`Edited ${draft.exerciseName} on ${selDate}`);
+          renderAll();
+          showToast(`Updated ${draft.exerciseName} → 1RM: ${toDisplayWeight(newMov1RmLbs)} ${u}`, true);
+        });
+      });
+
+      // Remove Entire Movement from Session (inside Per-Movement Edit Mode, with confirmation)
+      listEl.querySelectorAll('.del-rec-mov-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!recordMovementEditDraft) return;
+          const draft = recordMovementEditDraft;
+          requestRemovalConfirmation(
+            `Remove ${draft.exerciseName}?`,
+            `Are you sure you want to remove all ${draft.sets.length} set(s) of ${draft.exerciseName} from this session on ${selDate}? Its 1RM will be recalculated.`,
+            '🗑️ Remove Movement',
+            () => {
+              pushUndoSnapshot(`Removed ${draft.exerciseName}`);
+              state.calendarLogs = (state.calendarLogs || []).filter(l => {
+                const lSessKey = l.sessionId || l.routineName || 'Session';
+                const lExKey = l.exerciseId || l.exerciseName;
+                return !(l.date === selDate && `${lSessKey}__${lExKey}` === draft.groupKey);
+              });
+              editingRecordMovementKey = null;
+              recordMovementEditDraft = null;
+              if (draft.exerciseId) {
+                recomputeExercise1RmFromCalendarLogs(draft.exerciseId);
+              }
               refreshActiveSessionWeights();
-              handleWriteToGoogleSheet(`Removed record on ${selDate}`);
+              saveState();
+              handleWriteToGoogleSheet(`Removed ${draft.exerciseName} on ${selDate}`);
               renderAll();
-              showToast('Removed record & rebuilt 1RM', true);
+              showToast(`Removed ${draft.exerciseName} & rebuilt 1RM`, true);
             }
           );
         });
@@ -4401,6 +4691,8 @@ function doPost(e) {
             `Are you sure you want to delete all ${affected.length} logged set(s) in this session on ${selDate}?`,
             '🗑️ Delete Session',
             () => {
+              editingRecordMovementKey = null;
+              recordMovementEditDraft = null;
               pushUndoSnapshot('Deleted session');
               state.calendarLogs = (state.calendarLogs || []).filter(l => !((l.sessionId || l.routineName) === sId && l.date === selDate));
               exIds.forEach(id => recomputeExercise1RmFromCalendarLogs(id));
@@ -4423,6 +4715,8 @@ function doPost(e) {
             `Are you sure you want to remove all ${affected.length} record(s) logged on ${selDate}?`,
             '🗑️ Remove All',
             () => {
+              editingRecordMovementKey = null;
+              recordMovementEditDraft = null;
               pushUndoSnapshot(`Cleared ${selDate}`);
               state.calendarLogs = (state.calendarLogs || []).filter(l => l.date !== selDate);
               exIds.forEach(id => recomputeExercise1RmFromCalendarLogs(id));
@@ -5089,23 +5383,29 @@ function doPost(e) {
               </div>
             </div>
 
-            <div class="bg-forest-850 border border-forest-700 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2">
-              <span class="text-[11px] text-slate-300">Calibrate from scheme working weight at ${activeGym.name}:</span>
-              <div class="flex items-center gap-1 font-mono">
-                <input type="number" step="2.5" id="calWeight_${ex.id}" value="${sampleWorkDisp}"
-                  class="w-14 bg-forest-900 border border-forest-600 rounded-lg px-1.5 py-1 text-center text-white text-xs" />
-                <span class="text-[10px] text-slate-400">${u} @</span>
-                <select id="calSchemePct_${ex.id}" class="bg-forest-900 border border-forest-600 rounded-lg px-1.5 py-1 text-[10px] text-limeform-400">
-                  <option value="82.5">3×5 (82.5%)</option>
-                  <option value="75" selected>3×8 (75%)</option>
-                  <option value="70">3×10 / Prilepin 4×6 (70%)</option>
-                  <option value="65">GZCLP T2 3×10 (65%)</option>
-                  <option value="77">Texas Vol 5×5 (77%)</option>
-                  <option value="100">Strict 1RM (100%)</option>
-                </select>
-                <button type="button" data-cal-ex="${ex.id}" class="btn-calibrate-gym-machine btn-lime !py-1 !px-2.5 !text-[11px]">
-                  Calibrate
-                </button>
+            <div class="bg-forest-850 border border-forest-700 rounded-xl p-2.5 space-y-2 overflow-hidden">
+              <div class="text-[11px] text-slate-300">Calibrate from working weight at ${activeGym.name}:</div>
+              <div class="grid grid-cols-12 items-center gap-1.5 font-mono">
+                <div class="col-span-4 flex items-center gap-1 bg-forest-900 border border-forest-600 rounded-lg px-2 py-1 min-w-0">
+                  <input type="number" step="2.5" id="calWeight_${ex.id}" value="${sampleWorkDisp}"
+                    class="w-full min-w-0 bg-transparent text-center text-white font-bold focus:outline-none text-xs" />
+                  <span class="text-[10px] text-slate-400 shrink-0">${u}</span>
+                </div>
+                <div class="col-span-5 min-w-0">
+                  <select id="calSchemePct_${ex.id}" class="w-full min-w-0 bg-forest-900 border border-forest-600 rounded-lg px-1.5 py-1.5 text-[10px] text-limeform-400 truncate cursor-pointer">
+                    <option value="82.5">3×5 (82.5%)</option>
+                    <option value="75" selected>3×8 (75%)</option>
+                    <option value="70">3×10 / Prilepin (70%)</option>
+                    <option value="65">GZCLP T2 (65%)</option>
+                    <option value="77">Texas 5×5 (77%)</option>
+                    <option value="100">Strict 1RM (100%)</option>
+                  </select>
+                </div>
+                <div class="col-span-3 min-w-0">
+                  <button type="button" data-cal-ex="${ex.id}" class="btn-calibrate-gym-machine btn-lime w-full !py-1.5 !px-1.5 !text-[11px] justify-center truncate">
+                    Calibrate
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -5515,7 +5815,8 @@ function doPost(e) {
         const isBw = ex.type === 'bodyweight';
         const isUni = ex.laterality === 'unilateral';
         const cur1RmLbs = getExerciseE1RmLbs(ex);
-        const repsVal = item.testReps || (isFormula ? 5 : stageInfo.targetReps);
+        const repsVal = isFormula ? (item.testReps || 5) : stageInfo.targetReps;
+        if (!isFormula) item.testReps = stageInfo.targetReps;
 
         let workTotal = cur1RmLbs;
         if (isFormula) {
@@ -5577,9 +5878,13 @@ function doPost(e) {
                   class="onboard-input w-full bg-forest-900 border border-forest-600 rounded-xl px-2 py-1.5 text-center text-white font-bold" />
               </div>
               <div class="col-span-3">
-                <label class="block text-[9px] text-slate-400 mb-0.5">REPS</label>
-                <input type="number" step="1" min="1" max="30" data-onboard-ex="${ex.id}" data-onboard-field="reps" value="${repsVal}"
-                  class="onboard-input w-full bg-forest-900 border border-forest-600 rounded-xl px-2 py-1.5 text-center text-white font-bold" />
+                <label class="block text-[9px] text-slate-400 mb-0.5">${isFormula ? 'REPS' : 'REPS (FIXED)'}</label>
+                <input type="number" step="1" min="1" max="30" ${isFormula ? '' : 'disabled readonly'} data-onboard-ex="${ex.id}" data-onboard-field="reps" value="${repsVal}"
+                  class="onboard-input w-full border rounded-xl px-2 py-1.5 text-center font-bold ${
+                    isFormula
+                      ? 'bg-forest-900 border-forest-600 text-white'
+                      : 'bg-forest-950/70 border-forest-800 text-slate-400 cursor-not-allowed opacity-75'
+                  }" />
               </div>
               <div class="col-span-4">
                 <label class="block text-[9px] text-limeform-400 mb-0.5 truncate">EST. 1RM (${u.toUpperCase()})</label>
@@ -5771,6 +6076,52 @@ function doPost(e) {
       return { ok: false, error: 'Paste a deployed Google Apps Script Web App URL (https://script.google.com/macros/s/.../exec).' };
     }
 
+    let isPullingSheetInFlight = false;
+    let lastSheetPullTimestampMs = 0;
+
+    async function pullFreshDataFromGoogleSheet({ silent = true } = {}) {
+      if (isPullingSheetInFlight) return false;
+      if (!state.gdoc || !state.gdoc.isLoggedIn || state.gdoc.syncState === 'pending') return false;
+      const url = (state.gdoc.url || '').trim();
+      const cred = (state.gdoc.credential || '').trim();
+      if (!url || !cred.startsWith('https://script.google.com/')) return false;
+
+      // Avoid interrupting if the user is actively typing in an input or editing setup/records
+      const activeTag = document.activeElement ? document.activeElement.tagName : '';
+      if (silent && (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT' || isSetupEditMode || editingRecordMovementKey)) {
+        return false;
+      }
+
+      isPullingSheetInFlight = true;
+      try {
+        const getResp = await fetch(`${cred}?sheetUrl=${encodeURIComponent(url)}&sheetName=form_app_data&_t=${Date.now()}`, { redirect: 'follow' });
+        const rawText = await getResp.text();
+        const data = JSON.parse(rawText);
+        const sheetRows = data.rows || data.previewRows || null;
+        const nonEmpty = Array.isArray(sheetRows) ? sheetRows.filter(r => Array.isArray(r) && String(r[0] || '').trim() !== '') : [];
+        if (nonEmpty.length > 1 && (String(nonEmpty[0][0]) === 'TYPE' || String(nonEmpty[0][0]).startsWith('FORM_WORKOUT_SHEET'))) {
+          parseSpreadsheetTableIntoState(nonEmpty);
+          lastSheetPullTimestampMs = Date.now();
+          state.gdoc.syncState = 'confirmed';
+          state.gdoc.lastSynced = `Pulled ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+          appendSheetLog(`Pulled latest data from Google Sheet (${state.calendarLogs.length} records, active routine: ${state.sessionTitle}).`);
+          saveState();
+          renderAll();
+          if (!silent) {
+            showToast(`Synced latest data & active routine "${state.sessionTitle}" from Sheet`);
+          }
+          return true;
+        }
+      } catch (e) {
+        if (!silent) {
+          showToast('Using saved local data (Sheet pull offline)');
+        }
+      } finally {
+        isPullingSheetInFlight = false;
+      }
+      return false;
+    }
+
     // =========================================================================
     // MASTER RENDER & EVENT INIT
     // =========================================================================
@@ -5811,7 +6162,25 @@ function doPost(e) {
       if (!state.onboardingCompleted || !state.gdoc.isLoggedIn) {
         renderOnboardingModalTable();
         document.getElementById('onboardingSetupModal').classList.remove('hidden');
+      } else {
+        // Automatically pull fresh data & active routine from Google Sheet whenever the user opens the app!
+        pullFreshDataFromGoogleSheet({ silent: true });
       }
+
+      // Also pull fresh data from Google Sheet when returning to the app tab or periodically every 60s
+      window.addEventListener('focus', () => {
+        if (Date.now() - lastSheetPullTimestampMs > 20000) {
+          pullFreshDataFromGoogleSheet({ silent: true });
+        }
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && Date.now() - lastSheetPullTimestampMs > 20000) {
+          pullFreshDataFromGoogleSheet({ silent: true });
+        }
+      });
+      setInterval(() => {
+        pullFreshDataFromGoogleSheet({ silent: true });
+      }, 60000);
 
       // Undo buttons (in 03 Records header & in Toast banner)
       const recUndoBtn = document.getElementById('undoRecordsActionBtn');
@@ -6464,6 +6833,7 @@ function doPost(e) {
                 assistanceWeightLbs: asstW,
                 assistanceEquipment: s.assistanceEquipment || (asstW > 0 ? 'Assisted Machine' : 'None'),
                 reps: s.actualReps,
+                targetReps: s.targetRepsNum || s.actualReps,
                 prescribedPct: s.prescribedPctOf1Rm,
                 includeIn1Rm: includeBlock,
                 implied1RmLbs: schemeSession1RmLbs,
@@ -6671,16 +7041,19 @@ function doPost(e) {
       });
 
       document.getElementById('onboardLoadExistingAndFinishBtn').addEventListener('click', () => {
+        state.unfinishedSessionsByRoutine = {};
+        state.activeSessionExercises = [];
         if (window.__pendingTableRows && Array.isArray(window.__pendingTableRows)) {
           parseSpreadsheetTableIntoState(window.__pendingTableRows);
         }
         state.gdoc.isLoggedIn = true;
         state.gdoc.syncState = 'confirmed';
         state.onboardingCompleted = true;
-        refreshActiveSessionWeights();
+        loadRoutineIntoActiveSession(state.activeRoutineId, false, true);
         saveState();
         document.getElementById('onboardingSetupModal').classList.add('hidden');
         renderAll();
+        showToast(`Loaded active routine "${state.sessionTitle}" from Google Sheet`);
         if (!state.walkthroughShown) openWalkthroughTour();
       });
 
