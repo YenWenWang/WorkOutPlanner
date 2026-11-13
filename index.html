@@ -2230,6 +2230,15 @@ function doPost(e) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.exercises && parsed.gyms) {
           state = Object.assign(JSON.parse(JSON.stringify(INITIAL_DEFAULT_STATE)), parsed);
+          state.gdoc = Object.assign({}, INITIAL_DEFAULT_STATE.gdoc, parsed.gdoc || {});
+          // Keep user logged in across page reloads unless they explicitly clicked Log Out
+          if (!state.explicitlyLoggedOut && (state.onboardingCompleted || (state.gdoc.url && state.gdoc.credential))) {
+            state.gdoc.isLoggedIn = true;
+            state.onboardingCompleted = true;
+            if (state.gdoc.syncState === 'disconnected' && state.gdoc.url && state.gdoc.credential) {
+              state.gdoc.syncState = 'confirmed';
+            }
+          }
         }
       }
     } catch (e) {}
@@ -5786,8 +5795,14 @@ function doPost(e) {
     }
 
     function renderGoogleSheetHub() {
-      document.getElementById('gdocUrlInput').value = state.gdoc.url;
-      document.getElementById('gdocBridgeCredentialInput').value = state.gdoc.credential || '';
+      const gdocUrlEl = document.getElementById('gdocUrlInput');
+      const gdocCredEl = document.getElementById('gdocBridgeCredentialInput');
+      if (gdocUrlEl && document.activeElement !== gdocUrlEl) gdocUrlEl.value = state.gdoc.url || '';
+      if (gdocCredEl && document.activeElement !== gdocCredEl) gdocCredEl.value = state.gdoc.credential || '';
+      const onbUrlEl = document.getElementById('onboardGdocUrlInput');
+      const onbCredEl = document.getElementById('onboardBridgeUrlInput');
+      if (onbUrlEl && document.activeElement !== onbUrlEl) onbUrlEl.value = state.gdoc.url || '';
+      if (onbCredEl && document.activeElement !== onbCredEl) onbCredEl.value = state.gdoc.credential || '';
 
       const badge = document.getElementById('userPageDocStatusBadge');
       if (!state.gdoc.isLoggedIn || state.gdoc.syncState === 'disconnected') {
@@ -7246,12 +7261,16 @@ function doPost(e) {
         state.gdoc.docId = extractGoogleSheetId(url);
         state.gdoc.credential = bridge;
         state.gdoc.isLoggedIn = true;
+        state.explicitlyLoggedOut = false;
         state.gdoc.syncState = 'confirmed';
+        saveState();
 
         if (res.status === 'empty') {
           wipeAllAccountDataAndResetToDefaults();
           state.gdoc.isLoggedIn = true;
+          state.explicitlyLoggedOut = false;
           state.gdoc.syncState = 'confirmed';
+          saveState();
           document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
           renderOnboardingModalTable();
           step2.classList.remove('hidden');
@@ -7271,6 +7290,7 @@ function doPost(e) {
           parseSpreadsheetTableIntoState(window.__pendingTableRows);
         }
         state.gdoc.isLoggedIn = true;
+        state.explicitlyLoggedOut = false;
         state.gdoc.syncState = 'confirmed';
         state.onboardingCompleted = true;
         loadRoutineIntoActiveSession(state.activeRoutineId, false, true);
@@ -7285,6 +7305,8 @@ function doPost(e) {
         requestWipeWithConfirmation(() => {
           wipeAllAccountDataAndResetToDefaults();
           state.gdoc.isLoggedIn = true;
+          state.explicitlyLoggedOut = false;
+          saveState();
           handleWriteToGoogleSheet('Wiped form_app_data for fresh calibration', true);
           document.getElementById('onboardExistingDataFoundBox').classList.add('hidden');
           document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
@@ -7298,6 +7320,8 @@ function doPost(e) {
         requestWipeWithConfirmation(() => {
           wipeAllAccountDataAndResetToDefaults();
           state.gdoc.isLoggedIn = true;
+          state.explicitlyLoggedOut = false;
+          saveState();
           handleWriteToGoogleSheet('Initialized form_app_data tab', true);
           document.getElementById('onboardIncompatibleDataBox').classList.add('hidden');
           document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
@@ -7311,7 +7335,12 @@ function doPost(e) {
         state.gdoc.url = document.getElementById('onboardGdocUrlInput').value.trim();
         state.gdoc.docId = extractGoogleSheetId(state.gdoc.url);
         state.gdoc.credential = document.getElementById('onboardBridgeUrlInput').value.trim();
+        state.gdoc.isLoggedIn = true;
+        state.explicitlyLoggedOut = false;
         wipeAllAccountDataAndResetToDefaults();
+        state.gdoc.isLoggedIn = true;
+        state.explicitlyLoggedOut = false;
+        saveState();
         document.getElementById('onboardErrorBox').classList.add('hidden');
         document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
         renderOnboardingModalTable();
@@ -7452,7 +7481,19 @@ function doPost(e) {
           }
         });
 
+        const enteredOnbUrl = (document.getElementById('onboardGdocUrlInput')?.value || '').trim();
+        const enteredOnbCred = (document.getElementById('onboardBridgeUrlInput')?.value || '').trim();
+        if (enteredOnbUrl) {
+          state.gdoc.url = enteredOnbUrl;
+          state.gdoc.docId = extractGoogleSheetId(enteredOnbUrl);
+        }
+        if (enteredOnbCred) {
+          state.gdoc.credential = enteredOnbCred;
+        }
         state.onboardingCompleted = true;
+        state.gdoc.isLoggedIn = true;
+        state.explicitlyLoggedOut = false;
+        saveState();
         refreshActiveSessionWeights();
         handleWriteToGoogleSheet('Initial 1RM setup');
         document.getElementById('onboardingSetupModal').classList.add('hidden');
@@ -7463,8 +7504,12 @@ function doPost(e) {
 
       document.getElementById('gdocWriteNowBtn').addEventListener('click', async () => {
         state.gdoc.url = document.getElementById('gdocUrlInput').value.trim();
+        state.gdoc.docId = extractGoogleSheetId(state.gdoc.url);
         state.gdoc.credential = document.getElementById('gdocBridgeCredentialInput').value.trim();
         state.gdoc.isLoggedIn = true;
+        state.onboardingCompleted = true;
+        state.explicitlyLoggedOut = false;
+        saveState();
         const res = await handleWriteToGoogleSheet('Manual sync', true);
         showToast(res.ok ? 'Confirmed sync to Google Sheet' : 'Saved locally (Could not confirm server write)');
       });
@@ -7476,6 +7521,14 @@ function doPost(e) {
         readBtn.innerHTML = `<span class="form-spinner mr-1.5"></span><span>Reading Sheet...</span>`;
         const url = document.getElementById('gdocUrlInput').value.trim();
         const cred = document.getElementById('gdocBridgeCredentialInput').value.trim();
+        if (url) {
+          state.gdoc.url = url;
+          state.gdoc.docId = extractGoogleSheetId(url);
+        }
+        if (cred) {
+          state.gdoc.credential = cred;
+        }
+        saveState();
         let res;
         try {
           res = await verifyAndInspectGoogleSheet(url, cred);
@@ -7485,19 +7538,25 @@ function doPost(e) {
         }
         if (res.ok) {
           state.gdoc.isLoggedIn = true;
+          state.onboardingCompleted = true;
+          state.explicitlyLoggedOut = false;
           state.gdoc.syncState = 'confirmed';
           if (res.tableRows && Array.isArray(res.tableRows)) {
             parseSpreadsheetTableIntoState(res.tableRows);
           } else if (res.status === 'empty') {
             wipeAllAccountDataAndResetToDefaults();
             state.gdoc.isLoggedIn = true;
+            state.onboardingCompleted = true;
+            state.explicitlyLoggedOut = false;
             state.gdoc.syncState = 'confirmed';
           }
+          saveState();
           refreshActiveSessionWeights();
           renderAll();
           showToast(`Loaded ${state.gyms.length} gym(s) & ${state.calendarLogs.length} record(s) from Sheet`);
         } else {
           state.gdoc.syncState = 'failed';
+          saveState();
           renderGoogleSheetHub();
           showToast(res.error || 'Could not read Google Sheet');
         }
@@ -7514,6 +7573,7 @@ function doPost(e) {
 
       function logoutAndOpenSetupWizard() {
         state.gdoc.isLoggedIn = false;
+        state.explicitlyLoggedOut = true;
         state.gdoc.syncState = 'disconnected';
         state.gdoc.lastSynced = 'Disconnected';
         appendSheetLog('Logged out of Google Sheet — returned to Setup Wizard.');
