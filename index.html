@@ -1914,8 +1914,8 @@ function doPost(e) {
       calendarYear: new Date().getFullYear(),
       calendarMonth: new Date().getMonth(),
       selectedCalendarDate: getTodayIsoDate(),
-      onboardingCompleted: false,
-      walkthroughShown: false,
+      onboardingCompleted: true,
+      walkthroughShown: true,
       customSchemes: {},
       unfinishedSessionsByRoutine: {},
       savedRoutines: [
@@ -1960,12 +1960,12 @@ function doPost(e) {
         }
       ],
       gdoc: {
-        isLoggedIn: false,
-        syncState: 'disconnected', // 'disconnected' | 'pending' | 'confirmed' | 'failed'
+        isLoggedIn: true,
+        syncState: 'confirmed', // 'disconnected' | 'pending' | 'confirmed' | 'failed'
         url: '',
         docId: '',
         credential: '',
-        lastSynced: 'Disconnected',
+        lastSynced: 'Connected to Google Sheet',
         logs: ['Saves locally first; syncs to dedicated form_app_data worksheet when connected.']
       },
       gyms: [
@@ -2223,22 +2223,54 @@ function doPost(e) {
       ]
     };
 
+    function readBackupAuthFromCookieOrWindowName() {
+      try {
+        const m = (document.cookie || '').match(/(?:^|;\s*)form_workout_auth_v1=([^;]+)/);
+        if (m && m[1]) {
+          return JSON.parse(decodeURIComponent(m[1]));
+        }
+      } catch (e) {}
+      try {
+        if (window.name && window.name.startsWith('FORM_APP_STATE:')) {
+          return JSON.parse(window.name.slice('FORM_APP_STATE:'.length));
+        }
+      } catch (e) {}
+      return null;
+    }
+
     let state = JSON.parse(JSON.stringify(INITIAL_DEFAULT_STATE));
     try {
-      const saved = localStorage.getItem('form_workout_app_v19');
-      if (saved) {
-        const parsed = JSON.parse(saved);
+      let rawSaved = null;
+      try { rawSaved = localStorage.getItem('form_workout_app_v19'); } catch (e) {}
+      if (!rawSaved && window.name && window.name.startsWith('FORM_APP_FULL:')) {
+        rawSaved = window.name.slice('FORM_APP_FULL:'.length);
+      }
+      if (rawSaved) {
+        const parsed = JSON.parse(rawSaved);
         if (parsed && parsed.exercises && parsed.gyms) {
           state = Object.assign(JSON.parse(JSON.stringify(INITIAL_DEFAULT_STATE)), parsed);
           state.gdoc = Object.assign({}, INITIAL_DEFAULT_STATE.gdoc, parsed.gdoc || {});
-          // Keep user logged in across page reloads unless they explicitly clicked Log Out
-          if (!state.explicitlyLoggedOut && (state.onboardingCompleted || (state.gdoc.url && state.gdoc.credential))) {
-            state.gdoc.isLoggedIn = true;
-            state.onboardingCompleted = true;
-            if (state.gdoc.syncState === 'disconnected' && state.gdoc.url && state.gdoc.credential) {
-              state.gdoc.syncState = 'confirmed';
-            }
-          }
+        }
+      }
+      let savedAuth = null;
+      try {
+        const rawAuth = localStorage.getItem('form_workout_auth_v1');
+        if (rawAuth) savedAuth = JSON.parse(rawAuth);
+      } catch (e) {}
+      if (!savedAuth) savedAuth = readBackupAuthFromCookieOrWindowName();
+      if (savedAuth && typeof savedAuth === 'object') {
+        if (savedAuth.url) state.gdoc.url = savedAuth.url;
+        if (savedAuth.docId) state.gdoc.docId = savedAuth.docId;
+        if (savedAuth.credential) state.gdoc.credential = savedAuth.credential;
+        if (savedAuth.explicitlyLoggedOut !== undefined) state.explicitlyLoggedOut = savedAuth.explicitlyLoggedOut;
+        if (savedAuth.onboardingCompleted !== undefined) state.onboardingCompleted = savedAuth.onboardingCompleted;
+        if (savedAuth.isLoggedIn !== undefined) state.gdoc.isLoggedIn = savedAuth.isLoggedIn;
+      }
+      if (!state.explicitlyLoggedOut && (state.onboardingCompleted || (state.gdoc.url && state.gdoc.credential))) {
+        state.gdoc.isLoggedIn = true;
+        state.onboardingCompleted = true;
+        if (state.gdoc.syncState === 'disconnected' && state.gdoc.url && state.gdoc.credential) {
+          state.gdoc.syncState = 'confirmed';
         }
       }
     } catch (e) {}
@@ -2290,10 +2322,28 @@ function doPost(e) {
       };
     }
 
-    // Priority 4: saveState() saves state locally WITHOUT silently mutating state.savedRoutines!
+    // Priority 4: saveState() saves state locally across localStorage, cookie & window.name WITHOUT silently mutating state.savedRoutines!
     function saveState() {
+      const serialized = JSON.stringify(state);
       try {
-        localStorage.setItem('form_workout_app_v19', JSON.stringify(state));
+        localStorage.setItem('form_workout_app_v19', serialized);
+      } catch (e) {}
+      const authPayload = JSON.stringify({
+        url: state.gdoc ? state.gdoc.url : '',
+        docId: state.gdoc ? state.gdoc.docId : '',
+        credential: state.gdoc ? state.gdoc.credential : '',
+        isLoggedIn: Boolean(state.gdoc && state.gdoc.isLoggedIn),
+        onboardingCompleted: Boolean(state.onboardingCompleted),
+        explicitlyLoggedOut: Boolean(state.explicitlyLoggedOut)
+      });
+      try {
+        localStorage.setItem('form_workout_auth_v1', authPayload);
+      } catch (e) {}
+      try {
+        document.cookie = 'form_workout_auth_v1=' + encodeURIComponent(authPayload) + '; max-age=31536000; path=/; SameSite=Lax';
+      } catch (e) {}
+      try {
+        window.name = 'FORM_APP_FULL:' + serialized;
       } catch (e) {}
     }
 
@@ -7277,6 +7327,13 @@ function doPost(e) {
         } else if (res.status === 'compatible') {
           window.__pendingKineticJson = res.kineticJson;
           window.__pendingTableRows = res.tableRows;
+          if (res.tableRows && Array.isArray(res.tableRows)) {
+            parseSpreadsheetTableIntoState(res.tableRows);
+          }
+          state.onboardingCompleted = true;
+          state.gdoc.isLoggedIn = true;
+          state.explicitlyLoggedOut = false;
+          saveState();
           compatBox.classList.remove('hidden');
         } else {
           incompatBox.classList.remove('hidden');
