@@ -666,7 +666,7 @@
 
               <!-- Unified 1RM calculation explanation (Every set is a 1RM Set!) -->
               <div class="bg-forest-850 border border-forest-700 rounded-xl p-2.5 text-[11px] text-slate-300 leading-snug">
-                <strong class="text-limeform-400">How 1RM is calculated:</strong> Every set is a <strong>1RM Set</strong> weighted by its own target <span class="font-mono text-white">%1RM</span> and target reps: <span class="font-mono text-white">(Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)</span> averaged across the sets.
+                <strong class="text-limeform-400">How 1RM is calculated:</strong> Every set is a <strong>1RM Set</strong> weighted by its own target <span class="font-mono text-white">%1RM</span> and target reps: <span class="font-mono text-white">(Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)</span> averaged across the sets.
               </div>
 
               <!-- Day / Week / Stage Tabs -->
@@ -1416,7 +1416,7 @@ function doPost(e) {
         shortTag: '3×5',
         progressionCadence: 'single',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 3,
         refPctOf1Rm: 82.5,
         refReps: 5,
@@ -1439,7 +1439,7 @@ function doPost(e) {
         shortTag: '3×8',
         progressionCadence: 'single',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 3,
         refPctOf1Rm: 75,
         refReps: 8,
@@ -1462,7 +1462,7 @@ function doPost(e) {
         shortTag: '3×10',
         progressionCadence: 'single',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 3,
         refPctOf1Rm: 70,
         refReps: 10,
@@ -1485,7 +1485,7 @@ function doPost(e) {
         shortTag: 'Drop Sets',
         progressionCadence: 'single',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 3,
         refPctOf1Rm: 80,
         refReps: 8,
@@ -1516,7 +1516,7 @@ function doPost(e) {
         shortTag: 'Prilepin Table',
         progressionCadence: 'session',
         formulaType: 'prilepin_zone',
-        formulaLabel: "Prilepin Zone Formula: (Working Weight ÷ Zone %) × (1 + 0.04 × (Total Reps − Optimal Reps) ÷ Optimal Reps)",
+        formulaLabel: "Prilepin Zone Formula: (Working Weight ÷ Zone %) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)",
         setsCount: 4,
         refPctOf1Rm: 70,
         refReps: 6,
@@ -1565,7 +1565,7 @@ function doPost(e) {
         shortTag: '5/3/1 BBB',
         progressionCadence: 'weekly',
         formulaType: 'wendler_531',
-        formulaLabel: '1RM Set Formula: Averages (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps) across completed sets',
+        formulaLabel: '1RM Set Formula: Averages (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps) across completed sets',
         setsCount: 8,
         refPctOf1Rm: 76.5,
         refReps: 5,
@@ -1645,7 +1645,7 @@ function doPost(e) {
         shortTag: 'Texas 5×5',
         progressionCadence: 'session',
         formulaType: 'texas_method',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 5,
         refPctOf1Rm: 77,
         refReps: 5,
@@ -1688,7 +1688,7 @@ function doPost(e) {
         shortTag: 'GZCLP T1',
         progressionCadence: 'stage_pass',
         formulaType: 'gzclp_t1',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Stage %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Stage %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 5,
         refPctOf1Rm: 85,
         refReps: 3,
@@ -1722,7 +1722,7 @@ function doPost(e) {
         shortTag: 'GZCLP T2',
         progressionCadence: 'stage_pass',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Stage %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Stage %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 3,
         refPctOf1Rm: 65,
         refReps: 10,
@@ -1756,7 +1756,7 @@ function doPost(e) {
         shortTag: 'DUP 3-Day',
         progressionCadence: 'session',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Day %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Day %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 4,
         refPctOf1Rm: 75,
         refReps: 8,
@@ -1790,7 +1790,7 @@ function doPost(e) {
         shortTag: 'RPT Pyramid',
         progressionCadence: 'weekly',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 3,
         refPctOf1Rm: 85,
         refReps: 5,
@@ -1837,7 +1837,7 @@ function doPost(e) {
         shortTag: '4×10 Volume',
         progressionCadence: 'single',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 4,
         refPctOf1Rm: 70,
         refReps: 10,
@@ -1860,7 +1860,7 @@ function doPost(e) {
         shortTag: 'GVT 10-Set',
         progressionCadence: 'weekly',
         formulaType: 'prilepin_zone',
-        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+        formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 10,
         refPctOf1Rm: 60,
         refReps: 10,
@@ -1914,8 +1914,8 @@ function doPost(e) {
       calendarYear: new Date().getFullYear(),
       calendarMonth: new Date().getMonth(),
       selectedCalendarDate: getTodayIsoDate(),
-      onboardingCompleted: true,
-      walkthroughShown: true,
+      onboardingCompleted: false,
+      walkthroughShown: false,
       customSchemes: {},
       unfinishedSessionsByRoutine: {},
       savedRoutines: [
@@ -1960,12 +1960,12 @@ function doPost(e) {
         }
       ],
       gdoc: {
-        isLoggedIn: true,
-        syncState: 'confirmed', // 'disconnected' | 'pending' | 'confirmed' | 'failed'
+        isLoggedIn: false,
+        syncState: 'disconnected', // 'disconnected' | 'pending' | 'confirmed' | 'failed'
         url: '',
         docId: '',
         credential: '',
-        lastSynced: 'Connected to Google Sheet',
+        lastSynced: 'Disconnected',
         logs: ['Saves locally first; syncs to dedicated form_app_data worksheet when connected.']
       },
       gyms: [
@@ -2266,12 +2266,18 @@ function doPost(e) {
         if (savedAuth.onboardingCompleted !== undefined) state.onboardingCompleted = savedAuth.onboardingCompleted;
         if (savedAuth.isLoggedIn !== undefined) state.gdoc.isLoggedIn = savedAuth.isLoggedIn;
       }
-      if (!state.explicitlyLoggedOut && (state.onboardingCompleted || (state.gdoc.url && state.gdoc.credential))) {
+      const hasSavedSheetCredentials = Boolean(state.gdoc && state.gdoc.url && state.gdoc.credential);
+      if (!state.explicitlyLoggedOut && hasSavedSheetCredentials) {
         state.gdoc.isLoggedIn = true;
         state.onboardingCompleted = true;
-        if (state.gdoc.syncState === 'disconnected' && state.gdoc.url && state.gdoc.credential) {
-          state.gdoc.syncState = 'confirmed';
+        state.gdoc.syncState = 'confirmed';
+        if (!state.gdoc.lastSynced || state.gdoc.lastSynced === 'Disconnected' || String(state.gdoc.lastSynced).startsWith('⏳')) {
+          state.gdoc.lastSynced = 'Connected to Google Sheet';
         }
+      } else if (!hasSavedSheetCredentials) {
+        state.gdoc.isLoggedIn = false;
+        state.gdoc.syncState = 'disconnected';
+        state.onboardingCompleted = false;
       }
     } catch (e) {}
 
@@ -2478,6 +2484,7 @@ function doPost(e) {
       fresh.gdoc.credential = keepCred;
       fresh.gdoc.isLoggedIn = keepLogin;
       fresh.gdoc.syncState = keepLogin ? 'confirmed' : 'disconnected';
+      fresh.gdoc.lastSynced = keepLogin ? 'Connected' : 'Disconnected';
       fresh.onboardingCompleted = state.onboardingCompleted;
       fresh.calendarLogs = [];
       fresh.unfinishedSessionsByRoutine = {};
@@ -3033,7 +3040,8 @@ function doPost(e) {
       if (state.estimationMode === 'strict_wxr') {
         return computeDirectFormulaTest1RmLbs(load, rAct);
       }
-      return Math.max(0, (load / pct) * (1 + 0.04 * ((rAct - rTarg) / rTarg)));
+      const logMultiplier = Math.log(1 + rAct) / Math.log(1 + rTarg);
+      return Math.max(0, (load / pct) * logMultiplier);
     }
 
     // Computes effective total system load for a set:
@@ -3549,7 +3557,7 @@ function doPost(e) {
               name: String(r[1] || 'Custom Scheme'),
               shortTag: String(r[3] || 'Custom'),
               formulaType: 'prilepin_zone',
-              formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+              formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
               setsCount: firstPat.length,
               refPctOf1Rm: parseFloat(r[6]) || firstPat[0].pct,
               refReps: parseInt(r[7], 10) || firstPat[0].reps,
@@ -5865,7 +5873,10 @@ function doPost(e) {
         badge.textContent = '⚠️ Sync failed (Saved locally)';
         badge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-rose-950/80 text-rose-300 border border-rose-500/50';
       } else {
-        badge.textContent = `✓ ${state.gdoc.lastSynced || 'Confirmed'}`;
+        const cleanSyncText = (state.gdoc.lastSynced && !String(state.gdoc.lastSynced).toLowerCase().includes('disconnected'))
+          ? state.gdoc.lastSynced
+          : 'Connected';
+        badge.textContent = `✓ ${cleanSyncText}`;
         badge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-limeform-400/15 text-limeform-400 border border-limeform-400/40';
       }
 
@@ -6374,7 +6385,7 @@ function doPost(e) {
 
     async function pullFreshDataFromGoogleSheet({ silent = true } = {}) {
       if (isPullingSheetInFlight) return false;
-      if (!state.gdoc || !state.gdoc.isLoggedIn || state.gdoc.syncState === 'pending') return false;
+      if (!state.gdoc || !state.gdoc.isLoggedIn) return false;
       const url = (state.gdoc.url || '').trim();
       const cred = (state.gdoc.credential || '').trim();
       if (!url || !cred.startsWith('https://script.google.com/')) return false;
@@ -6692,7 +6703,7 @@ function doPost(e) {
           shortTag: name.slice(0, 16),
           progressionCadence: cadence,
           formulaType: 'prilepin_zone',
-          formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × (1 + 0.04 × (Actual − Target Reps) ÷ Target Reps)',
+          formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
           setsCount: firstPat.length,
           refPctOf1Rm: firstPat[0].pct,
           refReps: firstPat[0].reps,
@@ -7307,12 +7318,14 @@ function doPost(e) {
           return;
         }
 
+        const nowSyncLabel = `Connected ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
         state.gdoc.url = url;
         state.gdoc.docId = extractGoogleSheetId(url);
         state.gdoc.credential = bridge;
         state.gdoc.isLoggedIn = true;
         state.explicitlyLoggedOut = false;
         state.gdoc.syncState = 'confirmed';
+        state.gdoc.lastSynced = nowSyncLabel;
         saveState();
 
         if (res.status === 'empty') {
@@ -7320,6 +7333,7 @@ function doPost(e) {
           state.gdoc.isLoggedIn = true;
           state.explicitlyLoggedOut = false;
           state.gdoc.syncState = 'confirmed';
+          state.gdoc.lastSynced = nowSyncLabel;
           saveState();
           document.getElementById('onboardStepBadge').textContent = 'Step 2 of 2';
           renderOnboardingModalTable();
@@ -7332,6 +7346,8 @@ function doPost(e) {
           }
           state.onboardingCompleted = true;
           state.gdoc.isLoggedIn = true;
+          state.gdoc.syncState = 'confirmed';
+          state.gdoc.lastSynced = nowSyncLabel;
           state.explicitlyLoggedOut = false;
           saveState();
           compatBox.classList.remove('hidden');
@@ -7349,6 +7365,7 @@ function doPost(e) {
         state.gdoc.isLoggedIn = true;
         state.explicitlyLoggedOut = false;
         state.gdoc.syncState = 'confirmed';
+        state.gdoc.lastSynced = `Synced ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
         state.onboardingCompleted = true;
         loadRoutineIntoActiveSession(state.activeRoutineId, false, true);
         saveState();
@@ -7549,14 +7566,18 @@ function doPost(e) {
         }
         state.onboardingCompleted = true;
         state.gdoc.isLoggedIn = true;
+        state.gdoc.syncState = 'confirmed';
+        state.gdoc.lastSynced = 'Connected to Google Sheet';
         state.explicitlyLoggedOut = false;
         saveState();
         refreshActiveSessionWeights();
-        handleWriteToGoogleSheet('Initial 1RM setup');
         document.getElementById('onboardingSetupModal').classList.add('hidden');
-        saveState();
         renderAll();
         if (!state.walkthroughShown) openWalkthroughTour();
+        handleWriteToGoogleSheet('Initial 1RM setup').then(() => {
+          saveState();
+          renderGoogleSheetHub();
+        });
       });
 
       document.getElementById('gdocWriteNowBtn').addEventListener('click', async () => {
@@ -7594,10 +7615,12 @@ function doPost(e) {
           readBtn.innerHTML = origHtml;
         }
         if (res.ok) {
+          const readTimeStr = `Pulled ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
           state.gdoc.isLoggedIn = true;
           state.onboardingCompleted = true;
           state.explicitlyLoggedOut = false;
           state.gdoc.syncState = 'confirmed';
+          state.gdoc.lastSynced = readTimeStr;
           if (res.tableRows && Array.isArray(res.tableRows)) {
             parseSpreadsheetTableIntoState(res.tableRows);
           } else if (res.status === 'empty') {
@@ -7606,6 +7629,7 @@ function doPost(e) {
             state.onboardingCompleted = true;
             state.explicitlyLoggedOut = false;
             state.gdoc.syncState = 'confirmed';
+            state.gdoc.lastSynced = readTimeStr;
           }
           saveState();
           refreshActiveSessionWeights();
