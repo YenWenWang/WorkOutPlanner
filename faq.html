@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>form. — User Guide &amp; FAQ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            display: ['"Fraunces"', 'Georgia', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            forest: {
+              950: '#0b110d',
+              900: '#111a14',
+              850: '#162119',
+              800: '#1c2a20',
+              750: '#233327',
+              700: '#2b3e30',
+              600: '#3a5240'
+            },
+            limeform: {
+              300: '#d3f07a',
+              400: '#bce05d',
+              500: '#a3c940'
+            },
+            plum: {
+              200: '#e9d5ff',
+              300: '#d8b4fe',
+              400: '#c084fc',
+              800: '#3b1d54',
+              900: '#271238'
+            },
+            cream: {
+              50: '#fbfaf6',
+              100: '#f3f1e8'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #1c2a20 0%, #0b110d 70%);
+      color: #f3f1e8;
+      min-height: 100vh;
+    }
+    .faq-card {
+      background: rgba(22, 33, 25, 0.92);
+      border: 1px solid #2b3e30;
+      border-radius: 22px;
+    }
+    .formula-box {
+      background: #111a14;
+      border: 1px solid #3a5240;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #bce05d;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased py-8 px-4 sm:px-6">
+  <div class="max-w-2xl mx-auto space-y-6">
+    <!-- Top Header -->
+    <header class="flex items-center justify-between border-b border-forest-700 pb-4">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl font-extrabold tracking-tighter text-white">form.</span>
+          <span class="px-2.5 py-0.5 rounded-full bg-plum-800 text-plum-300 text-[11px] font-mono font-semibold uppercase tracking-wider">User Guide &amp; FAQ</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-1">Scheme-Based 1RM Progression, Multi-Gym Auto-Recalibration &amp; Google Sheet Sync</p>
+      </div>
+      <a href="./index.html" onclick="if(window.opener){window.close();return false;}" class="px-3.5 py-2 rounded-full bg-limeform-400 hover:bg-limeform-300 text-forest-950 font-bold text-xs transition shrink-0">
+        ← Back to App
+      </a>
+    </header>
+
+    <!-- Section 1: Overview & Data Privacy -->
+    <section class="space-y-3">
+      <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-limeform-400 px-1">01 · Overview &amp; Data Privacy</div>
+
+      <div class="faq-card p-5 space-y-2.5">
+        <h2 class="text-base font-bold text-white">1. What does this app do?</h2>
+        <ul class="text-xs text-slate-300 space-y-2 leading-relaxed list-disc list-inside">
+          <li><strong class="text-white">Calculates scheme-accurate 1RMs &amp; working weights:</strong> Prescribes your starting working weights and reps for each set from your rolling 7-day or 28-day 1RM across single-stage schemes (<code class="text-limeform-300">3×5</code>, <code class="text-limeform-300">3×8</code>, <code class="text-limeform-300">3×10</code>, <code class="text-limeform-300">4×10</code>, <code class="text-limeform-300">Drop Sets</code>), multi-day/week periodized schemes (<code class="text-limeform-300">Prilepin's Table</code>, <code class="text-limeform-300">5/3/1 BBB</code>, <code class="text-limeform-300">Texas Method</code>, <code class="text-limeform-300">DUP</code>, <code class="text-limeform-300">RPT</code>, <code class="text-limeform-300">GVT</code>, <code class="text-limeform-300">GZCLP</code>), and custom multi-stage schemes.</li>
+          <li><strong class="text-white">Tracks bodyweight, free-weight, and multi-gym machine strength:</strong> Logs bodyweight sessions with added or assisted load, deduces provisional starting loads for new movements from your muscle-group reference lift, and auto-recalibrates machine/cable pulley ratios across different gyms.</li>
+          <li><strong class="text-white">Syncs with your own Google Sheet:</strong> Keeps a complete, editable calendar history of your sessions, notes, and 1RM trends on your device and syncs them to a dedicated tab in your personal Google Sheet.</li>
+        </ul>
+      </div>
+
+      <div class="faq-card p-5 space-y-2.5">
+        <h2 class="text-base font-bold text-white">2. What doesn’t this app do?</h2>
+        <ul class="text-xs text-slate-300 space-y-2 leading-relaxed list-disc list-inside">
+          <li><strong class="text-limeform-400">It can’t predict your future gains or spot an off day:</strong> The prescribed weights are calculated strictly from your recent logged history—not a guarantee of how strong you'll feel today. You still need to listen to your body, figure out the right working weight for that day using the <code class="text-white">−</code> / <code class="text-white">+</code> buttons in <strong>02 Log</strong>, or toggle <strong class="text-amber-300">🌙 Off-day: Log only (Skip 1RM)</strong> when you are fatigued.</li>
+          <li><strong class="text-white">No external servers or third-party accounts:</strong> It does not upload your workouts, profile, or Google Sheet URL to any external company database or proprietary cloud.</li>
+          <li><strong class="text-white">No silent overwrites of your routines, completed sets, or spreadsheet tabs:</strong> Swapping a lift in <strong>02 Log</strong> only affects today's workout (your saved routines in <strong>04 Setup</strong> stay locked until you tap <strong>✎ Edit Setup</strong> and <strong>✓ Confirm</strong>), changing settings mid-workout never alters sets you've already checked off, and syncing never clears your other Google Sheet tabs.</li>
+          <li><strong class="text-white">No cardio, nutrition, or social clutter:</strong> It does not track calories, macros, GPS runs, or social feeds—it focuses strictly on strength programming, set logging, and 1RM progression.</li>
+        </ul>
+      </div>
+
+      <div class="faq-card p-5 space-y-2.5">
+        <h2 class="text-base font-bold text-white">3. How is my data stored?</h2>
+        <ul class="text-xs text-slate-300 space-y-2 leading-relaxed list-disc list-inside">
+          <li><strong class="text-white">Local-first in your browser (<code class="text-limeform-300">localStorage</code>):</strong> Every set, note, routine, custom scheme, and 1RM update is saved immediately to your browser's local storage on your device, so the app works offline and never loses progress if a connection drops.</li>
+          <li><strong class="text-white">Synced to a dedicated <code class="text-limeform-300">form_app_data</code> tab in your Google Sheet:</strong> When connected via your Google Apps Script Web App (<code class="text-limeform-300">/exec</code>) URL, the app reads and writes structured rows (<code class="text-slate-200">SETTING</code>, <code class="text-slate-200">GYM</code>, <code class="text-slate-200">MOVEMENT</code>, <code class="text-slate-200">ROUTINE</code>, <code class="text-slate-200">SCHEME</code>, and <code class="text-slate-200">LOG</code>) exclusively inside a worksheet tab named <strong class="text-limeform-400">form_app_data</strong> in your own Google Drive spreadsheet—giving you full ownership, backup, and spreadsheet access to your training history without touching any other tabs in your file.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: Getting Started & Google Sheet Sync -->
+    <section class="space-y-3">
+      <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-limeform-400 px-1">02 · Getting Started &amp; Google Sheet Sync</div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">4. How do I connect my Google Sheet?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          In Step 1 of the Setup Wizard (accessible anytime via <strong>⏻ Log Out / Setup Wizard</strong> in <strong>06 Settings</strong>), paste your Google Sheet URL, copy the 30-second Apps Script into <strong>Extensions → Apps Script</strong> in your sheet, deploy it as a Web App (<em>Who has access: Anyone</em>), and paste the <code class="text-limeform-300">/exec</code> URL. Tap <strong>🔍 Verify Read/Write &amp; Check Sheet</strong> to confirm access and either load your existing records or calibrate starting 1RMs.
+        </p>
+      </div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">5. What do the sync status badges mean?</h2>
+        <ul class="text-xs text-slate-300 space-y-1.5 leading-relaxed list-disc list-inside">
+          <li><strong class="text-amber-300">⏳ Pending:</strong> Saved locally on your device; waiting for your Google Sheet to confirm the write.</li>
+          <li><strong class="text-limeform-400">✓ Confirmed:</strong> Your Google Sheet verified that all rows were written to <code class="text-limeform-300">form_app_data</code>.</li>
+          <li><strong class="text-rose-300">⚠️ Sync failed:</strong> Saved locally on your device, but the Google Sheet couldn't be reached; tap <strong>↑ Sync to Sheet Now</strong> in <strong>06 Settings</strong> to retry.</li>
+          <li><strong class="text-slate-300">○ Disconnected:</strong> Local-only mode; no network requests are sent until you reconnect. When connected, the app automatically pulls the latest data and active routine from your Sheet whenever you open or refocus the app.</li>
+        </ul>
+      </div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">6. How do I estimate my starting 1RMs during setup if I haven't tested a 1-rep max?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          In Step 2 of the Setup Wizard (or in <strong>02 Log → ⚡ 1RM Formula Test</strong>), you can either choose <strong>⚡ Direct Formula Test</strong> and enter any weight and rep count you can lift (<code class="text-limeform-300">Weight × (1 + Reps / 30)</code>), or pick any training <strong>Scheme</strong>, tap the <strong>Week / Day / Stage</strong> pill you use, and enter your working weight for that stage's fixed target reps.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3: Logging Workouts & 1RM Calculation -->
+    <section class="space-y-3">
+      <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-limeform-400 px-1">03 · Logging Workouts &amp; 1RM Calculation</div>
+
+      <div class="faq-card p-5 space-y-2.5">
+        <h2 class="text-base font-bold text-white">7. How does the app calculate my 1RM from different workout schemes?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Every set in a scheme is evaluated against its own prescribed <code class="text-limeform-300">%1RM</code> and target reps:
+        </p>
+        <div class="formula-box">
+          Set 1RM = (Total Load ÷ Set %1RM) × (1 + 0.04 × (Actual Reps − Target Reps) ÷ Target Reps)
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Your session 1RM for that movement is the average across all prescribed sets in that scheme.
+        </p>
+      </div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">8. What happens if I skip a set or don't finish all prescribed sets in a scheme?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Once you check (<code class="text-limeform-300">✓</code>) at least one set on an exercise, any unchecked set is treated as <strong>0 total load (<code class="text-limeform-300">Set 1RM = 0</code>)</strong>—equivalent to <code class="text-white">0 kg/lbs</code> on free weights or <code class="text-white">−Bodyweight</code> on bodyweight lifts—and averaged across all prescribed sets. Dropping the weight on a fatigued set and completing your reps is always rewarded over skipping the set. If you cut a workout short for non-strength reasons, switch the movement to <strong class="text-amber-300">🌙 Off-day: Log only (Skip 1RM)</strong>.
+        </p>
+      </div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">9. How are bodyweight exercises (like Pull-Ups) calculated and stored?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Total system load is <code class="text-limeform-300">Session Bodyweight + Added Weight − Assistance Weight</code>. Enter positive numbers (<code class="text-white">+10</code>) for added weight, <code class="text-white">0</code> for unweighted bodyweight, and negative numbers (<code class="text-white">-15</code>) for assisted sets. Each logged set stores your <strong>Session Bodyweight</strong>, <strong>Added Weight</strong>, <strong>Assistance Weight</strong>, and <strong>Assistance Equipment</strong> in <strong>03 Records</strong>.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 4: Progression, Untested Lifts & Multi-Gym Calibration -->
+    <section class="space-y-3">
+      <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-limeform-400 px-1">04 · Progression, Untested Lifts &amp; Multi-Gym Calibration</div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">10. When do multi-day or multi-week schemes automatically advance to the next step?</h2>
+        <ul class="text-xs text-slate-300 space-y-1.5 leading-relaxed list-disc list-inside">
+          <li><strong class="text-white">Every Session (<code class="text-limeform-300">Prilepin's Table</code>, <code class="text-limeform-300">Texas Method 5×5</code>, <code class="text-limeform-300">DUP 3-Day</code>):</strong> Advances to the next Day (<code class="text-slate-200">D1 → D2 → D3</code>) immediately after you complete all prescribed sets.</li>
+          <li><strong class="text-white">Weekly Wave (<code class="text-limeform-300">5/3/1 BBB</code>, <code class="text-limeform-300">RPT Pyramid</code>, <code class="text-limeform-300">German Volume GVT</code>):</strong> Advances once per calendar week (holding steady on the current week if you train that lift multiple times in the same week, and pausing without skipping weeks if you take a week off).</li>
+          <li><strong class="text-white">Performance Stage (<code class="text-limeform-300">GZCLP Tier 1 &amp; Tier 2</code>):</strong> Stays on the current stage when you hit all target reps as your 1RM increases, and advances to the next stage (<code class="text-slate-200">5×3+ → 6×2+</code> or <code class="text-slate-200">3×10 → 3×8</code>) only when you miss a target rep or skip a set.</li>
+        </ul>
+      </div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">11. Why do some movements show a <code class="text-limeform-300">Provisional load</code> badge?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Each muscle group in <strong>06 Settings → Movement Estimator</strong> has <strong>1 Reference Lift</strong>. Any untested movement in that muscle group whose 1RM is auto-deduced from the reference lift (with a <code class="text-white">-15%</code> conservative buffer) displays <strong>Provisional load</strong> until you log a workout for it or enter a direct 1RM override.
+        </p>
+      </div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">12. How does the app calibrate machines and cables across different gyms?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          <strong>Barbells, dumbbells, and bodyweight lifts</strong> share the same 1RM across all gyms. <strong>Machines and cables</strong> auto-recalibrate via 3 rules as you log in <strong>02 Log</strong>:
+        </p>
+        <ol class="text-xs text-slate-300 space-y-1.5 leading-relaxed list-decimal list-inside">
+          <li><strong class="text-white">Same gym → Same gym:</strong> Consecutive sessions on a machine at the same gym transfer your <code class="text-limeform-300">%</code> strength gain to all other saved gyms so inactive gyms keep pace with your progress.</li>
+          <li><strong class="text-white">Switching to a new gym:</strong> Your first session on a machine at a new gym sets that gym's 1RM and calibrates its pulley ratio without changing your other gyms.</li>
+          <li><strong class="text-white">Switching back to a previous gym:</strong> Logging after switching back updates that gym's 1RM directly and auto-corrects the pulley ratio between the stacks.</li>
+        </ol>
+      </div>
+
+      <div class="faq-card p-5 space-y-2">
+        <h2 class="text-base font-bold text-white">13. How do I edit a past workout or fix a mistaken 1RM entry?</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          In <strong>03 Records</strong>, select the date on the calendar and tap <strong>✎ Edit</strong> on the movement card to change set weights, reps, or notes (or tap <strong>🗑️ Remove Movement</strong>), then tap <strong>✓ Save &amp; Update 1RM</strong> to recalculate your 1RM and trend chart—or tap <strong>↩ Undo</strong> to reverse your last action.
+        </p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

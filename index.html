@@ -308,6 +308,10 @@
           <div class="flex items-center justify-between gap-1.5">
             <button type="button" id="brandHomeBtn" class="text-2xl font-extrabold tracking-tighter text-white hover:text-limeform-400 transition">form.</button>
             <div class="flex items-center gap-1.5">
+              <a href="./faq.html" target="_blank" rel="noopener noreferrer" id="openFaqTopBtn" class="btn-pill !px-2.5 !py-1.5 !rounded-full text-[11px] !border-plum-300/50 !text-plum-200 no-underline" title="Open FAQ in a new window">
+                <span>📖</span>
+                <span>FAQ</span>
+              </a>
               <button type="button" id="openWalkthroughBtn" class="btn-pill !px-2.5 !py-1.5 !rounded-full text-[11px] !border-limeform-400/50 !text-limeform-400" title="Open Interactive App Walkthrough">
                 <span>?</span>
                 <span>Tour</span>
@@ -774,9 +778,12 @@
 
             <!-- 1. Athlete & 1RM Engine -->
             <div class="form-card p-5 space-y-3.5">
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between gap-2">
                 <div class="text-sm font-bold text-white">Athlete &amp; 1RM Engine</div>
-                <button type="button" id="settingsLaunchTourBtn" class="btn-pill !py-1 !px-2.5 !text-[11px] !text-limeform-400">? Launch Walkthrough</button>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <a href="./faq.html" target="_blank" rel="noopener noreferrer" id="settingsOpenFaqBtn" class="btn-pill !py-1 !px-2.5 !text-[11px] !border-plum-300/50 !text-plum-200 no-underline">📖 FAQ ↗</a>
+                  <button type="button" id="settingsLaunchTourBtn" class="btn-pill !py-1 !px-2.5 !text-[11px] !text-limeform-400">? Tour</button>
+                </div>
               </div>
 
               <div class="flex items-center justify-between text-xs">
@@ -869,12 +876,12 @@
 
               <div class="space-y-2">
                 <label class="block text-[11px] text-slate-400">Google Sheet URL</label>
-                <input id="gdocUrlInput" type="url" value="https://docs.google.com/spreadsheets/d/1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw/edit?gid=0#gid=0" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3 py-2 text-xs font-mono text-limeform-300" />
+                <input id="gdocUrlInput" type="url" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3 py-2 text-xs font-mono text-limeform-300" />
               </div>
 
               <div class="space-y-2">
                 <label class="block text-[11px] text-slate-400">Apps Script Web App URL (<code class="text-limeform-400">/exec</code>)</label>
-                <input id="gdocBridgeCredentialInput" type="text" value="https://script.google.com/macros/s/AKfycbyy8e7lAHAN_uiES7sq9zRee1P5TXRYRW8iTtkKGy7UgwApjBzaMP74h2gN3ayr98JW/exec" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3 py-2 text-xs font-mono text-white" />
+                <input id="gdocBridgeCredentialInput" type="text" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3 py-2 text-xs font-mono text-white" />
               </div>
 
               <div class="grid grid-cols-2 gap-2 pt-1">
@@ -1007,11 +1014,11 @@ function doPost(e) {
         <div class="space-y-3">
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Google Sheet URL</label>
-            <input id="onboardGdocUrlInput" type="url" value="https://docs.google.com/spreadsheets/d/1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw/edit?gid=0#gid=0" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3.5 py-2.5 text-xs font-mono text-limeform-300 focus:outline-none focus:border-limeform-400" />
+            <input id="onboardGdocUrlInput" type="url" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3.5 py-2.5 text-xs font-mono text-limeform-300 focus:outline-none focus:border-limeform-400" />
           </div>
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Apps Script Web App URL or OAuth Token</label>
-            <input id="onboardBridgeUrlInput" type="text" value="https://script.google.com/macros/s/AKfycbyy8e7lAHAN_uiES7sq9zRee1P5TXRYRW8iTtkKGy7UgwApjBzaMP74h2gN3ayr98JW/exec" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-limeform-400" />
+            <input id="onboardBridgeUrlInput" type="text" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-limeform-400" />
           </div>
         </div>
 
@@ -1955,9 +1962,9 @@ function doPost(e) {
       gdoc: {
         isLoggedIn: false,
         syncState: 'disconnected', // 'disconnected' | 'pending' | 'confirmed' | 'failed'
-        url: 'https://docs.google.com/spreadsheets/d/1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw/edit?gid=0#gid=0',
-        docId: '1CV1JlB5NfH6sHaLQ8rQf7f2JpA64VSSyIDY3RUw0Nbw',
-        credential: 'https://script.google.com/macros/s/AKfycbyy8e7lAHAN_uiES7sq9zRee1P5TXRYRW8iTtkKGy7UgwApjBzaMP74h2gN3ayr98JW/exec',
+        url: '',
+        docId: '',
+        credential: '',
         lastSynced: 'Disconnected',
         logs: ['Saves locally first; syncs to dedicated form_app_data worksheet when connected.']
       },
@@ -2951,53 +2958,61 @@ function doPost(e) {
     }
 
     function computeDirectFormulaTest1RmLbs(totalLoadLbs, reps) {
-      const load = Math.max(5, parseFloat(totalLoadLbs) || 0);
-      const r = Math.max(1, parseInt(reps, 10) || 1);
-      return r <= 1 ? load : load * (1 + r / 30);
+      const load = Math.max(0, parseFloat(totalLoadLbs) || 0);
+      const r = Math.max(0, parseInt(reps, 10) || 0);
+      if (load <= 0 || r <= 0) return 0;
+      return r === 1 ? load : load * (1 + r / 30);
     }
 
     function computeImplied1RmFromSet(totalLoadLbs, actualReps, targetReps, prescribedPct) {
-      const load = Math.max(5, parseFloat(totalLoadLbs) || 0);
-      const rAct = Math.max(1, parseFloat(actualReps) || 1);
-      const rTarg = Math.max(1, parseFloat(targetReps) || rAct);
+      const load = Math.max(0, parseFloat(totalLoadLbs) || 0);
+      const parsedAct = parseFloat(actualReps);
+      const rAct = !isNaN(parsedAct) ? Math.max(0, parsedAct) : 0;
+      if (load <= 0 || rAct <= 0) return 0;
+      const rTarg = Math.max(1, parseFloat(targetReps) || rAct || 1);
       const pct = Math.min(100, Math.max(30, parseFloat(prescribedPct) || 75)) / 100;
       if (state.estimationMode === 'strict_wxr') {
         return computeDirectFormulaTest1RmLbs(load, rAct);
       }
-      return Math.max(load, (load / pct) * (1 + 0.04 * ((rAct - rTarg) / rTarg)));
+      return Math.max(0, (load / pct) * (1 + 0.04 * ((rAct - rTarg) / rTarg)));
     }
 
-    // Computes effective total system load for a set (using the set's stored sessionBodyweightLbs + addedWeightLbs - assistanceWeightLbs for bodyweight lifts!)
+    // Computes effective total system load for a set:
+    // - For bodyweight lifts: bw + added - assist (so if external weight = -bw, total system load = 0 -> Set 1RM = 0!)
+    // - For free weights/machines: actualExternalLbs (so 0 lbs -> Set 1RM = 0!)
     function getSetTotalSystemLoadLbs(s, ex) {
       if (ex && ex.type === 'bodyweight') {
         const bw = s.sessionBodyweightLbs !== undefined ? s.sessionBodyweightLbs : state.bodyweightLbs;
-        if (s.addedWeightLbs !== undefined || s.assistanceWeightLbs !== undefined) {
-          const added = Math.max(0, parseFloat(s.addedWeightLbs) || 0);
-          const assist = Math.max(0, parseFloat(s.assistanceWeightLbs) || 0);
-          return Math.max(20, bw + added - assist);
-        }
-        return Math.max(20, bw + (parseFloat(s.actualExternalLbs) || 0));
+        const ext = parseFloat(s.actualExternalLbs) || 0;
+        return Math.max(0, bw + ext);
       }
-      return Math.max(5, parseFloat(s.actualExternalLbs) || 0);
+      return Math.max(0, parseFloat(s.actualExternalLbs) || 0);
     }
 
+    // Computes the scheme's implied 1RM across ALL prescribed sets:
+    // - When at least 1 set is checked, any unfinished/unchecked set is treated as 0 total load (equivalent to 0 lbs on free weights or -bodyweight on bodyweight lifts), so its Set 1RM = 0!
+    // - When 0 sets are checked yet (preview before logging), previews using the planned sets.
     function computeSchemeBlock1RmLbs(block, ex) {
       const cur1RmLbs = getExerciseE1RmLbs(ex);
       const { dayObj } = getSchemeDayObj(block.schemeId, block.dayIdx || 0);
 
-      const activeSets = block.sets.filter(s => s.completed);
-      const setsPool = activeSets.length > 0 ? activeSets : block.sets;
-      if (setsPool.length === 0) return cur1RmLbs;
+      const allSets = block.sets || [];
+      if (allSets.length === 0) return cur1RmLbs;
 
       if (dayObj.isDeload || dayObj.isRecovery) {
         return cur1RmLbs;
       }
 
-      const sumImplied = setsPool.reduce((sum, s) => {
+      const anyChecked = allSets.some(s => s.completed);
+      const sumImplied = allSets.reduce((sum, s) => {
+        if (anyChecked && !s.completed) {
+          // Unfinished set -> 0 total system load (for bodyweight, equivalent to external weight = -bodyweight) -> Set 1RM = 0!
+          return sum + 0;
+        }
         const sysLoad = getSetTotalSystemLoadLbs(s, ex);
         return sum + computeImplied1RmFromSet(sysLoad, s.actualReps, s.targetRepsNum, s.prescribedPctOf1Rm);
       }, 0);
-      return sumImplied / setsPool.length;
+      return sumImplied / allSets.length;
     }
 
     function computePrescribedWeightForExercise(ex, pctOf1Rm) {
@@ -3824,7 +3839,7 @@ function doPost(e) {
         const isBw = ex.type === 'bodyweight';
         const isUni = ex.laterality === 'unilateral';
         const dispW = toDisplayWeight(row.weightLbs);
-        const sysLoadLbs = isBw ? Math.max(20, state.bodyweightLbs + row.weightLbs) : Math.max(5, row.weightLbs);
+        const sysLoadLbs = isBw ? Math.max(0, state.bodyweightLbs + row.weightLbs) : Math.max(0, row.weightLbs);
         const rawFormula1Rm = computeDirectFormulaTest1RmLbs(sysLoadLbs, row.reps);
         const dispEst1Rm = toDisplayWeight(rawFormula1Rm);
 
@@ -4057,7 +4072,8 @@ function doPost(e) {
           if (diff > 0) weightSubLabel = `<span class="text-limeform-400">+${diff} ${u} today</span>`;
           else if (diff < 0) weightSubLabel = `<span class="text-amber-300">${diff} ${u} today</span>`;
 
-          const sysLoadLbs = getSetTotalSystemLoadLbs(s, ex);
+          const blockHasChecked = block.sets.some(x => x.completed);
+          const sysLoadLbs = (blockHasChecked && !s.completed) ? 0 : getSetTotalSystemLoadLbs(s, ex);
           const setEst1RmDisp = toDisplayWeight(computeImplied1RmFromSet(sysLoadLbs, s.actualReps, s.targetRepsNum, s.prescribedPctOf1Rm));
 
           return `
@@ -4444,8 +4460,9 @@ function doPost(e) {
       const isBw = exObj && exObj.type === 'bodyweight';
       const setEstimates = setsList.map(s => {
         const bwLbs = s.bodyweightLbs || state.bodyweightLbs;
-        const sysLoad = isBw ? Math.max(20, bwLbs + (parseFloat(s.weightLbs) || 0)) : Math.max(0, parseFloat(s.weightLbs) || 0);
-        const reps = Math.max(1, parseInt(s.reps, 10) || 1);
+        const sysLoad = isBw ? Math.max(0, bwLbs + (parseFloat(s.weightLbs) || 0)) : Math.max(0, parseFloat(s.weightLbs) || 0);
+        const reps = Math.max(0, parseInt(s.reps, 10) || 0);
+        if (sysLoad <= 0 || reps <= 0) return 0;
         const isFormulaTest = String(s.routineName || '').startsWith('1RM Formula Test') || String(s.schemeWeekLabel || '').startsWith('1RM Formula Test');
         const isDirect1Rm = String(s.routineName || '').startsWith('1RM Input') || (s.prescribedPct === 100 && reps === 1);
         if (isDirect1Rm) return sysLoad;
@@ -4453,10 +4470,11 @@ function doPost(e) {
         const pct = parseFloat(s.prescribedPct) || 75;
         const targR = parseInt(s.targetReps, 10) || reps;
         return computeImplied1RmFromSet(sysLoad, reps, targR, pct);
-      }).filter(v => v > 0);
-      if (setEstimates.length === 0) return 0;
-      const avg = setEstimates.reduce((a, b) => a + b, 0) / setEstimates.length;
-      return Math.round(avg * 10) / 10;
+      });
+      const expectedTotalSets = Math.max(setEstimates.length, parseInt((setsList[0] && setsList[0].prescribedSetsCount) || setEstimates.length, 10) || setEstimates.length);
+      // Unfinished/missed sets contribute 0 to the sum while dividing by expectedTotalSets!
+      const sumCompleted = setEstimates.reduce((a, b) => a + b, 0);
+      return expectedTotalSets > 0 ? Math.round((sumCompleted / expectedTotalSets) * 10) / 10 : 0;
     }
 
     function renderTrainingCalendar() {
@@ -4681,23 +4699,23 @@ function doPost(e) {
 
           return `
             <div class="form-subcard p-3.5 space-y-2.5 overflow-hidden ${isEditingThisMovement ? 'border border-limeform-400/60' : ''}">
-              <div class="flex items-start justify-between gap-2">
-                <div class="min-w-0">
-                  <div class="text-sm font-bold text-white truncate">${group.exerciseName}</div>
-                  ${group.schemeWeekLabel ? `
-                    <div class="mt-0.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-plum-800/90 border border-plum-400/30 text-plum-200 text-[10px] font-mono font-semibold max-w-full truncate">
-                      <span>📅 Week / Stage: ${group.schemeWeekLabel}</span>
-                    </div>
-                  ` : ''}
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="text-sm font-bold text-white leading-snug break-words min-w-0">${group.exerciseName}</div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    ${movement1RmBadgeHtml}
+                    ${!isEditingThisMovement ? `
+                      <button type="button" data-edit-rec-mov="${group.groupKey}" class="edit-rec-mov-btn btn-pill !py-1 !px-2.5 !text-[11px] !text-limeform-400">
+                        ✎ Edit
+                      </button>
+                    ` : ''}
+                  </div>
                 </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                  ${movement1RmBadgeHtml}
-                  ${!isEditingThisMovement ? `
-                    <button type="button" data-edit-rec-mov="${group.groupKey}" class="edit-rec-mov-btn btn-pill !py-1 !px-2.5 !text-[11px] !text-limeform-400">
-                      ✎ Edit
-                    </button>
-                  ` : ''}
-                </div>
+                ${group.schemeWeekLabel ? `
+                  <div class="w-full px-2.5 py-1 rounded-lg bg-plum-800/90 border border-plum-400/30 text-plum-200 text-[10px] font-mono font-semibold leading-relaxed break-words">
+                    📅 Week / Stage: ${group.schemeWeekLabel}
+                  </div>
+                ` : ''}
               </div>
 
               ${isEditingThisMovement ? `
@@ -5378,8 +5396,11 @@ function doPost(e) {
         let dayPillsHtml = '';
         if (totalDays > 1 && Array.isArray(sc.days)) {
           dayPillsHtml = `
-            <div class="flex flex-wrap items-center gap-1 pt-1">
-              <span class="text-[10px] text-slate-400 mr-1">Day / Stage:</span>
+            <div class="space-y-1 pt-1">
+              <div class="text-[10px] font-mono text-plum-200 bg-plum-900/60 border border-plum-400/30 rounded-lg px-2 py-1 leading-snug break-words">
+                📅 Week / Stage: ${dayObj.dayLabel || dayObj.shortDay}
+              </div>
+              <div class="flex flex-wrap items-center gap-1">
               ${sc.days.map((d, dIdx) => `
                 <button type="button" ${!isSetupEditMode ? 'disabled' : ''} data-setup-block="${bIdx}" data-setup-day="${dIdx}"
                   class="setup-day-pill-btn px-2 py-0.5 rounded-lg font-mono text-[10px] border ${
@@ -5392,6 +5413,7 @@ function doPost(e) {
                   ${d.shortDay}
                 </button>
               `).join('')}
+              </div>
             </div>
           `;
         }
@@ -5603,7 +5625,7 @@ function doPost(e) {
         const hasBeenTested = Boolean(ex.anchorGymId) || (state.calendarLogs || []).some(l => l.exerciseId === ex.id && l.includeIn1Rm);
         const ratioPct = anchor1RmLbs > 0 ? Math.round(((thisGym1RmLbs - anchor1RmLbs) / anchor1RmLbs) * 100) : 0;
         const ratioTag = !hasBeenTested
-          ? 'Unanchored (1st calibration sets true baseline)'
+          ? 'Unanchored'
           : (activeGym.id === anchorGymId
               ? `Reference stack (${anchorGymObj.name})`
               : (ratioPct === 0 ? `1.00× vs ${anchorGymObj.name}` : (ratioPct > 0 ? `+${ratioPct}% vs ${anchorGymObj.name} (lighter pulley)` : `${ratioPct}% vs ${anchorGymObj.name} (heavier stack)`)));
@@ -5631,31 +5653,7 @@ function doPost(e) {
               </div>
             </div>
 
-            <div class="bg-forest-850 border border-forest-700 rounded-xl p-2.5 space-y-2 overflow-hidden">
-              <div class="text-[11px] text-slate-300">Calibrate from working weight at ${activeGym.name}:</div>
-              <div class="grid grid-cols-12 items-center gap-1.5 font-mono">
-                <div class="col-span-4 flex items-center gap-1 bg-forest-900 border border-forest-600 rounded-lg px-2 py-1 min-w-0">
-                  <input type="number" step="2.5" id="calWeight_${ex.id}" value="${sampleWorkDisp}"
-                    class="w-full min-w-0 bg-transparent text-center text-white font-bold focus:outline-none text-xs" />
-                  <span class="text-[10px] text-slate-400 shrink-0">${u}</span>
-                </div>
-                <div class="col-span-5 min-w-0">
-                  <select id="calSchemePct_${ex.id}" class="w-full min-w-0 bg-forest-900 border border-forest-600 rounded-lg px-1.5 py-1.5 text-[10px] text-limeform-400 truncate cursor-pointer">
-                    <option value="82.5">3×5 (82.5%)</option>
-                    <option value="75" selected>3×8 (75%)</option>
-                    <option value="70">3×10 / Prilepin (70%)</option>
-                    <option value="65">GZCLP T2 (65%)</option>
-                    <option value="77">Texas 5×5 (77%)</option>
-                    <option value="100">Strict 1RM (100%)</option>
-                  </select>
-                </div>
-                <div class="col-span-3 min-w-0">
-                  <button type="button" data-cal-ex="${ex.id}" class="btn-calibrate-gym-machine btn-lime w-full !py-1.5 !px-1.5 !text-[11px] justify-center truncate">
-                    Calibrate
-                  </button>
-                </div>
-              </div>
-            </div>
+
           </div>
         `;
       }).join('');
@@ -5672,25 +5670,7 @@ function doPost(e) {
         });
       });
 
-      eqList.querySelectorAll('.btn-calibrate-gym-machine').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const exId = btn.getAttribute('data-cal-ex');
-          const ex = getExerciseById(exId);
-          const wVal = parseFloat(document.getElementById(`calWeight_${exId}`).value) || 0;
-          const pctVal = parseFloat(document.getElementById(`calSchemePct_${exId}`).value) || 75;
-          if (wVal <= 0) {
-            showToast('Enter your working weight on this machine');
-            return;
-          }
-          const wLbs = fromDisplayWeight(wVal);
-          const est1RmLbs = wLbs / (pctVal / 100);
-          setDirect1RmForExerciseLbs(ex, est1RmLbs, state.activeGymId, true, `Gym scheme calibration (${wVal}${u} ÷ ${pctVal}% at ${activeGym.name})`);
-          refreshActiveSessionWeights();
-          renderAll();
-          handleWriteToGoogleSheet(`Calibrated ${ex.name} at ${activeGym.name} (${wVal}${u} ÷ ${pctVal}%)`);
-          showToast(`Calibrated ${ex.name} at ${activeGym.name}: ${toDisplayWeight(est1RmLbs)} ${u} 1RM`, true);
-        });
-      });
+
     }
 
     // =========================================================================
@@ -6093,9 +6073,9 @@ function doPost(e) {
           `).join('');
           stagePillsHtml = `
             <div class="space-y-1 pt-0.5">
-              <div class="flex items-center justify-between text-[10px] text-slate-400">
-                <span class="truncate">${stageInfo.dayObj.dayLabel}</span>
-                <span class="font-mono text-limeform-400 shrink-0 ml-2">${stageInfo.pct}% 1RM · ${stageInfo.targetReps} reps</span>
+              <div class="flex flex-wrap items-center justify-between gap-1 text-[10px] text-slate-300 bg-forest-900/80 border border-forest-700 rounded-lg px-2 py-1">
+                <span class="break-words leading-snug">${stageInfo.dayObj.dayLabel}</span>
+                <span class="font-mono text-limeform-400 font-semibold shrink-0">${stageInfo.pct}% 1RM · ${stageInfo.targetReps} reps</span>
               </div>
               <div class="flex flex-wrap gap-1">${dayBtns}</div>
             </div>
@@ -6967,7 +6947,7 @@ function doPost(e) {
           checkedRows.forEach((row, idx) => {
             const ex = getExerciseById(row.exerciseId);
             const isBw = ex.type === 'bodyweight';
-            const sysLoad = isBw ? Math.max(20, state.bodyweightLbs + row.weightLbs) : Math.max(5, row.weightLbs);
+            const sysLoad = isBw ? Math.max(0, state.bodyweightLbs + row.weightLbs) : Math.max(0, row.weightLbs);
             const formula1Rm = Math.round(computeDirectFormulaTest1RmLbs(sysLoad, row.reps) * 10) / 10;
 
             // Prevent duplicate formula-test records if same exercise + date + weight + reps already exists!
@@ -7077,6 +7057,7 @@ function doPost(e) {
                 assistanceEquipment: s.assistanceEquipment || (asstW > 0 ? 'Assisted Machine' : 'None'),
                 reps: s.actualReps,
                 targetReps: s.targetRepsNum || s.actualReps,
+                prescribedSetsCount: blk.sets.length,
                 prescribedPct: s.prescribedPctOf1Rm,
                 includeIn1Rm: includeBlock,
                 implied1RmLbs: schemeSession1RmLbs,
@@ -7099,37 +7080,42 @@ function doPost(e) {
           if (totalDays > 1) {
             const cadence = scObj.progressionCadence || 'session';
             const curDayIdx = blk.dayIdx || 0;
+            const completedAllPrescribedSets = checkedSets.length >= blk.sets.length;
             let shouldAdvanceNow = false;
 
             if (cadence === 'session') {
-              // Day/session rotation (Prilepin, Texas Method, DUP): advances to next day immediately after each workout
-              shouldAdvanceNow = true;
+              // Day/session rotation (Prilepin, Texas Method, DUP): advances to next day when all prescribed sets are completed
+              if (completedAllPrescribedSets) {
+                shouldAdvanceNow = true;
+              }
             } else if (cadence === 'stage_pass') {
-              // Performance stage (GZCLP): advances to next stage ONLY if target reps were missed on any completed set
-              const failedSet = checkedSets.some(s => s.actualReps < s.targetRepsNum);
+              // Performance stage (GZCLP): advances to next stage if any set was skipped (0 reps) OR target reps were missed
+              const failedSet = !completedAllPrescribedSets || checkedSets.some(s => s.actualReps < s.targetRepsNum);
               if (failedSet) {
                 shouldAdvanceNow = true;
               }
             } else if (cadence === 'weekly') {
-              // Weekly wave (3×5, 3×8, 3×10, 4×10, 5/3/1 BBB, RPT, GVT):
-              if (!state.exerciseWeeklyProgress) state.exerciseWeeklyProgress = {};
-              const progKey = `${ex.id}_${blk.schemeId}`;
-              const curWeekStr = getIsoWeekYear(todayStr);
+              // Weekly wave (5/3/1 BBB, RPT, GVT): only advances if all prescribed sets were completed!
+              if (completedAllPrescribedSets) {
+                if (!state.exerciseWeeklyProgress) state.exerciseWeeklyProgress = {};
+                const progKey = `${ex.id}_${blk.schemeId}`;
+                const curWeekStr = getIsoWeekYear(todayStr);
 
-              // Check if exercise is scheduled multiple times across saved routines in the same week
-              const isMultiDayInWeek = (state.savedRoutines || []).filter(r => (r.blocks || []).some(b => b.exerciseId === ex.id)).length > 1;
+                // Check if exercise is scheduled multiple times across saved routines in the same week
+                const isMultiDayInWeek = (state.savedRoutines || []).filter(r => (r.blocks || []).some(b => b.exerciseId === ex.id)).length > 1;
 
-              state.exerciseWeeklyProgress[progKey] = {
-                isoWeek: curWeekStr,
-                loggedDate: todayStr,
-                dayIdx: curDayIdx,
-                advancedForNewWeek: false
-              };
+                state.exerciseWeeklyProgress[progKey] = {
+                  isoWeek: curWeekStr,
+                  loggedDate: todayStr,
+                  dayIdx: curDayIdx,
+                  advancedForNewWeek: false
+                };
 
-              // If lift appears once per week, advance it immediately for next week's session!
-              // If it appears multiple times per week, keep it on the current week until the calendar week rolls over.
-              if (!isMultiDayInWeek) {
-                shouldAdvanceNow = true;
+                // If lift appears once per week, advance it immediately for next week's session!
+                // If it appears multiple times per week, keep it on the current week until the calendar week rolls over.
+                if (!isMultiDayInWeek) {
+                  shouldAdvanceNow = true;
+                }
               }
             }
 
