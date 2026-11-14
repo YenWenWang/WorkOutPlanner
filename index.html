@@ -650,16 +650,21 @@
               </button>
             </div>
 
-            <!-- Create New Multi-Day / Multi-Stage Scheme Card -->
-            <div class="form-card p-4 space-y-3.5">
-              <div class="flex items-center justify-between">
+            <!-- Create / Edit Multi-Day / Multi-Stage Scheme Card -->
+            <div id="schemeBuilderCard" class="form-card p-4 space-y-3.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <span class="text-xs font-bold text-limeform-400 uppercase tracking-wider">Create Custom Scheme</span>
-                  <p class="text-[10px] text-slate-400">Build multiple days, weeks, or stages with custom 1RM math</p>
+                  <span id="schemeBuilderHeaderTitle" class="text-xs font-bold text-limeform-400 uppercase tracking-wider">Create Custom Scheme</span>
+                  <p id="schemeBuilderHeaderSub" class="text-[10px] text-slate-400">Build a new scheme or tap ✎ Edit on any scheme below to customize it</p>
                 </div>
-                <button type="button" id="addCustomSchemeDayBtn" class="btn-lime !py-1 !px-2.5 !text-[11px]">
-                  + Add Day / Stage
-                </button>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" id="cancelSchemeEditBtn" class="hidden btn-pill !py-1 !px-2.5 !text-[11px]">
+                    ✕ Cancel Edit
+                  </button>
+                  <button type="button" id="addCustomSchemeDayBtn" class="btn-lime !py-1 !px-2.5 !text-[11px]">
+                    + Add Day / Stage
+                  </button>
+                </div>
               </div>
 
               <input id="customSchemeNameInput" type="text" placeholder="Scheme name (e.g. Hepburn 8×2→8×3, Custom 3-Week Wave)" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-limeform-400" />
@@ -692,6 +697,7 @@
                 <div class="flex items-center justify-between bg-forest-900 border border-forest-700 rounded-lg px-2.5 py-1.5 text-xs">
                   <span class="text-[10px] text-slate-300 font-medium">Auto-advance step:</span>
                   <select id="customSchemeCadenceSelect" class="bg-forest-850 border border-forest-600 rounded-md px-2 py-1 text-limeform-400 font-semibold text-[11px] cursor-pointer">
+                    <option value="single">Single stage (Fixed set/rep target)</option>
                     <option value="weekly" selected>Weekly wave (Advances on new calendar week)</option>
                     <option value="session">Every session (Day 1 → Day 2 → Day 3)</option>
                     <option value="stage_pass">Performance stage (Advance only on failed reps)</option>
@@ -712,7 +718,7 @@
               </div>
 
               <button type="button" id="saveNewCustomSchemeBtn" class="btn-lime w-full !py-2.5">
-                <span>💾 Save Multi-Day / Stage Scheme</span>
+                <span id="saveCustomSchemeBtnLabel">💾 Save Multi-Day / Stage Scheme</span>
               </button>
             </div>
 
@@ -1512,56 +1518,56 @@ function doPost(e) {
 
       prilepin_optimal: {
         id: 'prilepin_optimal',
-        name: "Prilepin's Table (4 Zone Days: 60% · 70% · 82.5% · 90%)",
+        name: "Prilepin's Table (4 Zones: 60% 4×6 · 75% 3×6 · 85% 5×3 · 90% 3×2+1×1)",
         shortTag: 'Prilepin Table',
         progressionCadence: 'session',
         formulaType: 'prilepin_zone',
         formulaLabel: "Prilepin Zone Formula: (Working Weight ÷ Zone %) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)",
         setsCount: 4,
-        refPctOf1Rm: 70,
+        refPctOf1Rm: 75,
         refReps: 6,
-        defaultDayIdx: 1,
+        defaultDayIdx: 0,
         days: [
           {
-            dayLabel: 'Day 1 · 60% Speed (4×6 · 24 opt reps)',
-            shortDay: 'D1: 60% 4×6',
+            dayLabel: 'Zone 1 (55–65%) · 60% Speed/Volume (4×6 · 24 optimal reps)',
+            shortDay: 'Z1: 60% 4×6 (24r)',
             zonePct: 60,
             optimalTotalReps: 24,
             setPattern: Array.from({ length: 4 }, () => ({ pct: 60, reps: 6, role: 'work' }))
           },
           {
-            dayLabel: 'Day 2 · 70% Volume (4×6 · 24 opt reps)',
-            shortDay: 'D2: 70% 4×6',
-            zonePct: 70,
-            optimalTotalReps: 24,
-            setPattern: Array.from({ length: 4 }, () => ({ pct: 70, reps: 6, role: 'work' }))
+            dayLabel: 'Zone 2 (70–80%) · 75% Strength-Volume (3×6 · 18 optimal reps)',
+            shortDay: 'Z2: 75% 3×6 (18r)',
+            zonePct: 75,
+            optimalTotalReps: 18,
+            setPattern: Array.from({ length: 3 }, () => ({ pct: 75, reps: 6, role: 'work' }))
           },
           {
-            dayLabel: 'Day 3 · 82.5% Strength (5×3 · 15 opt reps)',
-            shortDay: 'D3: 82.5% 5×3',
-            zonePct: 82.5,
+            dayLabel: 'Zone 3 (80–90%) · 85% Heavy Strength (5×3 · 15 optimal reps)',
+            shortDay: 'Z3: 85% 5×3 (15r)',
+            zonePct: 85,
             optimalTotalReps: 15,
-            setPattern: Array.from({ length: 5 }, () => ({ pct: 82.5, reps: 3, role: 'work' }))
+            setPattern: Array.from({ length: 5 }, () => ({ pct: 85, reps: 3, role: 'work' }))
           },
           {
-            dayLabel: 'Day 4 · 90% Peak (3×2 + 1×1 · 7 opt reps)',
-            shortDay: 'D4: 90% 4×2',
+            dayLabel: 'Zone 4 (90%+) · 90% Peak Intensity (3×2 + 1×1 · 7 optimal reps)',
+            shortDay: 'Z4: 90% 3×2+1×1 (7r)',
             zonePct: 90,
             optimalTotalReps: 7,
             setPattern: [
-              { pct: 90, reps: 2, role: 'work' },
-              { pct: 90, reps: 2, role: 'work' },
-              { pct: 90, reps: 2, role: 'work' },
-              { pct: 90, reps: 1, role: 'work' }
+              { pct: 90, reps: 2, role: 'work', label: '90% (×2)' },
+              { pct: 90, reps: 2, role: 'work', label: '90% (×2)' },
+              { pct: 90, reps: 2, role: 'work', label: '90% (×2)' },
+              { pct: 90, reps: 1, role: 'work', label: '90% (×1)' }
             ]
           }
         ],
-        setPattern: Array.from({ length: 4 }, () => ({ pct: 70, reps: 6, role: 'work' }))
+        setPattern: Array.from({ length: 4 }, () => ({ pct: 60, reps: 6, role: 'work' }))
       },
 
       wendler_bbb: {
         id: 'wendler_bbb',
-        name: '5/3/1 Boring But Big (4-Week Cycle · 90% TM + 5×10 BBB)',
+        name: '5/3/1 Boring But Big (4-Week Cycle · 90% TM + 5×10 @ 50% TM)',
         shortTag: '5/3/1 BBB',
         progressionCadence: 'weekly',
         formulaType: 'wendler_531',
@@ -1572,11 +1578,11 @@ function doPost(e) {
         defaultDayIdx: 0,
         days: [
           {
-            dayLabel: 'Week 1 · 5/5/5+ (65/75/85% TM) + 5×10 BBB',
-            shortDay: 'Wk1: 5/5/5+',
+            dayLabel: 'Week 1 · 5s Week (65/75/85% TM × 5/5/5+) + 5×10 BBB @ 50% TM',
+            shortDay: 'Wk1: 5/5/5+ + BBB',
             setPattern: [
-              { pct: 58.5, reps: 5, role: 'work', label: '65% TM' },
-              { pct: 67.5, reps: 5, role: 'work', label: '75% TM' },
+              { pct: 58.5, reps: 5, role: 'work', label: '65% TM (58.5%)' },
+              { pct: 67.5, reps: 5, role: 'work', label: '75% TM (67.5%)' },
               { pct: 76.5, reps: 5, role: 'work', label: '85% TM (5+)' },
               { pct: 45, reps: 10, role: 'work', label: 'BBB 50% TM' },
               { pct: 45, reps: 10, role: 'work', label: 'BBB 50% TM' },
@@ -1586,11 +1592,11 @@ function doPost(e) {
             ]
           },
           {
-            dayLabel: 'Week 2 · 3/3/3+ (70/80/90% TM) + 5×10 BBB',
-            shortDay: 'Wk2: 3/3/3+',
+            dayLabel: 'Week 2 · 3s Week (70/80/90% TM × 3/3/3+) + 5×10 BBB @ 50% TM',
+            shortDay: 'Wk2: 3/3/3+ + BBB',
             setPattern: [
-              { pct: 63.0, reps: 3, role: 'work', label: '70% TM' },
-              { pct: 72.0, reps: 3, role: 'work', label: '80% TM' },
+              { pct: 63.0, reps: 3, role: 'work', label: '70% TM (63%)' },
+              { pct: 72.0, reps: 3, role: 'work', label: '80% TM (72%)' },
               { pct: 81.0, reps: 3, role: 'work', label: '90% TM (3+)' },
               { pct: 45, reps: 10, role: 'work', label: 'BBB 50% TM' },
               { pct: 45, reps: 10, role: 'work', label: 'BBB 50% TM' },
@@ -1600,11 +1606,11 @@ function doPost(e) {
             ]
           },
           {
-            dayLabel: 'Week 3 · 5/3/1+ (75/85/95% TM) + 5×10 BBB',
-            shortDay: 'Wk3: 5/3/1+',
+            dayLabel: 'Week 3 · 5/3/1 Week (75/85/95% TM × 5/3/1+) + 5×10 BBB @ 50% TM',
+            shortDay: 'Wk3: 5/3/1+ + BBB',
             setPattern: [
-              { pct: 67.5, reps: 5, role: 'work', label: '75% TM' },
-              { pct: 76.5, reps: 3, role: 'work', label: '85% TM' },
+              { pct: 67.5, reps: 5, role: 'work', label: '75% TM (67.5%)' },
+              { pct: 76.5, reps: 3, role: 'work', label: '85% TM (76.5%)' },
               { pct: 85.5, reps: 1, role: 'work', label: '95% TM (1+)' },
               { pct: 45, reps: 10, role: 'work', label: 'BBB 50% TM' },
               { pct: 45, reps: 10, role: 'work', label: 'BBB 50% TM' },
@@ -1614,16 +1620,13 @@ function doPost(e) {
             ]
           },
           {
-            dayLabel: 'Week 4 · Deload (40/50/60% TM) + 3×10',
-            shortDay: 'Wk4: Deload',
+            dayLabel: 'Week 4 · Deload (40/50/60% TM × 5/5/5 · No BBB sets)',
+            shortDay: 'Wk4: Deload 3×5',
             isDeload: true,
             setPattern: [
-              { pct: 36.0, reps: 5, role: 'work', label: '40% TM' },
-              { pct: 45.0, reps: 5, role: 'work', label: '50% TM' },
-              { pct: 54.0, reps: 5, role: 'work', label: '60% TM' },
-              { pct: 45.0, reps: 10, role: 'work', label: 'BBB 3×10' },
-              { pct: 45.0, reps: 10, role: 'work', label: 'BBB 3×10' },
-              { pct: 45.0, reps: 10, role: 'work', label: 'BBB 3×10' }
+              { pct: 36.0, reps: 5, role: 'work', label: '40% TM (36%)' },
+              { pct: 45.0, reps: 5, role: 'work', label: '50% TM (45%)' },
+              { pct: 54.0, reps: 5, role: 'work', label: '60% TM (54%)' }
             ]
           }
         ],
@@ -1641,7 +1644,7 @@ function doPost(e) {
 
       strength_5x5: {
         id: 'strength_5x5',
-        name: 'Texas Method 5×5 (3 Days: Volume 5×5 · Light 2×5 · Intensity 1×5)',
+        name: 'Texas Method 5×5 (3 Days: Volume 5×5 @ 77% · Light 2×5 @ 62% · Intensity 1×5 @ 85%)',
         shortTag: 'Texas 5×5',
         progressionCadence: 'session',
         formulaType: 'texas_method',
@@ -1652,14 +1655,14 @@ function doPost(e) {
         defaultDayIdx: 0,
         days: [
           {
-            dayLabel: 'Day 1 · Volume Day (5×5 @ 77% 1RM)',
+            dayLabel: 'Day 1 · Volume Day (5×5 @ 77% 1RM · ~90% of 5RM)',
             shortDay: 'D1: Vol 5×5 (77%)',
             zonePct: 77,
             optimalTotalReps: 25,
             setPattern: Array.from({ length: 5 }, () => ({ pct: 77, reps: 5, role: 'work' }))
           },
           {
-            dayLabel: 'Day 2 · Light Recovery (2×5 @ 62% 1RM)',
+            dayLabel: 'Day 2 · Light Recovery (2×5 @ 62% 1RM · ~80% of Volume)',
             shortDay: 'D2: Light 2×5 (62%)',
             isRecovery: true,
             zonePct: 62,
@@ -1670,11 +1673,11 @@ function doPost(e) {
             ]
           },
           {
-            dayLabel: 'Day 3 · Intensity Day (Ramp + 1×5 Top RM @ 85%)',
+            dayLabel: 'Day 3 · Intensity Day (1×5 Top 5RM Set @ 85% 1RM)',
             shortDay: 'D3: Int 1×5 (85%)',
+            zonePct: 85,
+            optimalTotalReps: 5,
             setPattern: [
-              { pct: 70, reps: 5, role: 'work', label: 'Ramp 70%' },
-              { pct: 78, reps: 3, role: 'work', label: 'Ramp 78%' },
               { pct: 85, reps: 5, role: 'work', label: 'Top 1×5 (85%)' }
             ]
           }
@@ -1695,19 +1698,19 @@ function doPost(e) {
         defaultDayIdx: 0,
         days: [
           {
-            dayLabel: 'Stage 1 · 5×3+ @ 85% 1RM',
+            dayLabel: 'Stage 1 · 5×3+ @ 85% 1RM (Last set AMRAP)',
             shortDay: 'Stg1: 5×3+ (85%)',
             zonePct: 85,
             setPattern: Array.from({ length: 5 }, (_, i) => ({ pct: 85, reps: 3, role: 'work', label: i === 4 ? '85% (3+)' : '85%' }))
           },
           {
-            dayLabel: 'Stage 2 · 6×2+ @ 90% 1RM',
+            dayLabel: 'Stage 2 · 6×2+ @ 90% 1RM (Last set AMRAP)',
             shortDay: 'Stg2: 6×2+ (90%)',
             zonePct: 90,
             setPattern: Array.from({ length: 6 }, (_, i) => ({ pct: 90, reps: 2, role: 'work', label: i === 5 ? '90% (2+)' : '90%' }))
           },
           {
-            dayLabel: 'Stage 3 · 10×1+ @ 95% 1RM',
+            dayLabel: 'Stage 3 · 10×1+ @ 95% 1RM (Last set AMRAP)',
             shortDay: 'Stg3: 10×1+ (95%)',
             zonePct: 95,
             setPattern: Array.from({ length: 10 }, (_, i) => ({ pct: 95, reps: 1, role: 'work', label: i === 9 ? '95% (1+)' : '95%' }))
@@ -1752,82 +1755,70 @@ function doPost(e) {
 
       dup_3day: {
         id: 'dup_3day',
-        name: 'Daily Undulating DUP (3 Days: Hypertrophy 4×8 · Strength 5×5 · Power 5×3)',
+        name: 'Daily Undulating DUP (Zourdos HPS: Hypertrophy 4×8 @ 70% · Power 5×1 @ 80% · Strength 3×3+ @ 85%)',
         shortTag: 'DUP 3-Day',
         progressionCadence: 'session',
         formulaType: 'prilepin_zone',
         formulaLabel: '1RM Set Formula: (Weight ÷ Day %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 4,
-        refPctOf1Rm: 75,
+        refPctOf1Rm: 70,
         refReps: 8,
         defaultDayIdx: 0,
         days: [
           {
-            dayLabel: 'Day 1 · Hypertrophy (4×8 @ 72.5% 1RM)',
-            shortDay: 'D1: Hyp 4×8 (72.5%)',
-            zonePct: 72.5,
-            setPattern: Array.from({ length: 4 }, () => ({ pct: 72.5, reps: 8, role: 'work' }))
+            dayLabel: 'Day 1 · Hypertrophy (4×8 @ 70% 1RM)',
+            shortDay: 'D1: Hyp 4×8 (70%)',
+            zonePct: 70,
+            setPattern: Array.from({ length: 4 }, () => ({ pct: 70, reps: 8, role: 'work' }))
           },
           {
-            dayLabel: 'Day 2 · Strength (5×5 @ 80% 1RM)',
-            shortDay: 'D2: Str 5×5 (80%)',
+            dayLabel: 'Day 2 · Power / Explosive Speed (5×1 @ 80% 1RM)',
+            shortDay: 'D2: Pwr 5×1 (80%)',
             zonePct: 80,
-            setPattern: Array.from({ length: 5 }, () => ({ pct: 80, reps: 5, role: 'work' }))
+            setPattern: Array.from({ length: 5 }, () => ({ pct: 80, reps: 1, role: 'work', label: '80% Speed' }))
           },
           {
-            dayLabel: 'Day 3 · Power (5×3 @ 85% 1RM)',
-            shortDay: 'D3: Pwr 5×3 (85%)',
+            dayLabel: 'Day 3 · Strength (3×3+ @ 85% 1RM · Last set AMRAP)',
+            shortDay: 'D3: Str 3×3+ (85%)',
             zonePct: 85,
-            setPattern: Array.from({ length: 5 }, () => ({ pct: 85, reps: 3, role: 'work' }))
+            setPattern: [
+              { pct: 85, reps: 3, role: 'work', label: '85%' },
+              { pct: 85, reps: 3, role: 'work', label: '85%' },
+              { pct: 85, reps: 3, role: 'work', label: '85% (3+)' }
+            ]
           }
         ],
-        setPattern: Array.from({ length: 4 }, () => ({ pct: 72.5, reps: 8, role: 'work' }))
+        setPattern: Array.from({ length: 4 }, () => ({ pct: 70, reps: 8, role: 'work' }))
       },
 
       dropset_3: {
         id: 'dropset_3',
-        name: 'Reverse Pyramid RPT (3 Waves: 6/8/10 · 5/7/9 · 4/6/8)',
+        name: 'Reverse Pyramid RPT (Leangains −10% Bar Drops: 85%×6 → 76.5%×8 → 68%×10)',
         shortTag: 'RPT Pyramid',
-        progressionCadence: 'weekly',
+        progressionCadence: 'single',
         formulaType: 'prilepin_zone',
         formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 3,
         refPctOf1Rm: 85,
-        refReps: 5,
-        defaultDayIdx: 1,
+        refReps: 6,
+        defaultDayIdx: 0,
         days: [
           {
-            dayLabel: 'Wave 1 · RPT 6/8/10 (82.5%×6 · 75%×8 · 67.5%×10)',
-            shortDay: 'W1: 6/8/10 (82.5%)',
+            dayLabel: 'Leangains RPT · Top 85%×6 → −10% Load (76.5%×8) → −20% Load (68%×10)',
+            shortDay: 'RPT: 6/8/10 (−10%)',
+            zonePct: 85,
+            optimalTotalReps: 24,
             setPattern: [
-              { pct: 82.5, reps: 6, role: 'work', label: '82.5%' },
-              { pct: 75, reps: 8, role: 'work', label: '75%' },
-              { pct: 67.5, reps: 10, role: 'work', label: '67.5%' }
-            ]
-          },
-          {
-            dayLabel: 'Wave 2 · RPT 5/7/9 (85%×5 · 77.5%×7 · 70%×9)',
-            shortDay: 'W2: 5/7/9 (85%)',
-            setPattern: [
-              { pct: 85, reps: 5, role: 'work', label: '85%' },
-              { pct: 77.5, reps: 7, role: 'work', label: '77.5%' },
-              { pct: 70, reps: 9, role: 'work', label: '70%' }
-            ]
-          },
-          {
-            dayLabel: 'Wave 3 · Heavy RPT 4/6/8 (87.5%×4 · 80%×6 · 72.5%×8)',
-            shortDay: 'W3: 4/6/8 (87.5%)',
-            setPattern: [
-              { pct: 87.5, reps: 4, role: 'work', label: '87.5%' },
-              { pct: 80, reps: 6, role: 'work', label: '80%' },
-              { pct: 72.5, reps: 8, role: 'work', label: '72.5%' }
+              { pct: 85, reps: 6, role: 'work', label: 'Top 85%' },
+              { pct: 76.5, reps: 8, role: 'work', label: '−10% (76.5%)' },
+              { pct: 68, reps: 10, role: 'work', label: '−20% (68%)' }
             ]
           }
         ],
         setPattern: [
-          { pct: 85, reps: 5, role: 'work' },
-          { pct: 77.5, reps: 7, role: 'work' },
-          { pct: 70, reps: 9, role: 'work' }
+          { pct: 85, reps: 6, role: 'work', label: 'Top 85%' },
+          { pct: 76.5, reps: 8, role: 'work', label: '−10% (76.5%)' },
+          { pct: 68, reps: 10, role: 'work', label: '−20% (68%)' }
         ]
       },
 
@@ -1856,9 +1847,9 @@ function doPost(e) {
 
       gvt_10x10: {
         id: 'gvt_10x10',
-        name: 'German Volume GVT (3 Phases: 10×10 @ 60% · 10×8 @ 65% · 10×6 @ 70%)',
-        shortTag: 'GVT 10-Set',
-        progressionCadence: 'weekly',
+        name: 'German Volume GVT (Poliquin 10×10 @ 60% 1RM · Phase 2: 10×6 @ 75% 1RM)',
+        shortTag: 'GVT 10×10',
+        progressionCadence: 'single',
         formulaType: 'prilepin_zone',
         formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
         setsCount: 10,
@@ -1867,22 +1858,18 @@ function doPost(e) {
         defaultDayIdx: 0,
         days: [
           {
-            dayLabel: 'Phase 1 · GVT 10×10 @ 60% 1RM (100 total reps)',
+            dayLabel: 'Phase 1 · Classic GVT 10×10 @ 60% 1RM (100 total reps)',
             shortDay: 'Ph1: 10×10 (60%)',
             zonePct: 60,
+            optimalTotalReps: 100,
             setPattern: Array.from({ length: 10 }, () => ({ pct: 60, reps: 10, role: 'work' }))
           },
           {
-            dayLabel: 'Phase 2 · GVT 10×8 @ 65% 1RM (80 total reps)',
-            shortDay: 'Ph2: 10×8 (65%)',
-            zonePct: 65,
-            setPattern: Array.from({ length: 10 }, () => ({ pct: 65, reps: 8, role: 'work' }))
-          },
-          {
-            dayLabel: 'Phase 3 · GVT 10×6 @ 70% 1RM (60 total reps)',
-            shortDay: 'Ph3: 10×6 (70%)',
-            zonePct: 70,
-            setPattern: Array.from({ length: 10 }, () => ({ pct: 70, reps: 6, role: 'work' }))
+            dayLabel: 'Phase 2 · GVT Intensification 10×6 @ 75% 1RM (60 total reps)',
+            shortDay: 'Ph2: 10×6 (75%)',
+            zonePct: 75,
+            optimalTotalReps: 60,
+            setPattern: Array.from({ length: 10 }, () => ({ pct: 75, reps: 6, role: 'work' }))
           }
         ],
         setPattern: Array.from({ length: 10 }, () => ({ pct: 60, reps: 10, role: 'work' }))
@@ -1923,10 +1910,10 @@ function doPost(e) {
           id: 'routine_push',
           name: 'Push — Chest, Shoulders & Triceps',
           blocks: [
-            { exerciseId: 'ex_bench', schemeId: 'normal_3x5', dayIdx: 1 },
-            { exerciseId: 'ex_ohp', schemeId: 'prilepin_optimal', dayIdx: 1 },
-            { exerciseId: 'ex_db_bench', schemeId: 'normal_3x8', dayIdx: 1 },
-            { exerciseId: 'ex_tricep_pushdown', schemeId: 'normal_3x10', dayIdx: 1 }
+            { exerciseId: 'ex_bench', schemeId: 'normal_3x5', dayIdx: 0 },
+            { exerciseId: 'ex_ohp', schemeId: 'prilepin_optimal', dayIdx: 0 },
+            { exerciseId: 'ex_db_bench', schemeId: 'normal_3x8', dayIdx: 0 },
+            { exerciseId: 'ex_tricep_pushdown', schemeId: 'normal_3x10', dayIdx: 0 }
           ]
         },
         {
@@ -1934,28 +1921,28 @@ function doPost(e) {
           name: 'Pull — Back & Biceps',
           blocks: [
             { exerciseId: 'ex_pullups', schemeId: 'wendler_bbb', dayIdx: 0 },
-            { exerciseId: 'ex_lat_pulldown', schemeId: 'normal_3x8', dayIdx: 1 },
-            { exerciseId: 'ex_db_row', schemeId: 'normal_3x8', dayIdx: 1 },
-            { exerciseId: 'ex_db_curl', schemeId: 'normal_3x10', dayIdx: 1 }
+            { exerciseId: 'ex_lat_pulldown', schemeId: 'normal_3x8', dayIdx: 0 },
+            { exerciseId: 'ex_db_row', schemeId: 'normal_3x8', dayIdx: 0 },
+            { exerciseId: 'ex_db_curl', schemeId: 'normal_3x10', dayIdx: 0 }
           ]
         },
         {
           id: 'routine_legs',
           name: 'Legs — Quads, Hamstrings & Glutes',
           blocks: [
-            { exerciseId: 'ex_squat', schemeId: 'prilepin_optimal', dayIdx: 1 },
-            { exerciseId: 'ex_rdl', schemeId: 'normal_3x8', dayIdx: 1 },
-            { exerciseId: 'ex_split_squat', schemeId: 'normal_3x10', dayIdx: 1 }
+            { exerciseId: 'ex_squat', schemeId: 'prilepin_optimal', dayIdx: 0 },
+            { exerciseId: 'ex_rdl', schemeId: 'normal_3x8', dayIdx: 0 },
+            { exerciseId: 'ex_split_squat', schemeId: 'normal_3x10', dayIdx: 0 }
           ]
         },
         {
           id: 'routine_upper',
           name: 'Upper Body — Push & Pull',
           blocks: [
-            { exerciseId: 'ex_bench', schemeId: 'normal_3x5', dayIdx: 1 },
-            { exerciseId: 'ex_pullups', schemeId: 'normal_3x8', dayIdx: 1 },
-            { exerciseId: 'ex_ohp', schemeId: 'prilepin_optimal', dayIdx: 1 },
-            { exerciseId: 'ex_db_row', schemeId: 'normal_3x8', dayIdx: 1 }
+            { exerciseId: 'ex_bench', schemeId: 'normal_3x5', dayIdx: 0 },
+            { exerciseId: 'ex_pullups', schemeId: 'normal_3x8', dayIdx: 0 },
+            { exerciseId: 'ex_ohp', schemeId: 'prilepin_optimal', dayIdx: 0 },
+            { exerciseId: 'ex_db_row', schemeId: 'normal_3x8', dayIdx: 0 }
           ]
         }
       ],
@@ -1990,7 +1977,7 @@ function doPost(e) {
           laterality: 'bilateral',
           isNewMovement: false,
           defaultScheme: 'normal_3x5',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 1.00,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 211.64 },
@@ -2008,7 +1995,7 @@ function doPost(e) {
           laterality: 'unilateral',
           isNewMovement: true,
           defaultScheme: 'normal_3x8',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.42,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 75.56 },
@@ -2026,7 +2013,7 @@ function doPost(e) {
           laterality: 'bilateral',
           isNewMovement: true,
           defaultScheme: 'normal_3x8',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.92,
           stepLbs: 11.0231131,
           e1rmByGym: { gym_general: 165.50 },
@@ -2044,7 +2031,7 @@ function doPost(e) {
           laterality: 'bilateral',
           isNewMovement: false,
           defaultScheme: 'prilepin_optimal',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 1.00,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 143.30 },
@@ -2062,7 +2049,7 @@ function doPost(e) {
           laterality: 'bilateral',
           isNewMovement: false,
           defaultScheme: 'normal_3x10',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.42,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 88.18 },
@@ -2098,7 +2085,7 @@ function doPost(e) {
           laterality: 'bilateral',
           isNewMovement: true,
           defaultScheme: 'normal_3x8',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.85,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 159.28 },
@@ -2116,7 +2103,7 @@ function doPost(e) {
           laterality: 'unilateral',
           isNewMovement: true,
           defaultScheme: 'normal_3x8',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.45,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 84.33 },
@@ -2134,7 +2121,7 @@ function doPost(e) {
           laterality: 'unilateral',
           isNewMovement: false,
           defaultScheme: 'normal_3x10',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.24,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 48.50 },
@@ -2152,7 +2139,7 @@ function doPost(e) {
           laterality: 'bilateral',
           isNewMovement: false,
           defaultScheme: 'prilepin_optimal',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 1.00,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 308.65 },
@@ -2170,7 +2157,7 @@ function doPost(e) {
           laterality: 'unilateral',
           isNewMovement: true,
           defaultScheme: 'normal_3x10',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.36,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 94.45 },
@@ -2206,7 +2193,7 @@ function doPost(e) {
           laterality: 'bilateral',
           isNewMovement: true,
           defaultScheme: 'normal_3x8',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: 0.78,
           stepLbs: 5.51155655,
           e1rmByGym: { gym_general: 248.48 },
@@ -3374,7 +3361,7 @@ function doPost(e) {
           sc.id,
           sc.shortTag,
           daysEncoded,
-          'prilepin_zone',
+          sc.progressionCadence || 'weekly',
           sc.refPctOf1Rm,
           sc.refReps
         ]));
@@ -3410,7 +3397,7 @@ function doPost(e) {
       return rows;
     }
 
-    function parseSpreadsheetTableIntoState(rows) {
+    function parseSpreadsheetTableIntoState(rows, { preserveLocalSession = false } = {}) {
       if (!Array.isArray(rows) || rows.length < 2) return false;
       const nonEmptyRows = rows.filter(r => Array.isArray(r) && String(r[0] || '').trim() !== '');
       if (nonEmptyRows.length < 2) return false;
@@ -3550,10 +3537,15 @@ function doPost(e) {
               days = [{ dayLabel: String(r[1] || 'Day 1'), shortDay: 'D1', isDeload: false, setPattern }];
             }
             const firstPat = days[0].setPattern;
+            const rawCadence = String(r[5] || '').trim();
+            const validCadence = ['single', 'weekly', 'session', 'stage_pass'].includes(rawCadence)
+              ? rawCadence
+              : ((BASE_SCHEME_CATALOG[scId] && BASE_SCHEME_CATALOG[scId].progressionCadence) ? BASE_SCHEME_CATALOG[scId].progressionCadence : (days.length === 1 ? 'single' : 'weekly'));
             parsedSchemes[scId] = {
               id: scId,
               name: String(r[1] || 'Custom Scheme'),
               shortTag: String(r[3] || 'Custom'),
+              progressionCadence: validCadence,
               formulaType: 'prilepin_zone',
               formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
               setsCount: firstPat.length,
@@ -3624,27 +3616,35 @@ function doPost(e) {
         }
       });
 
+      const prevActiveRoutineId = state.activeRoutineId;
+      const prevSessionTitle = state.sessionTitle;
+
       if (parsedRoutines.length > 0) {
         state.savedRoutines = parsedRoutines;
-        // Ensure activeRoutineId matches the ACTIVE routine from the Sheet (or routine matching sessionTitleFromSheet, or first routine)
-        let matchedActive = parsedRoutines.find(r => r.id === state.activeRoutineId);
-        if (!matchedActive && sessionTitleFromSheet) {
-          matchedActive = parsedRoutines.find(r => r.name.toLowerCase() === sessionTitleFromSheet.toLowerCase());
+        if (preserveLocalSession && prevActiveRoutineId && parsedRoutines.some(r => r.id === prevActiveRoutineId)) {
+          state.activeRoutineId = prevActiveRoutineId;
+          state.sessionTitle = prevSessionTitle || parsedRoutines.find(r => r.id === prevActiveRoutineId).name;
+        } else {
+          // Ensure activeRoutineId matches the ACTIVE routine from the Sheet (or routine matching sessionTitleFromSheet, or first routine)
+          let matchedActive = parsedRoutines.find(r => r.isActiveRow) || parsedRoutines.find(r => r.id === state.activeRoutineId);
+          if (!matchedActive && sessionTitleFromSheet) {
+            matchedActive = parsedRoutines.find(r => r.name.toLowerCase() === sessionTitleFromSheet.toLowerCase());
+          }
+          if (!matchedActive) {
+            matchedActive = parsedRoutines[0];
+          }
+          state.activeRoutineId = matchedActive.id;
+          state.sessionTitle = matchedActive.name;
         }
-        if (!matchedActive) {
-          matchedActive = parsedRoutines[0];
-        }
-        state.activeRoutineId = matchedActive.id;
-        state.sessionTitle = matchedActive.name;
-      } else if (sessionTitleFromSheet) {
+      } else if (sessionTitleFromSheet && !preserveLocalSession) {
         state.sessionTitle = sessionTitleFromSheet;
       }
 
-      // Immediately load the active routine into activeSessionExercises unless the user has completed/modified sets in progress
-      const hasTouchedSetsInSession = (state.activeSessionExercises || []).some(
-        b => b.swappedToday || (b.sets || []).some(s => s.completed || s.userModified)
+      // Preserve any in-progress session changes (day/week selection, swapped lift, notes, off-day toggle, or touched sets)
+      const hasTouchedSession = preserveLocalSession || (state.activeSessionExercises || []).some(
+        b => b.swappedToday || (b.note && b.note.trim() !== '') || b.includeBlockIn1Rm === false || (b.sets || []).some(s => s.completed || s.userModified)
       );
-      if (!hasTouchedSetsInSession) {
+      if (!hasTouchedSession || !state.activeSessionExercises || state.activeSessionExercises.length === 0) {
         state.unfinishedSessionsByRoutine = {};
         loadRoutineIntoActiveSession(state.activeRoutineId, false, true);
       } else {
@@ -4257,10 +4257,20 @@ function doPost(e) {
           const blk = state.activeSessionExercises[bIdx];
           const ex = getExerciseById(blk.exerciseId);
           ex.defaultDayIdx = dIdx;
-          state.activeSessionExercises[bIdx] = createSessionBlock(ex.id, blk.schemeId, dIdx);
+          const updatedBlk = createSessionBlock(ex.id, blk.schemeId, dIdx);
+          updatedBlk.swappedToday = true;
+          updatedBlk.includeBlockIn1Rm = blk.includeBlockIn1Rm !== false;
+          updatedBlk.note = blk.note || '';
+          state.activeSessionExercises[bIdx] = updatedBlk;
+          const activeR = getActiveRoutineTemplate();
+          if (activeR && activeR.blocks && activeR.blocks[bIdx] && activeR.blocks[bIdx].exerciseId === ex.id) {
+            activeR.blocks[bIdx].dayIdx = dIdx;
+          }
           saveState();
           renderWorkoutScreen();
           renderTodayScreen();
+          renderWorkoutSetupScreen();
+          handleWriteToGoogleSheet(`Changed ${ex.name} stage/day to index ${dIdx + 1}`);
         });
       });
 
@@ -4318,6 +4328,7 @@ function doPost(e) {
           const bIdx = parseInt(btn.getAttribute('data-block'), 10);
           const blk = state.activeSessionExercises[bIdx];
           blk.includeBlockIn1Rm = !(blk.includeBlockIn1Rm !== false);
+          blk.swappedToday = true;
           blk.sets.forEach(s => { s.includeIn1Rm = blk.includeBlockIn1Rm; });
           saveState();
           renderWorkoutScreen();
@@ -5044,6 +5055,96 @@ function doPost(e) {
     ];
     let activeDraftCustomDayIdx = 0;
     let pendingSchemeAssignBlockIdx = null;
+    let editingSchemeId = null;
+
+    function updateSchemeBuilderModeHeader() {
+      const titleEl = document.getElementById('schemeBuilderHeaderTitle');
+      const subEl = document.getElementById('schemeBuilderHeaderSub');
+      const cancelBtn = document.getElementById('cancelSchemeEditBtn');
+      const saveLbl = document.getElementById('saveCustomSchemeBtnLabel');
+      const cardEl = document.getElementById('schemeBuilderCard');
+      if (editingSchemeId) {
+        const sc = getScheme(editingSchemeId);
+        if (titleEl) titleEl.textContent = `✎ Editing Scheme: ${sc.shortTag || sc.name}`;
+        if (subEl) subEl.textContent = `Modify stages, %1RM, or target reps below and tap Save Changes`;
+        if (cancelBtn) cancelBtn.classList.remove('hidden');
+        if (saveLbl) saveLbl.textContent = `💾 Save Changes to "${sc.shortTag || sc.name}"`;
+        if (cardEl) cardEl.className = 'form-card-active p-4 space-y-3.5';
+      } else {
+        if (titleEl) titleEl.textContent = 'Create Custom Scheme';
+        if (subEl) subEl.textContent = 'Build a new scheme or tap ✎ Edit on any scheme below to customize it';
+        if (cancelBtn) cancelBtn.classList.add('hidden');
+        if (saveLbl) saveLbl.textContent = '💾 Save Multi-Day / Stage Scheme';
+        if (cardEl) cardEl.className = 'form-card p-4 space-y-3.5';
+      }
+    }
+
+    function loadSchemeIntoEditor(scId) {
+      const sc = getScheme(scId);
+      if (!sc) return;
+      editingSchemeId = sc.id;
+      const nameInput = document.getElementById('customSchemeNameInput');
+      if (nameInput) {
+        nameInput.value = sc.name;
+      }
+      const cadSelect = document.getElementById('customSchemeCadenceSelect');
+      if (cadSelect) {
+        cadSelect.value = sc.progressionCadence || ((Array.isArray(sc.days) && sc.days.length > 1) ? 'weekly' : 'single');
+      }
+      if (Array.isArray(sc.days) && sc.days.length > 0) {
+        draftCustomSchemeDays = JSON.parse(JSON.stringify(sc.days)).map((d, idx) => ({
+          dayLabel: d.dayLabel || `Day ${idx + 1}`,
+          shortDay: d.shortDay || `D${idx + 1}`,
+          isDeload: Boolean(d.isDeload || d.isRecovery),
+          setPattern: Array.isArray(d.setPattern) && d.setPattern.length > 0
+            ? d.setPattern.map(s => ({ pct: s.pct, reps: s.reps, role: 'work', label: s.label }))
+            : [{ pct: sc.refPctOf1Rm || 75, reps: sc.refReps || 8, role: 'work' }]
+        }));
+      } else {
+        const pat = Array.isArray(sc.setPattern) && sc.setPattern.length > 0
+          ? JSON.parse(JSON.stringify(sc.setPattern))
+          : [{ pct: sc.refPctOf1Rm || 75, reps: sc.refReps || 8, role: 'work' }];
+        draftCustomSchemeDays = [{
+          dayLabel: sc.name,
+          shortDay: sc.shortTag || 'Stage 1',
+          isDeload: false,
+          setPattern: pat
+        }];
+      }
+      activeDraftCustomDayIdx = 0;
+      updateSchemeBuilderModeHeader();
+      renderCustomSchemeBuilderRows();
+      renderSchemesPage();
+      const cardEl = document.getElementById('schemeBuilderCard');
+      if (cardEl && cardEl.scrollIntoView) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      showToast(`Editing "${sc.shortTag || sc.name}"`);
+    }
+
+    function cancelSchemeEditorMode() {
+      editingSchemeId = null;
+      const nameInput = document.getElementById('customSchemeNameInput');
+      if (nameInput) nameInput.value = '';
+      draftCustomSchemeDays = [
+        {
+          dayLabel: 'Day 1 / Stage 1 · Volume (4×6 @ 72.5%)',
+          shortDay: 'D1: 72.5% 4×6',
+          isDeload: false,
+          setPattern: Array.from({ length: 4 }, () => ({ pct: 72.5, reps: 6, role: 'work' }))
+        },
+        {
+          dayLabel: 'Day 2 / Stage 2 · Heavy (4×4 @ 80%)',
+          shortDay: 'D2: 80% 4×4',
+          isDeload: false,
+          setPattern: Array.from({ length: 4 }, () => ({ pct: 80, reps: 4, role: 'work' }))
+        }
+      ];
+      activeDraftCustomDayIdx = 0;
+      updateSchemeBuilderModeHeader();
+      renderCustomSchemeBuilderRows();
+      renderSchemesPage();
+    }
 
     function renderCustomSchemeBuilderRows() {
       const tabsEl = document.getElementById('customSchemeDayTabs');
@@ -5160,30 +5261,115 @@ function doPost(e) {
       });
     }
 
+    function summarizeSetPatternCompact(setPattern) {
+      if (!Array.isArray(setPattern) || setPattern.length === 0) return '';
+      // Group consecutive identical pct x reps sets (e.g. 5 sets of 45%x10 -> "5×(45%×10)")
+      const groups = [];
+      setPattern.forEach(s => {
+        const key = `${s.pct}%×${s.reps}`;
+        const last = groups[groups.length - 1];
+        if (last && last.key === key) {
+          last.count++;
+        } else {
+          groups.push({ key, count: 1, pct: s.pct, reps: s.reps });
+        }
+      });
+      if (groups.length === 1) {
+        const g = groups[0];
+        return `${g.count}×${g.reps} @ ${g.pct}%`;
+      }
+      return groups.map(g => g.count > 1 ? `${g.count}×(${g.pct}%×${g.reps})` : `${g.pct}%×${g.reps}`).join(' → ');
+    }
+
     function renderSchemesPage() {
+      updateSchemeBuilderModeHeader();
       renderCustomSchemeBuilderRows();
       const allSchemes = getAllSchemes();
       const pGrid = document.getElementById('programCardsGrid');
       if (!pGrid) return;
 
+      const cadenceLabels = {
+        single: 'Single stage',
+        weekly: 'Weekly wave',
+        session: 'Every session',
+        stage_pass: 'Performance stage'
+      };
+
       pGrid.innerHTML = Object.values(allSchemes).map(sc => {
-        const isCustom = sc.id.startsWith('scheme_custom_');
-        const daysSummary = Array.isArray(sc.days)
-          ? sc.days.map(d => d.shortDay).join(' · ')
-          : (sc.setPattern || []).slice(0, 5).map(p => `${p.pct}%×${p.reps}`).join(' · ');
+        const isBuiltIn = Boolean(BASE_SCHEME_CATALOG[sc.id]);
+        const isEditedBuiltIn = isBuiltIn && Boolean(state.customSchemes && state.customSchemes[sc.id]);
+        const isCustomOnly = !isBuiltIn;
+        const isBeingEdited = editingSchemeId === sc.id;
+        const cadText = cadenceLabels[sc.progressionCadence] || 'Single stage';
+
+        const daysList = Array.isArray(sc.days) && sc.days.length > 0
+          ? sc.days
+          : [{ dayLabel: sc.name, shortDay: sc.shortTag, setPattern: sc.setPattern || [] }];
+
+        const stagesDetailHtml = daysList.map((d, idx) => {
+          const patSummary = summarizeSetPatternCompact(d.setPattern || []);
+          return `
+            <div class="flex flex-wrap items-baseline justify-between gap-1 bg-forest-900/80 border border-forest-750 rounded-lg px-2 py-1 text-[10px] font-mono">
+              <span class="text-slate-200 font-semibold break-words">${d.dayLabel || d.shortDay || `Stage ${idx + 1}`}</span>
+              <span class="text-limeform-400 font-bold shrink-0">${patSummary}</span>
+            </div>
+          `;
+        }).join('');
+
         return `
-          <div class="form-subcard p-3 flex items-center justify-between gap-2 text-xs overflow-hidden">
-            <div class="min-w-0 space-y-0.5">
-              <div class="font-bold text-white truncate">${sc.name}</div>
-              <div class="text-[10px] font-mono text-limeform-400 truncate">${daysSummary}</div>
+          <div class="${isBeingEdited ? 'form-card-active' : 'form-subcard'} p-3.5 space-y-2 text-xs overflow-hidden">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div class="min-w-0 flex-1 space-y-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="px-1.5 py-0.5 rounded bg-plum-800 text-plum-200 font-mono text-[9px] font-bold uppercase">${sc.shortTag || 'Scheme'}</span>
+                  <span class="px-1.5 py-0.5 rounded bg-forest-800 text-slate-300 font-mono text-[9px]">${cadText}</span>
+                  ${isEditedBuiltIn ? `<span class="px-1.5 py-0.5 rounded bg-limeform-400/20 text-limeform-300 font-mono text-[9px] font-bold">Edited</span>` : ''}
+                  ${isCustomOnly ? `<span class="px-1.5 py-0.5 rounded bg-limeform-400/20 text-limeform-300 font-mono text-[9px] font-bold">Custom</span>` : ''}
+                </div>
+                <div class="font-bold text-white break-words leading-snug">${sc.name}</div>
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+                ${pendingSchemeAssignBlockIdx !== null ? `<button type="button" data-pick-scheme="${sc.id}" class="pick-scheme-for-block-btn btn-lime !py-1 !px-2.5 !text-[11px]">Use</button>` : ''}
+                <button type="button" data-edit-scheme="${sc.id}" class="edit-existing-scheme-btn btn-pill !py-1 !px-2.5 !text-[11px] !text-limeform-400">
+                  ✎ Edit
+                </button>
+                ${isEditedBuiltIn ? `<button type="button" data-reset-scheme="${sc.id}" class="reset-builtin-scheme-btn btn-pill !py-1 !px-2 !text-[10px] !text-amber-300" title="Reset to default preset">↺ Reset</button>` : ''}
+                ${isCustomOnly ? `<button type="button" data-del-scheme="${sc.id}" class="del-custom-scheme-btn btn-danger !px-2 !py-1" title="Delete scheme">🗑️</button>` : ''}
+              </div>
             </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              ${pendingSchemeAssignBlockIdx !== null ? `<button type="button" data-pick-scheme="${sc.id}" class="pick-scheme-for-block-btn btn-lime !py-1 !px-2.5 !text-[11px]">Use</button>` : ''}
-              ${isCustom ? `<button type="button" data-del-scheme="${sc.id}" class="del-custom-scheme-btn btn-danger !px-2 !py-1" title="Delete scheme">🗑️</button>` : ''}
-            </div>
+            <div class="space-y-1">${stagesDetailHtml}</div>
           </div>
         `;
       }).join('');
+
+      pGrid.querySelectorAll('.edit-existing-scheme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          loadSchemeIntoEditor(btn.getAttribute('data-edit-scheme'));
+        });
+      });
+
+      pGrid.querySelectorAll('.reset-builtin-scheme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const scId = btn.getAttribute('data-reset-scheme');
+          const defSc = BASE_SCHEME_CATALOG[scId];
+          if (!defSc) return;
+          requestRemovalConfirmation(
+            'Reset scheme to default?',
+            `Reset "${defSc.name}" back to its default stages and percentages?`,
+            '↺ Reset Scheme',
+            () => {
+              if (state.customSchemes) delete state.customSchemes[scId];
+              if (editingSchemeId === scId) cancelSchemeEditorMode();
+              refreshActiveSessionWeights();
+              saveState();
+              renderAll();
+              renderSchemesPage();
+              handleWriteToGoogleSheet(`Reset scheme ${defSc.shortTag}`);
+              showToast(`Reset ${defSc.shortTag} to default`);
+            }
+          );
+        });
+      });
 
       pGrid.querySelectorAll('.pick-scheme-for-block-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -5222,6 +5408,7 @@ function doPost(e) {
               '🗑️ Delete Scheme',
               () => {
                 delete state.customSchemes[scId];
+                if (editingSchemeId === scId) cancelSchemeEditorMode();
                 saveState();
                 renderSchemesPage();
                 renderWorkoutSetupScreen();
@@ -5418,20 +5605,26 @@ function doPost(e) {
         ).join('') + `<option value="__ADD_NEW_SCHEME__" class="bg-forest-900 text-limeform-400 font-bold">+ Add / Manage Schemes...</option>`;
 
         const previewSets = generateSetsFromPatternOrScheme(ex, tplBlock.schemeId, tplBlock.dayIdx || 0, null, 0);
-        const setPreview = previewSets.slice(0, 4).map(s => {
+        const allSetsPillsHtml = previewSets.map((s, sIdx) => {
           const rawBase = isBw
             ? snapLoadLbs((cur1RmLbs * (s.prescribedPctOf1Rm / 100)) - state.bodyweightLbs, ex, true)
             : snapLoadLbs(cur1RmLbs * (s.prescribedPctOf1Rm / 100), ex, false);
           const w = toDisplayWeight(rawBase);
-          const wTxt = isBw ? (w > 0 ? `+${w}${u}` : (w < 0 ? `${w}${u}` : 'BW')) : `${w}${u}`;
-          return `${wTxt}×${s.targetRepsNum}`;
-        }).join(' · ') + (previewSets.length > 4 ? ` (+${previewSets.length - 4} more)` : '');
+          const wTxt = isBw ? (w > 0 ? `+${w}${u}` : (w < 0 ? `${w}${u}` : `BW (${toDisplayWeight(state.bodyweightLbs)}${u})`)) : `${w}${u}`;
+          return `
+            <span class="inline-flex items-center gap-1 bg-forest-900 border border-forest-700 rounded-lg px-2 py-1 text-[10px] font-mono">
+              <span class="text-slate-400">S${sIdx + 1}:</span>
+              <span class="text-white font-bold">${wTxt}×${s.targetRepsNum}</span>
+              <span class="text-limeform-400">(${s.prescribedPctOf1Rm}%)</span>
+            </span>
+          `;
+        }).join('');
 
         let dayPillsHtml = '';
         if (totalDays > 1 && Array.isArray(sc.days)) {
           dayPillsHtml = `
-            <div class="space-y-1 pt-1">
-              <div class="text-[10px] font-mono text-plum-200 bg-plum-900/60 border border-plum-400/30 rounded-lg px-2 py-1 leading-snug break-words">
+            <div class="space-y-1.5 pt-1">
+              <div class="text-[10px] font-mono text-plum-200 bg-plum-900/60 border border-plum-400/30 rounded-lg px-2.5 py-1.5 leading-snug break-words">
                 📅 Week / Stage: ${dayObj.dayLabel || dayObj.shortDay}
               </div>
               <div class="flex flex-wrap items-center gap-1">
@@ -5450,12 +5643,18 @@ function doPost(e) {
               </div>
             </div>
           `;
+        } else {
+          dayPillsHtml = `
+            <div class="text-[10px] font-mono text-plum-200 bg-plum-900/60 border border-plum-400/30 rounded-lg px-2.5 py-1.5 leading-snug break-words">
+              📅 Scheme: ${dayObj.dayLabel || sc.name}
+            </div>
+          `;
         }
 
         return `
           <div class="form-card p-4 space-y-2.5 text-xs overflow-hidden ${lockClass}">
             <div class="flex items-center gap-2 w-full">
-              <select ${!isSetupEditMode ? 'disabled' : ''} data-setup-block="${bIdx}" class="setup-ex-select min-w-0 flex-1 bg-forest-900 border border-forest-600 hover:border-limeform-400 rounded-xl px-2.5 py-2 text-xs font-bold text-white truncate cursor-pointer">
+              <select ${!isSetupEditMode ? 'disabled' : ''} data-setup-block="${bIdx}" class="setup-ex-select min-w-0 flex-1 bg-forest-900 border border-forest-600 hover:border-limeform-400 rounded-xl px-2.5 py-2 text-xs font-bold text-white cursor-pointer">
                 ${exOptions}
               </select>
               <button type="button" ${!isSetupEditMode ? 'disabled' : ''} data-setup-block="${bIdx}" class="setup-remove-ex-btn btn-danger !py-2 !px-2.5 shrink-0" title="Remove movement">
@@ -5463,8 +5662,13 @@ function doPost(e) {
               </button>
             </div>
 
+            <div class="flex flex-wrap items-center justify-between gap-1 text-[10px] font-mono text-slate-300 px-0.5">
+              <span class="font-bold text-white break-words">${ex.name}</span>
+              <span class="text-slate-400">${getPushPullGroupLabel(ex)} · ${ex.type}${ex.laterality === 'unilateral' ? ' (Per side)' : ''}</span>
+            </div>
+
             ${isAutoDeducedProvisional(ex) && cur1RmLbs > 0
-              ? `<div class="flex items-center justify-between text-[10px] bg-forest-900/80 border border-forest-700 rounded-lg px-2.5 py-1">
+              ? `<div class="flex flex-wrap items-center justify-between gap-1 text-[10px] bg-forest-900/80 border border-forest-700 rounded-lg px-2.5 py-1">
                    <span class="text-limeform-400 font-semibold">Provisional load from ${ex.muscle} reference</span>
                    <span class="text-slate-400">${isSetupEditMode ? 'Edit 1RM to override' : 'Tap Edit Setup to override'}</span>
                  </div>`
@@ -5477,7 +5681,7 @@ function doPost(e) {
 
             <div class="grid grid-cols-12 gap-2 items-center">
               <div class="col-span-8">
-                <select ${!isSetupEditMode ? 'disabled' : ''} data-setup-block="${bIdx}" class="setup-scheme-select w-full bg-forest-900 border border-forest-600 hover:border-limeform-400 rounded-xl px-2.5 py-2 text-limeform-400 font-semibold truncate cursor-pointer">
+                <select ${!isSetupEditMode ? 'disabled' : ''} data-setup-block="${bIdx}" class="setup-scheme-select w-full bg-forest-900 border border-forest-600 hover:border-limeform-400 rounded-xl px-2.5 py-2 text-limeform-400 font-semibold cursor-pointer">
                   ${schemeOptions}
                 </select>
               </div>
@@ -5491,9 +5695,14 @@ function doPost(e) {
 
             ${dayPillsHtml}
 
-            <div class="text-[11px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
-              <span class="truncate">${dayObj.shortDay}: ${setPreview}</span>
-              <span class="text-slate-500 shrink-0 ml-2">${getPushPullGroupLabel(ex)}</span>
+            <div class="bg-forest-950/60 border border-forest-800 rounded-xl p-2.5 space-y-1.5">
+              <div class="flex flex-wrap items-center justify-between gap-1 text-[10px] font-mono text-slate-400">
+                <span>Prescribed Sets (${previewSets.length} set${previewSets.length === 1 ? '' : 's'})</span>
+                <span class="text-limeform-400">${dayObj.shortDay}</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                ${allSetsPillsHtml}
+              </div>
             </div>
           </div>
         `;
@@ -6030,9 +6239,9 @@ function doPost(e) {
     // SPREADSHEET SETUP (ONBOARDING STEP 2 — WITH SCHEME WEEK / DAY / STAGE PILLS)
     // =========================================================================
     let onboardCalibrationRows = [
-      { id: 'ex_bench', modeOrScheme: 'normal_3x5', dayIdx: 1, testReps: 5 },
+      { id: 'ex_bench', modeOrScheme: 'normal_3x5', dayIdx: 0, testReps: 5 },
       { id: 'ex_pullups', modeOrScheme: 'wendler_bbb', dayIdx: 0, testReps: 5 },
-      { id: 'ex_squat', modeOrScheme: 'prilepin_optimal', dayIdx: 1, testReps: 6 },
+      { id: 'ex_squat', modeOrScheme: 'prilepin_optimal', dayIdx: 0, testReps: 6 },
       { id: 'ex_ohp', modeOrScheme: '__DIRECT_FORMULA__', dayIdx: 0, testReps: 5 }
     ];
 
@@ -6371,7 +6580,7 @@ function doPost(e) {
         const sheetRows = data.rows || data.previewRows || null;
         const nonEmpty = Array.isArray(sheetRows) ? sheetRows.filter(r => Array.isArray(r) && String(r[0] || '').trim() !== '') : [];
         if (nonEmpty.length > 1 && (String(nonEmpty[0][0]) === 'TYPE' || String(nonEmpty[0][0]).startsWith('FORM_WORKOUT_SHEET'))) {
-          parseSpreadsheetTableIntoState(nonEmpty);
+          parseSpreadsheetTableIntoState(nonEmpty, { preserveLocalSession: silent });
           lastSheetPullTimestampMs = Date.now();
           state.gdoc.syncState = 'confirmed';
           state.gdoc.lastSynced = `Pulled ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
@@ -6651,23 +6860,42 @@ function doPost(e) {
         renderCustomSchemeBuilderRows();
       });
 
+      const cancelSchemeBtnEl = document.getElementById('cancelSchemeEditBtn');
+      if (cancelSchemeBtnEl) {
+        cancelSchemeBtnEl.addEventListener('click', () => {
+          cancelSchemeEditorMode();
+          showToast('Cancelled scheme edit');
+        });
+      }
+
       document.getElementById('saveNewCustomSchemeBtn').addEventListener('click', () => {
         const rawName = (document.getElementById('customSchemeNameInput').value || '').trim();
-        const name = rawName || `Custom (${draftCustomSchemeDays.length} stages)`;
-        const newId = 'scheme_custom_' + Date.now();
+        const isEditingExisting = Boolean(editingSchemeId);
+        const targetId = isEditingExisting ? editingSchemeId : ('scheme_custom_' + Date.now());
+        const existingSc = isEditingExisting ? getScheme(editingSchemeId) : null;
         if (!state.customSchemes) state.customSchemes = {};
         const cleanDays = JSON.parse(JSON.stringify(draftCustomSchemeDays)).map((d, idx) => ({
           dayLabel: d.dayLabel || `Day ${idx + 1}`,
-          shortDay: (d.shortDay || d.dayLabel || `D${idx + 1}`).slice(0, 14),
+          shortDay: (d.shortDay || d.dayLabel || `D${idx + 1}`).slice(0, 18),
           isDeload: !!d.isDeload,
-          setPattern: d.setPattern.map(s => ({ pct: s.pct, reps: s.reps, role: 'work' }))
+          setPattern: d.setPattern.map(s => ({ pct: s.pct, reps: s.reps, role: 'work', label: s.label }))
         }));
         const firstPat = cleanDays[0].setPattern;
-        const cadence = document.getElementById('customSchemeCadenceSelect') ? document.getElementById('customSchemeCadenceSelect').value : 'weekly';
-        state.customSchemes[newId] = {
-          id: newId,
-          name: `${name} (${cleanDays.length} stage${cleanDays.length === 1 ? '' : 's'})`,
-          shortTag: name.slice(0, 16),
+        const cadence = document.getElementById('customSchemeCadenceSelect')
+          ? document.getElementById('customSchemeCadenceSelect').value
+          : (cleanDays.length === 1 ? 'single' : 'weekly');
+
+        const displayName = rawName
+          ? rawName
+          : (existingSc ? existingSc.name : `Custom (${cleanDays.length} stage${cleanDays.length === 1 ? '' : 's'})`);
+        const shortTagStr = existingSc && existingSc.shortTag && rawName === existingSc.name
+          ? existingSc.shortTag
+          : displayName.slice(0, 16);
+
+        state.customSchemes[targetId] = {
+          id: targetId,
+          name: displayName,
+          shortTag: shortTagStr,
           progressionCadence: cadence,
           formulaType: 'prilepin_zone',
           formulaLabel: '1RM Set Formula: (Weight ÷ Set %1RM) × ln(1 + Actual Reps) ÷ ln(1 + Target Reps)',
@@ -6678,24 +6906,53 @@ function doPost(e) {
           days: cleanDays,
           setPattern: firstPat
         };
+
+        // Ensure any routine blocks using this scheme have a valid dayIdx within cleanDays.length
+        (state.savedRoutines || []).forEach(r => {
+          (r.blocks || []).forEach(b => {
+            if (b.schemeId === targetId && (b.dayIdx || 0) >= cleanDays.length) {
+              b.dayIdx = 0;
+            }
+          });
+        });
+        if (setupEditDraft && Array.isArray(setupEditDraft.blocks)) {
+          setupEditDraft.blocks.forEach(b => {
+            if (b.schemeId === targetId && (b.dayIdx || 0) >= cleanDays.length) {
+              b.dayIdx = 0;
+            }
+          });
+        }
+
         if (pendingSchemeAssignBlockIdx !== null) {
-          const r = getActiveRoutineTemplate();
-          if (r && r.blocks[pendingSchemeAssignBlockIdx]) {
-            const ex = getExerciseById(r.blocks[pendingSchemeAssignBlockIdx].exerciseId);
-            ex.defaultScheme = newId;
-            ex.defaultDayIdx = 0;
-            r.blocks[pendingSchemeAssignBlockIdx].schemeId = newId;
-            r.blocks[pendingSchemeAssignBlockIdx].dayIdx = 0;
-            syncTemplateSlotToActiveSessionIfUntouched(pendingSchemeAssignBlockIdx, r.blocks[pendingSchemeAssignBlockIdx]);
+          if (isSetupEditMode && setupEditDraft && setupEditDraft.blocks[pendingSchemeAssignBlockIdx]) {
+            setupEditDraft.blocks[pendingSchemeAssignBlockIdx].schemeId = targetId;
+            setupEditDraft.blocks[pendingSchemeAssignBlockIdx].dayIdx = 0;
+          } else {
+            const r = getActiveRoutineTemplate();
+            if (r && r.blocks[pendingSchemeAssignBlockIdx]) {
+              const ex = getExerciseById(r.blocks[pendingSchemeAssignBlockIdx].exerciseId);
+              ex.defaultScheme = targetId;
+              ex.defaultDayIdx = 0;
+              r.blocks[pendingSchemeAssignBlockIdx].schemeId = targetId;
+              r.blocks[pendingSchemeAssignBlockIdx].dayIdx = 0;
+              syncTemplateSlotToActiveSessionIfUntouched(pendingSchemeAssignBlockIdx, r.blocks[pendingSchemeAssignBlockIdx]);
+            }
           }
           pendingSchemeAssignBlockIdx = null;
         }
+
+        editingSchemeId = null;
         document.getElementById('customSchemeNameInput').value = '';
+        updateSchemeBuilderModeHeader();
+        refreshActiveSessionWeights();
         saveState();
         renderAll();
-        handleWriteToGoogleSheet(`Saved multi-stage scheme ${name}`);
-        switchScreen('programs');
-        showToast(`Saved scheme "${name}"!`);
+        renderSchemesPage();
+        handleWriteToGoogleSheet(`${isEditingExisting ? 'Updated' : 'Saved'} scheme ${shortTagStr}`);
+        if (!isEditingExisting) {
+          switchScreen('programs');
+        }
+        showToast(`${isEditingExisting ? 'Updated' : 'Saved'} scheme "${shortTagStr}"!`);
       });
 
       document.getElementById('globalGymSelect').addEventListener('change', e => {
@@ -6926,7 +7183,7 @@ function doPost(e) {
           laterality,
           isNewMovement: isDeduced,
           defaultScheme: 'normal_3x8',
-          defaultDayIdx: 1,
+          defaultDayIdx: 0,
           carryoverFactor: carryover,
           stepLbs,
           e1rmByGym: map,
@@ -6943,7 +7200,7 @@ function doPost(e) {
         } else {
           const activeR = getActiveRoutineTemplate();
           if (activeR) {
-            activeR.blocks.push({ exerciseId: newId, schemeId: 'normal_3x8', dayIdx: 1 });
+            activeR.blocks.push({ exerciseId: newId, schemeId: 'normal_3x8', dayIdx: 0 });
           }
           state.activeSessionExercises.push(createSessionBlock(newId, 'normal_3x8', 1));
         }
