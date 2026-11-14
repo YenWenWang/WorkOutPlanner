@@ -2218,8 +2218,8 @@ function doPost(e) {
       workoutHistory: [],
       activeSessionExercises: [],
       formulaTestRows: [
-        { exerciseId: 'ex_bench', weightLbs: 176.37, addedWeightLbs: 0, assistanceWeightLbs: 0, assistanceEquipment: 'None', reps: 5, completed: true },
-        { exerciseId: 'ex_squat', weightLbs: 264.55, addedWeightLbs: 0, assistanceWeightLbs: 0, assistanceEquipment: 'None', reps: 5, completed: true }
+        { exerciseId: 'ex_bench', weightLbs: 176.37, addedWeightLbs: 0, assistanceWeightLbs: 0, reps: 5, completed: true },
+        { exerciseId: 'ex_squat', weightLbs: 264.55, addedWeightLbs: 0, assistanceWeightLbs: 0, reps: 5, completed: true }
       ]
     };
 
@@ -2848,7 +2848,6 @@ function doPost(e) {
           bodyweightLbs: isBw ? state.bodyweightLbs : 0,
           addedWeightLbs: isBw ? Math.max(0, diffBw) : 0,
           assistanceWeightLbs: isBw ? Math.max(0, -diffBw) : 0,
-          assistanceEquipment: 'None',
           reps: 1,
           prescribedPct: 100,
           includeIn1Rm: true,
@@ -3146,7 +3145,6 @@ function doPost(e) {
           sessionBodyweightLbs: state.bodyweightLbs,
           addedWeightLbs: isBw ? Math.max(0, adjustedLbs) : 0,
           assistanceWeightLbs: isBw ? Math.max(0, -adjustedLbs) : 0,
-          assistanceEquipment: (isBw && adjustedLbs < 0) ? 'Assisted Machine' : 'None',
           targetRepsNum: reps,
           actualReps: reps,
           role: 'work',
@@ -3390,7 +3388,7 @@ function doPost(e) {
         const sessBw = toDisplayWeight(log.bodyweightLbs || state.bodyweightLbs);
         const addW = toDisplayWeight(log.addedWeightLbs || 0);
         const asstW = toDisplayWeight(log.assistanceWeightLbs || 0);
-        const asstEq = encodeURIComponent(log.assistanceEquipment || 'None');
+        const asstEq = '';
         const wkLblEnc = encodeURIComponent(log.schemeWeekLabel || '');
         const targR = log.targetReps || log.reps || 5;
         rows.push(padRow8([
@@ -3577,11 +3575,9 @@ function doPost(e) {
             : computeImplied1RmFromSet(weightLbs, reps, reps, pct);
           let decNote = '';
           let decTime = '';
-          let decAsstEq = 'None';
           let decWkLbl = '';
           try { decNote = meta[5] ? decodeURIComponent(meta[5]) : ''; } catch (e) { decNote = meta[5] || ''; }
           try { decTime = meta[7] ? decodeURIComponent(meta[7]) : ''; } catch (e) { decTime = meta[7] || ''; }
-          try { decAsstEq = meta[11] ? decodeURIComponent(meta[11]) : 'None'; } catch (e) { decAsstEq = 'None'; }
           try { decWkLbl = meta[12] ? decodeURIComponent(meta[12]) : ''; } catch (e) { decWkLbl = ''; }
           const sessBwLbs = meta[8] !== undefined && !isNaN(parseFloat(meta[8])) ? fromDisplayWeight(parseFloat(meta[8])) : state.bodyweightLbs;
           const addWLbs = meta[9] !== undefined && !isNaN(parseFloat(meta[9])) ? fromDisplayWeight(parseFloat(meta[9])) : Math.max(0, weightLbs);
@@ -3598,7 +3594,6 @@ function doPost(e) {
             bodyweightLbs: sessBwLbs,
             addedWeightLbs: addWLbs,
             assistanceWeightLbs: asstWLbs,
-            assistanceEquipment: decAsstEq,
             reps,
             includeIn1Rm: include1Rm,
             implied1RmLbs: impLbs,
@@ -3897,7 +3892,7 @@ function doPost(e) {
       const u = getUnitStr();
       if (!Array.isArray(state.formulaTestRows) || state.formulaTestRows.length === 0) {
         state.formulaTestRows = [
-          { exerciseId: 'ex_bench', weightLbs: 176.37, addedWeightLbs: 0, assistanceWeightLbs: 0, assistanceEquipment: 'None', reps: 5, completed: true }
+          { exerciseId: 'ex_bench', weightLbs: 176.37, addedWeightLbs: 0, assistanceWeightLbs: 0, reps: 5, completed: true }
         ];
       }
 
@@ -4103,28 +4098,14 @@ function doPost(e) {
           `;
         }
 
-        // For bodyweight movements, provide distinct Session Bodyweight, Added Weight, Assistance Weight, and Assistance Equipment controls!
+        // For bodyweight movements, provide Session Bodyweight control
         const firstSet = block.sets[0] || {};
         const sessBwDisp = toDisplayWeight(firstSet.sessionBodyweightLbs !== undefined ? firstSet.sessionBodyweightLbs : state.bodyweightLbs);
-        const curAssistEq = firstSet.assistanceEquipment || 'None';
         const bwHeaderControlsHtml = isBw ? `
-          <div class="bg-forest-900/90 border border-forest-700 rounded-xl p-2.5 grid grid-cols-2 gap-2 text-[11px]">
-            <div>
-              <label class="block text-[9px] text-slate-400 mb-0.5 font-mono uppercase">Session BW (${u})</label>
-              <input type="number" step="0.5" data-block-bw="${bIdx}" value="${sessBwDisp}"
-                class="block-bw-input w-full bg-forest-850 border border-forest-600 rounded-lg px-2 py-1 font-mono text-white font-bold text-xs" />
-            </div>
-            <div>
-              <label class="block text-[9px] text-slate-400 mb-0.5 font-mono uppercase">Assistance Equipment</label>
-              <select data-block-asst-eq="${bIdx}" class="block-asst-eq-select w-full bg-forest-850 border border-forest-600 rounded-lg px-2 py-1 text-white text-xs cursor-pointer">
-                <option value="None" ${curAssistEq === 'None' ? 'selected' : ''}>None (BW / Weighted)</option>
-                <option value="Assisted Machine" ${curAssistEq === 'Assisted Machine' ? 'selected' : ''}>Assisted Machine Stack</option>
-                <option value="Light Band" ${curAssistEq === 'Light Band' ? 'selected' : ''}>Resistance Band (Light)</option>
-                <option value="Medium Band" ${curAssistEq === 'Medium Band' ? 'selected' : ''}>Resistance Band (Medium)</option>
-                <option value="Heavy Band" ${curAssistEq === 'Heavy Band' ? 'selected' : ''}>Resistance Band (Heavy)</option>
-                <option value="Foot/Spotter" ${curAssistEq === 'Foot/Spotter' ? 'selected' : ''}>Foot / Spotter Assist</option>
-              </select>
-            </div>
+          <div class="bg-forest-900/90 border border-forest-700 rounded-xl p-2.5 flex items-center justify-between gap-2 text-[11px]">
+            <label class="text-[10px] text-slate-300 font-mono uppercase">Session Bodyweight (${u})</label>
+            <input type="number" step="0.5" data-block-bw="${bIdx}" value="${sessBwDisp}"
+              class="block-bw-input w-24 bg-forest-850 border border-forest-600 rounded-lg px-2.5 py-1 font-mono text-white font-bold text-xs text-right" />
           </div>
         ` : '';
 
@@ -4267,18 +4248,7 @@ function doPost(e) {
         });
       });
 
-      container.querySelectorAll('.block-asst-eq-select').forEach(sel => {
-        sel.addEventListener('change', e => {
-          const bIdx = parseInt(e.target.getAttribute('data-block-asst-eq'), 10);
-          const eqVal = e.target.value;
-          state.activeSessionExercises[bIdx].sets.forEach(s => {
-            s.assistanceEquipment = eqVal;
-            s.userModified = true;
-          });
-          saveState();
-          renderWorkoutScreen();
-        });
-      });
+
 
       container.querySelectorAll('.pick-scheme-day-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -4310,9 +4280,7 @@ function doPost(e) {
             if (ex.type === 'bodyweight') {
               setObj.addedWeightLbs = rawLbs > 0 ? rawLbs : 0;
               setObj.assistanceWeightLbs = rawLbs < 0 ? Math.abs(rawLbs) : 0;
-              if (rawLbs < 0 && (!setObj.assistanceEquipment || setObj.assistanceEquipment === 'None')) {
-                setObj.assistanceEquipment = 'Assisted Machine';
-              }
+
             }
           }
           if (f === 'actualReps') {
@@ -4731,9 +4699,8 @@ function doPost(e) {
               const bwDisp = toDisplayWeight(s.bodyweightLbs || state.bodyweightLbs);
               const addDisp = toDisplayWeight(s.addedWeightLbs || (s.weightLbs > 0 ? s.weightLbs : 0));
               const asstDisp = toDisplayWeight(s.assistanceWeightLbs || (s.weightLbs < 0 ? Math.abs(s.weightLbs) : 0));
-              const eqStr = (s.assistanceEquipment && s.assistanceEquipment !== 'None') ? ` (${s.assistanceEquipment})` : '';
               if (addDisp > 0) wStr = `BW ${bwDisp} + ${addDisp} ${u}`;
-              else if (asstDisp > 0) wStr = `BW ${bwDisp} − ${asstDisp} ${u}${eqStr}`;
+              else if (asstDisp > 0) wStr = `BW ${bwDisp} − ${asstDisp} ${u}`;
               else wStr = `BW ${bwDisp} ${u}`;
             }
 
@@ -6526,7 +6493,7 @@ function doPost(e) {
 
       document.getElementById('addFormulaTestRowBtn').addEventListener('click', () => {
         if (!Array.isArray(state.formulaTestRows)) state.formulaTestRows = [];
-        state.formulaTestRows.push({ exerciseId: 'ex_ohp', weightLbs: 110.23, addedWeightLbs: 0, assistanceWeightLbs: 0, assistanceEquipment: 'None', reps: 5, completed: true });
+        state.formulaTestRows.push({ exerciseId: 'ex_ohp', weightLbs: 110.23, addedWeightLbs: 0, assistanceWeightLbs: 0, reps: 5, completed: true });
         saveState();
         renderFormulaTestLogger();
       });
@@ -7055,7 +7022,6 @@ function doPost(e) {
                 bodyweightLbs: state.bodyweightLbs,
                 addedWeightLbs: isBw ? Math.max(0, row.weightLbs) : 0,
                 assistanceWeightLbs: isBw ? Math.max(0, -row.weightLbs) : 0,
-                assistanceEquipment: row.assistanceEquipment || 'None',
                 reps: row.reps,
                 prescribedPct: 100,
                 includeIn1Rm: true,
@@ -7130,7 +7096,6 @@ function doPost(e) {
                 bodyweightLbs: sessBw,
                 addedWeightLbs: addW,
                 assistanceWeightLbs: asstW,
-                assistanceEquipment: s.assistanceEquipment || (asstW > 0 ? 'Assisted Machine' : 'None'),
                 reps: s.actualReps,
                 targetReps: s.targetRepsNum || s.actualReps,
                 prescribedSetsCount: blk.sets.length,
@@ -7526,7 +7491,6 @@ function doPost(e) {
             bodyweightLbs: state.bodyweightLbs,
             addedWeightLbs: isBw ? Math.max(0, wLbs) : 0,
             assistanceWeightLbs: isBw ? Math.max(0, -wLbs) : 0,
-            assistanceEquipment: (isBw && wLbs < 0) ? 'Assisted Machine' : 'None',
             reps: repsVal,
             prescribedPct: chosenPct,
             includeIn1Rm: true,
