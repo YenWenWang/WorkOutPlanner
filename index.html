@@ -3655,8 +3655,12 @@ function doPost(e) {
       return true;
     }
 
+    let isWritingSheetInFlight = false;
+    let lastLocalWriteTimestampMs = 0;
+
     async function handleWriteToGoogleSheet(reason = 'Auto-sync', forceAttempt = false) {
       // 1. Always save locally first!
+      lastLocalWriteTimestampMs = Date.now();
       saveState();
 
       const u = getUnitStr();
@@ -4257,8 +4261,9 @@ function doPost(e) {
           const blk = state.activeSessionExercises[bIdx];
           const ex = getExerciseById(blk.exerciseId);
           ex.defaultDayIdx = dIdx;
+          lastLocalWriteTimestampMs = Date.now();
           const updatedBlk = createSessionBlock(ex.id, blk.schemeId, dIdx);
-          updatedBlk.swappedToday = true;
+          updatedBlk.swappedToday = Boolean(blk.swappedToday);
           updatedBlk.includeBlockIn1Rm = blk.includeBlockIn1Rm !== false;
           updatedBlk.note = blk.note || '';
           state.activeSessionExercises[bIdx] = updatedBlk;
@@ -5438,6 +5443,7 @@ function doPost(e) {
       setupEditDraft = {
         routineId: activeR.id,
         name: activeR.name,
+        originalBlocks: JSON.parse(JSON.stringify(activeR.blocks)),
         blocks: JSON.parse(JSON.stringify(activeR.blocks)),
         direct1RmByExId,
         edited1RmExIds: new Set()
@@ -5458,6 +5464,7 @@ function doPost(e) {
       const u = getUnitStr();
       if (activeR) {
         const cleanName = (setupEditDraft.name || '').trim() || activeR.name || 'Routine';
+        const origBlocks = setupEditDraft.originalBlocks || [];
         activeR.name = cleanName;
         state.sessionTitle = cleanName;
         activeR.blocks = JSON.parse(JSON.stringify(setupEditDraft.blocks));
@@ -5472,8 +5479,8 @@ function doPost(e) {
           }
         });
 
-        // Update defaultScheme/defaultDayIdx on exercises in the routine and sync untouched slots in today's session
-        activeR.blocks.forEach((tplBlk, idx) => {
+        // Update defaultScheme/defaultDayIdx on exercises in the routine
+        activeR.blocks.forEach((tplBlk) => {
           const ex = getExerciseById(tplBlk.exerciseId);
           if (ex) {
             ex.defaultScheme = tplBlk.schemeId;
@@ -5481,13 +5488,27 @@ function doPost(e) {
           }
         });
 
-        const hasAnySwappedOrTouched = (state.activeSessionExercises || []).some(
-          b => b.swappedToday || (b.sets || []).some(s => s.completed || s.userModified)
-        );
-        if (!hasAnySwappedOrTouched) {
-          state.activeSessionExercises = activeR.blocks.map(b => createSessionBlock(b.exerciseId, b.schemeId, b.dayIdx || 0));
-        } else {
-          activeR.blocks.forEach((b, idx) => syncTemplateSlotToActiveSessionIfUntouched(idx, b));
+        // Sync activeR.blocks into 02 Log (state.activeSessionExercises):
+        // - If a slot was changed in 04 Setup (exerciseId, schemeId, or dayIdx changed) OR has no completed/modified sets, rebuild it from the new Setup block!
+        // - Only preserve an existing session slot if that slot wasn't changed in Setup AND already has completed/modified sets in progress.
+        const oldSessionBlocks = state.activeSessionExercises || [];
+        state.activeSessionExercises = activeR.blocks.map((tplBlk, idx) => {
+          const prevTpl = origBlocks[idx];
+          const curSlot = oldSessionBlocks[idx];
+          const changedInSetup = !prevTpl ||
+            prevTpl.exerciseId !== tplBlk.exerciseId ||
+            prevTpl.schemeId !== tplBlk.schemeId ||
+            (prevTpl.dayIdx || 0) !== (tplBlk.dayIdx || 0);
+          const hasCompletedOrEditedSets = curSlot && (curSlot.sets || []).some(s => s.completed || s.userModified);
+
+          if (!curSlot || changedInSetup || (!hasCompletedOrEditedSets && !curSlot.swappedToday)) {
+            return createSessionBlock(tplBlk.exerciseId, tplBlk.schemeId, tplBlk.dayIdx || 0);
+          }
+          return curSlot;
+        });
+
+        if (state.unfinishedSessionsByRoutine && state.unfinishedSessionsByRoutine[activeR.id]) {
+          delete state.unfinishedSessionsByRoutine[activeR.id];
         }
       }
 
@@ -5497,7 +5518,7 @@ function doPost(e) {
       saveState();
       renderAll();
       handleWriteToGoogleSheet(`Confirmed workout setup for ${activeR ? activeR.name : 'Routine'}`);
-      showToast(`Confirmed & saved setup for "${activeR ? activeR.name : 'Routine'}" (${u})`, true);
+      showToast(`Confirmed & updated 02 Log for "${activeR ? activeR.name : 'Routine'}" (${u})`, true);
     }
 
     // Sync a template slot change into today's session ONLY if that slot wasn't swapped today and has no completed/modified sets
@@ -6560,7 +6581,8 @@ function doPost(e) {
     let lastSheetPullTimestampMs = 0;
 
     async function pullFreshDataFromGoogleSheet({ silent = true } = {}) {
-      if (isPullingSheetInFlight) return false;
+      if (isPullingSheetInFlight || isWritingSheetInFlight) return false;
+      if (silent && (Date.now() - lastLocalWriteTimestampMs < 20000)) return false;
       if (!state.gdoc || !state.gdoc.isLoggedIn) return false;
       const url = (state.gdoc.url || '').trim();
       const cred = (state.gdoc.credential || '').trim();
