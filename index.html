@@ -441,6 +441,21 @@
 
             <!-- ROUTINE WORKOUT LOGGING PANEL -->
             <div id="routineLoggerPanel" class="space-y-4">
+              <div id="workoutSessionLockBanner" class="form-card p-3.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="min-w-0">
+                  <div id="workoutLockStatusTitle" class="font-bold text-white">Unlocked · Live Targets</div>
+                  <div id="workoutLockStatusSub" class="text-[10px] text-slate-400">Weights auto-sync with Current 1RM until you start</div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" id="startWorkoutSessionBtn" class="btn-lime !py-1.5 !px-3.5 !text-xs">
+                    <span>▶ Start Workout</span>
+                  </button>
+                  <button type="button" id="cancelWorkoutSessionBtn" class="hidden btn-danger !py-1.5 !px-3 !text-[11px]">
+                    <span>✕ Unlock / Reset</span>
+                  </button>
+                </div>
+              </div>
+
               <div class="bg-forest-850 border border-forest-700 rounded-2xl px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs">
                 <span class="text-slate-300">Only sets checked <strong class="text-limeform-400">✓</strong> are logged when you finish.</span>
                 <div class="flex items-center gap-2 shrink-0">
@@ -811,8 +826,8 @@
               <div class="flex items-center justify-between text-xs">
                 <span class="text-slate-300">1RM Source</span>
                 <select id="cfgEstModeSelect" class="bg-forest-900 border border-forest-600 rounded-xl px-3 py-1.5 text-white cursor-pointer">
-                  <option value="program_pct">Program-% implied (W ÷ %1RM)</option>
-                  <option value="strict_wxr">Strict 1RM Test (1RM = Top Single Weight)</option>
+                  <option value="program_pct">Include training + 1RM tests</option>
+                  <option value="strict_wxr">1RM tests only (Ignore training logs)</option>
                 </select>
               </div>
 
@@ -830,7 +845,7 @@
               <div class="flex items-center justify-between gap-2">
                 <div>
                   <div class="text-sm font-bold text-white">Movement Estimator</div>
-                  <div class="text-[11px] text-slate-400">1 reference per muscle group (shared bilateral &amp; unilateral). Deduced lifts start lower unless overridden; no reference = 0.</div>
+                  <div class="text-[11px] text-slate-400">1 reference per muscle group (read-only). Pulled from your training/testing logs; untested lifts receive a provisional estimate.</div>
                 </div>
                 <span class="px-2.5 py-1 rounded-xl bg-forest-900 border border-forest-700 text-[10px] font-mono text-limeform-400 shrink-0">Provisional Transfer</span>
                 <select id="equivNewLiftDiscountSelect" class="hidden"><option value="15" selected>15</option></select>
@@ -850,18 +865,18 @@
                 </select>
               </div>
 
-              <!-- Reference Lift & Reference 1RM for this Muscle Group -->
+              <!-- Reference Lift & Read-Only Reference 1RM for this Muscle Group -->
               <div class="bg-forest-850 border border-forest-700 rounded-xl p-3 space-y-2 text-xs">
                 <div class="flex items-center justify-between">
                   <span class="text-[10px] font-bold text-limeform-400 uppercase tracking-wider">Muscle Group Reference Lift</span>
-                  <span class="text-[10px] text-slate-400">0 = No reference</span>
+                  <span class="text-[10px] text-slate-400">Auto-pulled from logs</span>
                 </div>
                 <div class="grid grid-cols-12 gap-2 items-center">
                   <div class="col-span-8">
                     <select id="equivAnchorSelect" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-2.5 py-1.5 text-white font-semibold truncate cursor-pointer"></select>
                   </div>
-                  <div class="col-span-4 flex items-center gap-1 bg-forest-900 border border-limeform-400/60 rounded-xl px-2 py-1.5 font-mono">
-                    <input type="number" step="2.5" min="0" id="equivRef1RmInput" value="96" class="w-full bg-transparent text-right text-limeform-400 font-bold focus:outline-none text-xs" />
+                  <div class="col-span-4 flex items-center justify-end gap-1 bg-forest-950/80 border border-forest-700 rounded-xl px-2.5 py-1.5 font-mono">
+                    <span id="equivRef1RmDisplay" class="text-limeform-400 font-bold text-xs">0</span>
                     <span class="text-[10px] text-slate-400 unit-text">kg</span>
                   </div>
                 </div>
@@ -1903,6 +1918,7 @@ function doPost(e) {
       selectedCalendarDate: getTodayIsoDate(),
       onboardingCompleted: false,
       walkthroughShown: false,
+      workoutInProgress: false,
       customSchemes: {},
       unfinishedSessionsByRoutine: {},
       savedRoutines: [
@@ -2567,7 +2583,7 @@ function doPost(e) {
       if (!ex.gymRatioByGym) ex.gymRatioByGym = {};
 
       const matchingLogs = (state.calendarLogs || []).filter(log =>
-        log.exerciseId === ex.id && log.includeIn1Rm && log.implied1RmLbs > 0
+        log.exerciseId === ex.id && log.includeIn1Rm && log.implied1RmLbs > 0 && doesLogMatchEstimationMode(log)
       );
 
       if (matchingLogs.length === 0) {
@@ -2860,6 +2876,26 @@ function doPost(e) {
       saveState();
     }
 
+    function isDirect1RmTestLog(log) {
+      if (!log) return false;
+      const rName = String(log.routineName || '');
+      const wkLbl = String(log.schemeWeekLabel || '');
+      const note = String(log.note || '');
+      return rName.startsWith('1RM Formula Test') ||
+        rName.startsWith('1RM Input') ||
+        rName.startsWith('Baseline 1RM Setup') ||
+        wkLbl.startsWith('1RM Formula Test') ||
+        wkLbl === 'Direct 1RM Input' ||
+        note.includes('Direct 1RM Formula Test');
+    }
+
+    function doesLogMatchEstimationMode(log) {
+      if (state.estimationMode === 'strict_wxr') {
+        return isDirect1RmTestLog(log);
+      }
+      return true;
+    }
+
     function getDatedSession1RmSeries(ex, gymId = state.activeGymId) {
       const baseLbs = getBaseline1RmForGymLbs(ex, gymId);
       if (!ex) return { baselineLbs: baseLbs, loggedCount: 0, points: [{ label: 'Baseline', date: null, lbs: baseLbs }] };
@@ -2893,7 +2929,7 @@ function doPost(e) {
 
       const matchingLogs = (state.calendarLogs || []).filter(log => {
         if (log.exerciseId !== ex.id || !log.includeIn1Rm || !(log.implied1RmLbs > 0)) return false;
-        return true;
+        return doesLogMatchEstimationMode(log);
       });
 
       if (matchingLogs.length === 0) {
@@ -2996,17 +3032,13 @@ function doPost(e) {
     }
 
     function snapLoadLbs(rawLbs, ex, allowNegative = false) {
-      const stepLbs = getEffectiveStepLbs(ex);
       if (state.unit === 'kg') {
-        const rawKg = rawLbs / LBS_PER_KG;
-        const rawStepKg = stepLbs / LBS_PER_KG;
-        const cleanStepKg = rawStepKg >= 4 ? 5 : (rawStepKg >= 2 ? 2.5 : 1);
-        const snappedKg = Math.round(rawKg / cleanStepKg) * cleanStepKg;
-        const clampedKg = allowNegative ? snappedKg : Math.max(0, snappedKg);
+        const roundedKg = Math.round(rawLbs / LBS_PER_KG);
+        const clampedKg = allowNegative ? roundedKg : Math.max(0, roundedKg);
         return clampedKg * LBS_PER_KG;
       }
-      const snappedLbs = stepLbs > 0 ? Math.round(rawLbs / stepLbs) * stepLbs : Math.round(rawLbs);
-      return allowNegative ? snappedLbs : Math.max(0, snappedLbs);
+      const roundedLbs = Math.round(rawLbs);
+      return allowNegative ? roundedLbs : Math.max(0, roundedLbs);
     }
 
     function computeDirectFormulaTest1RmLbs(totalLoadLbs, reps) {
@@ -3023,9 +3055,6 @@ function doPost(e) {
       if (load <= 0 || rAct <= 0) return 0;
       const rTarg = Math.max(1, parseFloat(targetReps) || rAct || 1);
       const pct = Math.min(100, Math.max(30, parseFloat(prescribedPct) || 75)) / 100;
-      if (state.estimationMode === 'strict_wxr') {
-        return computeDirectFormulaTest1RmLbs(load, rAct);
-      }
       const logMultiplier = Math.log(1 + rAct) / Math.log(1 + rTarg);
       return Math.max(0, (load / pct) * logMultiplier);
     }
@@ -3191,7 +3220,7 @@ function doPost(e) {
         const stashed = state.unfinishedSessionsByRoutine[r.id];
         state.sessionTitle = stashed.sessionTitle || r.name;
         state.activeSessionExercises = JSON.parse(JSON.stringify(stashed.blocks));
-        saveState();
+        refreshActiveSessionWeights();
         return;
       }
 
@@ -3215,8 +3244,8 @@ function doPost(e) {
         const mergedSets = freshSets.map((freshSet, idx) => {
           const oldSet = (b.sets && b.sets[idx]) ? b.sets[idx] : null;
           freshSet.includeIn1Rm = includeBlock;
-          if (oldSet && (oldSet.completed || oldSet.userModified)) {
-            // Preserve user's entered result / completed set! Only update suggestedExternalLbs in background.
+          if (oldSet && (state.workoutInProgress || oldSet.completed || oldSet.userModified)) {
+            // While workout is active (locked) or set is completed/edited, keep user's entered inputs while updating live Target in background.
             return Object.assign({}, oldSet, {
               suggestedExternalLbs: freshSet.suggestedExternalLbs,
               suggestedReps: freshSet.suggestedReps,
@@ -3709,6 +3738,7 @@ function doPost(e) {
         rows: tableRows
       });
 
+      isWritingSheetInFlight = true;
       try {
         const resp = await fetch(cred, {
           method: 'POST',
@@ -3736,6 +3766,8 @@ function doPost(e) {
         saveState();
         renderGoogleSheetHub();
         return { ok: false, state: 'failed' };
+      } finally {
+        isWritingSheetInFlight = false;
       }
     }
     const handleWriteToGoogleDoc = handleWriteToGoogleSheet;
@@ -4065,6 +4097,31 @@ function doPost(e) {
       const badge = document.getElementById('stagedSetsCounterBadge');
       if (badge) badge.textContent = `${doneSetsCount}/${totalSetsCount} done`;
 
+      const lockBanner = document.getElementById('workoutSessionLockBanner');
+      const lockTitle = document.getElementById('workoutLockStatusTitle');
+      const lockSub = document.getElementById('workoutLockStatusSub');
+      const startBtn = document.getElementById('startWorkoutSessionBtn');
+      const cancelBtn = document.getElementById('cancelWorkoutSessionBtn');
+      if (state.workoutInProgress) {
+        if (lockBanner) lockBanner.className = 'form-card-active p-3.5 flex flex-wrap items-center justify-between gap-2 text-xs';
+        if (lockTitle) {
+          lockTitle.textContent = '🔒 Workout Active (Locked)';
+          lockTitle.className = 'font-bold text-limeform-400';
+        }
+        if (lockSub) lockSub.textContent = 'Inputs only change from your manual edits until you Finish or Unlock';
+        if (startBtn) startBtn.classList.add('hidden');
+        if (cancelBtn) cancelBtn.classList.remove('hidden');
+      } else {
+        if (lockBanner) lockBanner.className = 'form-card p-3.5 flex flex-wrap items-center justify-between gap-2 text-xs';
+        if (lockTitle) {
+          lockTitle.textContent = 'Unlocked · Live Targets';
+          lockTitle.className = 'font-bold text-white';
+        }
+        if (lockSub) lockSub.textContent = 'Weights auto-sync with Current 1RM · Tap Start Workout to lock';
+        if (startBtn) startBtn.classList.remove('hidden');
+        if (cancelBtn) cancelBtn.classList.add('hidden');
+      }
+
       const stepSmallDisp = state.unit === 'kg' ? 2.5 : 5;
       const stepLargeDisp = state.unit === 'kg' ? 5 : 10;
 
@@ -4118,11 +4175,11 @@ function doPost(e) {
           const dispWeight = toDisplayWeight(s.actualExternalLbs);
           const roleTag = s.setLabel || `${s.prescribedPctOf1Rm}%`;
 
-          const baseDisp = toDisplayWeight(s.prescribedBaseLbs !== undefined ? s.prescribedBaseLbs : s.actualExternalLbs);
-          const diff = Math.round((dispWeight - baseDisp) * 10) / 10;
-          let weightSubLabel = '';
-          if (diff > 0) weightSubLabel = `<span class="text-limeform-400">+${diff} ${u} today</span>`;
-          else if (diff < 0) weightSubLabel = `<span class="text-amber-300">${diff} ${u} today</span>`;
+          const targetLbs = s.suggestedExternalLbs !== undefined ? s.suggestedExternalLbs : (s.prescribedBaseLbs !== undefined ? s.prescribedBaseLbs : s.actualExternalLbs);
+          const targetDisp = toDisplayWeight(targetLbs);
+          const targetWTxt = isBw ? (targetDisp > 0 ? `+${targetDisp}${u}` : (targetDisp < 0 ? `${targetDisp}${u}` : 'BW')) : `${targetDisp}${u}`;
+          const targetRepsDisp = s.suggestedReps || s.targetRepsNum || s.actualReps;
+          const weightSubLabel = `<span class="text-slate-400">Target: ${targetWTxt}×${targetRepsDisp}</span>`;
 
           const blockHasChecked = block.sets.some(x => x.completed);
           const sysLoadLbs = (blockHasChecked && !s.completed) ? 0 : getSetTotalSystemLoadLbs(s, ex);
@@ -5960,9 +6017,9 @@ function doPost(e) {
 
       const anchorEx = getExerciseById(curAnchorId);
       const ref1RmLbs = Math.max(0, getExerciseE1RmLbs(anchorEx, 'gym_general'));
-      const refInput = document.getElementById('equivRef1RmInput');
-      if (refInput && document.activeElement !== refInput) {
-        refInput.value = toDisplayWeight(ref1RmLbs);
+      const refDispEl = document.getElementById('equivRef1RmDisplay');
+      if (refDispEl) {
+        refDispEl.textContent = toDisplayWeight(ref1RmLbs);
       }
 
       // Rank movements in this muscle group: Reference first, then Established (logged history), then Provisional by pattern similarity
@@ -6012,41 +6069,13 @@ function doPost(e) {
             </div>
 
             <div class="flex items-center gap-1.5 shrink-0 font-mono">
-              ${!isRef && !ex.isNewMovement ? `
-                <button type="button" data-reset-deduced="${ex.id}" class="reset-deduced-btn btn-pill !py-1 !px-2 !text-[9px] !text-limeform-400" title="Reset to provisional estimate from ${anchorEx.name}">
-                  Auto
-                </button>
-              ` : ''}
-              <input type="number" step="2.5" min="0" data-est-override-ex="${ex.id}" value="${toDisplayWeight(curEx1RmLbs)}"
-                class="est-override-input w-16 bg-forest-900 border ${isRef ? 'border-limeform-400 text-limeform-400' : 'border-forest-600 text-white'} rounded-lg px-2 py-1 text-right font-bold text-xs" />
-              <span class="text-[10px] text-slate-400">${suffix}</span>
+              <div class="px-2.5 py-1 rounded-lg bg-forest-950/80 border ${isRef ? 'border-limeform-400/60 text-limeform-400' : 'border-forest-700 text-white'} font-bold text-xs">
+                ${toDisplayWeight(curEx1RmLbs)} <span class="text-[10px] text-slate-400 font-normal">${suffix}</span>
+              </div>
             </div>
           </div>
         `;
       }).join('');
-
-      grid.querySelectorAll('.est-override-input').forEach(inp => {
-        inp.addEventListener('change', e => {
-          const ex = getExerciseById(e.target.getAttribute('data-est-override-ex'));
-          const valLbs = Math.max(0, fromDisplayWeight(e.target.value));
-          setDirect1RmForExerciseLbs(ex, valLbs, state.activeGymId, valLbs > 0, `Set 1RM in Movement Estimator`);
-          refreshActiveSessionWeights();
-          renderAll();
-          handleWriteToGoogleSheet(`Updated ${ex.name} 1RM`);
-          showToast(`${ex.name} 1RM → ${toDisplayWeight(valLbs)} ${u}`, true);
-        });
-      });
-
-      grid.querySelectorAll('.reset-deduced-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const ex = getExerciseById(btn.getAttribute('data-reset-deduced'));
-          ex.isNewMovement = true;
-          recalculateDeduced1RmsForMuscleGroup(ex.muscle);
-          refreshActiveSessionWeights();
-          renderAll();
-          showToast(`Reset ${ex.name} to provisional estimate from ${anchorEx.name}`);
-        });
-      });
     }
 
     function renderGoogleSheetHub() {
@@ -6977,10 +7006,40 @@ function doPost(e) {
         showToast(`${isEditingExisting ? 'Updated' : 'Saved'} scheme "${shortTagStr}"!`);
       });
 
+      document.getElementById('startWorkoutSessionBtn').addEventListener('click', () => {
+        refreshActiveSessionWeights();
+        state.workoutInProgress = true;
+        saveState();
+        renderWorkoutScreen();
+        showToast('Workout started — inputs locked to your manual edits');
+      });
+
+      document.getElementById('cancelWorkoutSessionBtn').addEventListener('click', () => {
+        requestRemovalConfirmation(
+          'Unlock & reset session?',
+          'This unlocks 02 Log, clears checked/edited sets in this unfinished session, and syncs weights back to your Current 1RM.',
+          '↺ Unlock & Reset',
+          () => {
+            state.workoutInProgress = false;
+            (state.activeSessionExercises || []).forEach(b => {
+              (b.sets || []).forEach(s => {
+                s.completed = false;
+                s.userModified = false;
+              });
+            });
+            refreshActiveSessionWeights();
+            saveState();
+            renderAll();
+            showToast('Session unlocked — weights synced to Current 1RM');
+          }
+        );
+      });
+
       document.getElementById('globalGymSelect').addEventListener('change', e => {
         state.activeGymId = e.target.value;
         refreshActiveSessionWeights();
         renderAll();
+        handleWriteToGoogleSheet(`Switched active gym to ${getActiveGym().name}`);
         showToast(`Active gym: ${getActiveGym().name}`);
       });
 
@@ -7002,20 +7061,27 @@ function doPost(e) {
 
       document.getElementById('unitToggleBtn').addEventListener('click', () => {
         state.unit = state.unit === 'lbs' ? 'kg' : 'lbs';
+        refreshActiveSessionWeights();
         saveState();
         renderAll();
+        handleWriteToGoogleSheet(`Switched unit to ${state.unit}`);
       });
 
       document.getElementById('cfgEstModeSelect').addEventListener('change', e => {
         state.estimationMode = e.target.value;
+        refreshActiveSessionWeights();
         saveState();
         renderAll();
+        handleWriteToGoogleSheet(`Updated 1RM source to ${state.estimationMode}`);
+        showToast(state.estimationMode === 'strict_wxr' ? 'Current 1RM: 1RM tests only' : 'Current 1RM: Training + 1RM tests');
       });
 
       document.getElementById('cfgRollingWindow').addEventListener('change', e => {
         state.rollingWindow = e.target.value;
         refreshActiveSessionWeights();
+        saveState();
         renderAll();
+        handleWriteToGoogleSheet(`Updated rolling window to ${state.rollingWindow}`);
       });
 
       document.querySelectorAll('.prog-cat-btn').forEach(btn => {
@@ -7029,7 +7095,9 @@ function doPost(e) {
       document.getElementById('progressWindowToggleBtn').addEventListener('click', () => {
         state.rollingWindow = state.rollingWindow === 'weekly' ? 'monthly' : 'weekly';
         refreshActiveSessionWeights();
+        saveState();
         renderAll();
+        handleWriteToGoogleSheet(`Updated rolling window to ${state.rollingWindow}`);
       });
 
       document.getElementById('equivMuscleFilter').addEventListener('change', renderEquivalenceEstimator);
@@ -7043,20 +7111,8 @@ function doPost(e) {
         recalculateDeduced1RmsForMuscleGroup(muscle);
         refreshActiveSessionWeights();
         renderAll();
+        handleWriteToGoogleSheet(`Updated ${muscle} reference lift to ${newRefEx.name}`);
         showToast(`${newRefEx.name} set as ${muscle} reference`);
-      });
-
-      document.getElementById('equivRef1RmInput').addEventListener('change', e => {
-        const muscle = document.getElementById('equivMuscleFilter').value;
-        const refId = (state.muscleGroupReferences && state.muscleGroupReferences[muscle]) || document.getElementById('equivAnchorSelect').value;
-        const refEx = getExerciseById(refId);
-        const valLbs = Math.max(0, fromDisplayWeight(e.target.value));
-        setDirect1RmForExerciseLbs(refEx, valLbs, state.activeGymId, valLbs > 0, `${muscle} Reference 1RM`);
-        recalculateDeduced1RmsForMuscleGroup(muscle);
-        refreshActiveSessionWeights();
-        renderAll();
-        handleWriteToGoogleSheet(`Updated ${muscle} reference 1RM`);
-        showToast(`Updated ${muscle} reference & provisional estimates`, true);
       });
 
       document.getElementById('toggleAddGymDrawerBtn').addEventListener('click', () => {
@@ -7383,9 +7439,9 @@ function doPost(e) {
                 implied1RmLbs: schemeSession1RmLbs,
                 note: combinedNote
               });
-              s.completed = false;
-              s.userModified = false;
             }
+            s.completed = false;
+            s.userModified = false;
           });
 
           if (includeBlock && !dayObj.isDeload && !dayObj.isRecovery) {
@@ -7468,6 +7524,7 @@ function doPost(e) {
         userPinnedSessionTime = false;
         userPinnedSessionDate = false;
         syncLiveSessionDateTimeInputs();
+        state.workoutInProgress = false;
         state.selectedCalendarDate = todayStr;
         refreshActiveSessionWeights();
         handleWriteToGoogleSheet(`Finished ${routineName} (${committedSetsCount} sets)`);
