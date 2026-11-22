@@ -585,14 +585,21 @@
                 <div class="kicker-text">ROUTINES &amp; MOVEMENTS</div>
                 <h2 class="font-display text-3xl font-bold text-white mt-1">Workout setup.</h2>
               </div>
-              <div class="flex items-center gap-1.5">
-                <button type="button" id="openSchemesPageBtn" class="btn-pill !border-plum-300/40 !text-plum-300">
-                  <span>Schemes →</span>
-                </button>
-                <button type="button" id="setupGoToLogBtn" class="btn-lime">
-                  <span>Log →</span>
-                </button>
-              </div>
+              <button type="button" id="setupGoToLogBtn" class="btn-lime">
+                <span>Log →</span>
+              </button>
+            </div>
+
+            <!-- Always-Unlocked Libraries Bar (Edit, Add & Delete Schemes or Lifts without touching Setup/Log) -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" id="openSchemesPageBtn" class="form-card hover:border-limeform-400/60 p-3 flex items-center justify-between text-xs font-bold text-white cursor-pointer transition">
+                <span>📐 Scheme Library</span>
+                <span class="text-limeform-400 font-mono">→</span>
+              </button>
+              <button type="button" id="openLiftsPageBtn" class="form-card hover:border-limeform-400/60 p-3 flex items-center justify-between text-xs font-bold text-white cursor-pointer transition">
+                <span>🏋️ Lift Library</span>
+                <span class="text-limeform-400 font-mono">→</span>
+              </button>
             </div>
 
             <!-- Routine Selector & Edit / Confirm Lock Bar -->
@@ -634,12 +641,9 @@
                   </button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
-                  <button type="button" id="openAddExerciseModalBtn" class="btn-pill !py-2">
-                    <span>+ Add Movement</span>
-                  </button>
-                  <button type="button" id="openCustomMovementModalBtn" class="btn-pill !py-2 !text-limeform-400">
-                    <span>+ New Custom Lift</span>
+                <div>
+                  <button type="button" id="openAddExerciseModalBtn" class="btn-pill w-full !py-2">
+                    <span>+ Add Movement to Routine</span>
                   </button>
                 </div>
               </div>
@@ -741,6 +745,112 @@
             <div class="form-card p-4 space-y-2.5">
               <div class="text-xs font-bold text-slate-300">Saved Schemes Library</div>
               <div id="programCardsGrid" class="space-y-2">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               04C DEDICATED LIFT LIBRARY SCREEN (ADD, EDIT & DELETE LIFTS)
+               =============================================================== -->
+          <section id="screen-lifts" class="app-screen hidden space-y-4">
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="kicker-text">EXERCISE DATABASE</div>
+                <h2 class="font-display text-3xl font-bold text-white mt-1">Lift Library.</h2>
+              </div>
+              <button type="button" id="backFromLiftsToSetupBtn" class="btn-pill">
+                <span>← Back</span>
+              </button>
+            </div>
+
+            <!-- Add / Edit Lift Form Card -->
+            <div id="liftLibEditorCard" class="form-card p-4 space-y-3 text-xs">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span id="liftLibHeaderTitle" class="text-xs font-bold text-limeform-400 uppercase tracking-wider">Add New Lift to Database</span>
+                  <p id="liftLibHeaderSub" class="text-[10px] text-slate-400">Saves to your Lift Library only — does not change your Workout Setup or 02 Log</p>
+                </div>
+                <button type="button" id="cancelLiftLibEditBtn" class="hidden btn-pill !py-1 !px-2.5 !text-[11px]">
+                  ✕ Cancel Edit
+                </button>
+              </div>
+
+              <input id="liftLibNameInput" type="text" placeholder="Lift name (e.g. Pendulum Squat, Cable Fly)" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-limeform-400" />
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-400 mb-1">Muscle Group</label>
+                  <select id="liftLibMuscleSelect" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-2.5 py-2 text-white cursor-pointer">
+                    <option value="Chest">Chest</option>
+                    <option value="Back / Lats">Back / Lats</option>
+                    <option value="Shoulders">Shoulders</option>
+                    <option value="Quads">Quads</option>
+                    <option value="Hamstrings / Glutes">Hamstrings / Glutes</option>
+                    <option value="Biceps">Biceps</option>
+                    <option value="Triceps">Triceps</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-400 mb-1">Movement Pattern</label>
+                  <select id="liftLibPatternSelect" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-2.5 py-2 text-white cursor-pointer">
+                    <option value="Horizontal Push">Horizontal Push</option>
+                    <option value="Vertical Push">Vertical Push</option>
+                    <option value="Vertical Pull">Vertical Pull</option>
+                    <option value="Horizontal Pull">Horizontal Pull</option>
+                    <option value="Knee-Dominant Squat">Knee-Dominant Squat</option>
+                    <option value="Hip Hinge">Hip Hinge</option>
+                    <option value="Isolation / Accessory">Isolation / Accessory</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-400 mb-1">Laterality</label>
+                  <select id="liftLibLateralitySelect" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-2.5 py-2 text-limeform-400 font-medium cursor-pointer">
+                    <option value="bilateral">Bilateral</option>
+                    <option value="unilateral">Unilateral (Per side)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-400 mb-1">Equipment Type</label>
+                  <select id="liftLibTypeSelect" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-2.5 py-2 text-white cursor-pointer">
+                    <option value="barbell">Barbell</option>
+                    <option value="dumbbell">Dumbbell</option>
+                    <option value="machine">Machine</option>
+                    <option value="cable">Cable</option>
+                    <option value="bodyweight">Bodyweight</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="liftLib1RmRow">
+                <label class="block text-[10px] text-slate-400 mb-1">Optional Starting 1RM (<span class="unit-text">kg</span>) — leave blank for provisional estimate</label>
+                <input id="liftLib1RmInput" type="number" step="1" min="0" placeholder="Auto-deduced from muscle reference if blank" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-3 py-2 font-mono text-white" />
+              </div>
+
+              <button type="button" id="saveLiftLibraryBtn" class="btn-lime w-full !py-2.5">
+                <span id="saveLiftLibBtnLabel">💾 Add Lift to Database</span>
+              </button>
+            </div>
+
+            <!-- Saved Lifts List -->
+            <div class="form-card p-4 space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div class="text-xs font-bold text-slate-300">All Lifts in Database (<span id="liftLibraryCountLabel">0</span>)</div>
+                <select id="liftLibFilterMuscle" class="bg-forest-900 border border-forest-600 rounded-lg px-2 py-1 text-[11px] text-white cursor-pointer">
+                  <option value="ALL">All Muscles</option>
+                  <option value="Chest">Chest</option>
+                  <option value="Back / Lats">Back / Lats</option>
+                  <option value="Shoulders">Shoulders</option>
+                  <option value="Quads">Quads</option>
+                  <option value="Hamstrings / Glutes">Hamstrings / Glutes</option>
+                  <option value="Biceps">Biceps</option>
+                  <option value="Triceps">Triceps</option>
+                </select>
+              </div>
+              <div id="liftLibraryCardsGrid" class="space-y-2 max-h-[420px] overflow-y-auto pr-0.5">
                 <!-- Populated by JS -->
               </div>
             </div>
@@ -1186,13 +1296,18 @@ function doPost(e) {
           <select id="swapModalSchemeSelect" class="w-full bg-forest-900 border border-forest-600 rounded-xl px-2.5 py-2 text-limeform-400 font-semibold cursor-pointer"></select>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" id="swapModalApplyCurrentBtn" class="btn-lime !py-2 !text-xs">
-            ✓ Update Scheme
+        <div class="space-y-2">
+          <button type="button" id="swapModalApplyCurrentBtn" class="btn-lime w-full !py-2 !text-xs">
+            ✓ Apply Scheme to Today's Slot
           </button>
-          <button type="button" id="swapModalOpenCustomMovementBtn" class="btn-pill !py-2 !text-xs !text-limeform-400">
-            + New Custom Lift
-          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="swapModalOpenNewSchemeBtn" class="btn-pill !py-2 !text-xs !text-plum-300">
+              + New Scheme
+            </button>
+            <button type="button" id="swapModalOpenCustomMovementBtn" class="btn-pill !py-2 !text-xs !text-limeform-400">
+              + New Custom Lift
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1920,6 +2035,7 @@ function doPost(e) {
       walkthroughShown: false,
       workoutInProgress: false,
       customSchemes: {},
+      deletedBuiltInSchemes: [],
       unfinishedSessionsByRoutine: {},
       savedRoutines: [
         {
@@ -2304,12 +2420,19 @@ function doPost(e) {
     }
 
     function getAllSchemes() {
-      return Object.assign({}, BASE_SCHEME_CATALOG, state.customSchemes || {});
+      const merged = Object.assign({}, BASE_SCHEME_CATALOG, state.customSchemes || {});
+      const deleted = Array.isArray(state.deletedBuiltInSchemes) ? state.deletedBuiltInSchemes : [];
+      deleted.forEach(id => {
+        if (merged[id] && Object.keys(merged).length > 1) {
+          delete merged[id];
+        }
+      });
+      return merged;
     }
 
     function getScheme(schemeId) {
       const all = getAllSchemes();
-      return all[schemeId] || BASE_SCHEME_CATALOG.normal_3x8;
+      return all[schemeId] || Object.values(all)[0] || BASE_SCHEME_CATALOG.normal_3x8;
     }
 
     function getSchemeDayObj(schemeId, dayIdx = 0) {
@@ -3776,7 +3899,7 @@ function doPost(e) {
     // NAVIGATION & GLOBAL TOP BAR
     // =========================================================================
     function switchScreen(screenId) {
-      if (state.activeScreen === 'programs' && screenId !== 'programs' && screenId !== 'schemes') {
+      if (state.activeScreen === 'programs' && screenId !== 'programs' && screenId !== 'schemes' && screenId !== 'lifts') {
         isSetupEditMode = false;
         setupEditDraft = null;
       }
@@ -3787,7 +3910,7 @@ function doPost(e) {
 
       document.querySelectorAll('.screen-nav-btn').forEach(btn => {
         const s = btn.getAttribute('data-screen');
-        const active = s === screenId || (screenId === 'schemes' && s === 'programs');
+        const active = s === screenId || ((screenId === 'schemes' || screenId === 'lifts') && s === 'programs');
         if (btn.classList.contains('flex')) {
           if (active) {
             btn.className = 'screen-nav-btn w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl bg-cream-100 text-forest-950 font-semibold text-sm transition shadow-md cursor-pointer';
@@ -3805,6 +3928,7 @@ function doPost(e) {
 
       if (screenId === 'progress') renderProgressScreen();
       if (screenId === 'schemes') renderSchemesPage();
+      if (screenId === 'lifts') renderLiftLibraryPage();
       saveState();
     }
 
@@ -5117,7 +5241,10 @@ function doPost(e) {
     ];
     let activeDraftCustomDayIdx = 0;
     let pendingSchemeAssignBlockIdx = null;
+    let pendingSchemeAssignMode = null; // 'setup' | 'log_swap' | null
     let editingSchemeId = null;
+    let editingLiftLibId = null;
+    let customLiftContext = { mode: 'library', blockIdx: null }; // 'library' | 'setup_slot' | 'add_modal' | 'log_swap'
 
     function updateSchemeBuilderModeHeader() {
       const titleEl = document.getElementById('schemeBuilderHeaderTitle');
@@ -5396,7 +5523,7 @@ function doPost(e) {
                   ✎ Edit
                 </button>
                 ${isEditedBuiltIn ? `<button type="button" data-reset-scheme="${sc.id}" class="reset-builtin-scheme-btn btn-pill !py-1 !px-2 !text-[10px] !text-amber-300" title="Reset to default preset">↺ Reset</button>` : ''}
-                ${isCustomOnly ? `<button type="button" data-del-scheme="${sc.id}" class="del-custom-scheme-btn btn-danger !px-2 !py-1" title="Delete scheme">🗑️</button>` : ''}
+                ${Object.keys(allSchemes).length > 1 ? `<button type="button" data-del-scheme="${sc.id}" class="del-custom-scheme-btn btn-danger !px-2 !py-1" title="Delete scheme">🗑️</button>` : ''}
               </div>
             </div>
             <div class="space-y-1">${stagesDetailHtml}</div>
@@ -5436,48 +5563,208 @@ function doPost(e) {
       pGrid.querySelectorAll('.pick-scheme-for-block-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const scId = btn.getAttribute('data-pick-scheme');
+          const returnToLog = pendingSchemeAssignMode === 'log_swap';
           if (pendingSchemeAssignBlockIdx !== null) {
-            if (isSetupEditMode && setupEditDraft && setupEditDraft.blocks[pendingSchemeAssignBlockIdx]) {
+            if (returnToLog && state.activeSessionExercises[pendingSchemeAssignBlockIdx]) {
+              const curBlk = state.activeSessionExercises[pendingSchemeAssignBlockIdx];
+              const newBlk = createSessionBlock(curBlk.exerciseId, scId, 0);
+              newBlk.swappedToday = true;
+              state.activeSessionExercises[pendingSchemeAssignBlockIdx] = newBlk;
+            } else if (isSetupEditMode && setupEditDraft && setupEditDraft.blocks[pendingSchemeAssignBlockIdx]) {
               setupEditDraft.blocks[pendingSchemeAssignBlockIdx].schemeId = scId;
               setupEditDraft.blocks[pendingSchemeAssignBlockIdx].dayIdx = 0;
-            } else {
-              const r = getActiveRoutineTemplate();
-              if (r && r.blocks[pendingSchemeAssignBlockIdx]) {
-                const ex = getExerciseById(r.blocks[pendingSchemeAssignBlockIdx].exerciseId);
-                ex.defaultScheme = scId;
-                r.blocks[pendingSchemeAssignBlockIdx].schemeId = scId;
-                r.blocks[pendingSchemeAssignBlockIdx].dayIdx = 0;
-                syncTemplateSlotToActiveSessionIfUntouched(pendingSchemeAssignBlockIdx, r.blocks[pendingSchemeAssignBlockIdx]);
-              }
             }
           }
           pendingSchemeAssignBlockIdx = null;
+          pendingSchemeAssignMode = null;
           saveState();
           renderAll();
-          switchScreen('programs');
-          showToast(`Assigned ${getScheme(scId).shortTag}`);
+          switchScreen(returnToLog ? 'workout' : 'programs');
+          showToast(returnToLog ? `Applied ${getScheme(scId).shortTag} for today's workout` : `Selected ${getScheme(scId).shortTag} in Setup draft`);
         });
       });
 
       pGrid.querySelectorAll('.del-custom-scheme-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const scId = btn.getAttribute('data-del-scheme');
-          if (state.customSchemes && state.customSchemes[scId]) {
-            const scName = state.customSchemes[scId].name;
-            requestRemovalConfirmation(
-              'Delete custom scheme?',
-              `Are you sure you want to delete "${scName}" from your scheme library?`,
-              '🗑️ Delete Scheme',
-              () => {
-                delete state.customSchemes[scId];
-                if (editingSchemeId === scId) cancelSchemeEditorMode();
-                saveState();
-                renderSchemesPage();
-                renderWorkoutSetupScreen();
-                showToast('Removed custom scheme');
-              }
-            );
+          const allNow = getAllSchemes();
+          if (Object.keys(allNow).length <= 1) {
+            showToast('Keep at least 1 scheme in the library');
+            return;
           }
+          const targetSc = allNow[scId];
+          if (!targetSc) return;
+          requestRemovalConfirmation(
+            'Delete scheme?',
+            `Are you sure you want to delete "${targetSc.name}" from your Scheme Library? Any routines using it will switch to another available scheme.`,
+            '🗑️ Delete Scheme',
+            () => {
+              if (state.customSchemes && state.customSchemes[scId]) {
+                delete state.customSchemes[scId];
+              }
+              if (BASE_SCHEME_CATALOG[scId]) {
+                if (!Array.isArray(state.deletedBuiltInSchemes)) state.deletedBuiltInSchemes = [];
+                if (!state.deletedBuiltInSchemes.includes(scId)) state.deletedBuiltInSchemes.push(scId);
+              }
+              const fallbackId = Object.keys(getAllSchemes())[0] || 'normal_3x8';
+              (state.exercises || []).forEach(ex => {
+                if (ex.defaultScheme === scId) { ex.defaultScheme = fallbackId; ex.defaultDayIdx = 0; }
+              });
+              (state.savedRoutines || []).forEach(r => {
+                (r.blocks || []).forEach(b => {
+                  if (b.schemeId === scId) { b.schemeId = fallbackId; b.dayIdx = 0; }
+                });
+              });
+              if (setupEditDraft && Array.isArray(setupEditDraft.blocks)) {
+                setupEditDraft.blocks.forEach(b => {
+                  if (b.schemeId === scId) { b.schemeId = fallbackId; b.dayIdx = 0; }
+                });
+              }
+              (state.activeSessionExercises || []).forEach(b => {
+                if (b.schemeId === scId) { b.schemeId = fallbackId; b.dayIdx = 0; }
+              });
+              if (editingSchemeId === scId) cancelSchemeEditorMode();
+              refreshActiveSessionWeights();
+              saveState();
+              renderAll();
+              renderSchemesPage();
+              handleWriteToGoogleSheet(`Deleted scheme ${targetSc.shortTag}`);
+              showToast(`Deleted scheme "${targetSc.shortTag}"`);
+            }
+          );
+        });
+      });
+    }
+
+    // =========================================================================
+    // 04C LIFT LIBRARY (ADD, EDIT & DELETE LIFTS WITHOUT TOUCHING SETUP/LOG)
+    // =========================================================================
+    function updateLiftLibEditorHeader() {
+      const titleEl = document.getElementById('liftLibHeaderTitle');
+      const subEl = document.getElementById('liftLibHeaderSub');
+      const cancelBtn = document.getElementById('cancelLiftLibEditBtn');
+      const saveLbl = document.getElementById('saveLiftLibBtnLabel');
+      const cardEl = document.getElementById('liftLibEditorCard');
+      const rmRow = document.getElementById('liftLib1RmRow');
+      if (editingLiftLibId) {
+        const ex = getExerciseById(editingLiftLibId);
+        if (titleEl) titleEl.textContent = `✎ Editing Lift: ${ex ? ex.name : ''}`;
+        if (subEl) subEl.textContent = 'Update name, muscle group, movement pattern, laterality, or equipment type';
+        if (cancelBtn) cancelBtn.classList.remove('hidden');
+        if (saveLbl) saveLbl.textContent = `💾 Save Changes to "${ex ? ex.name : 'Lift'}"`;
+        if (cardEl) cardEl.className = 'form-card-active p-4 space-y-3 text-xs';
+        if (rmRow) rmRow.classList.add('hidden');
+      } else {
+        if (titleEl) titleEl.textContent = 'Add New Lift to Database';
+        if (subEl) subEl.textContent = 'Saves to your Lift Library only — does not change your Workout Setup or 02 Log';
+        if (cancelBtn) cancelBtn.classList.add('hidden');
+        if (saveLbl) saveLbl.textContent = '💾 Add Lift to Database';
+        if (cardEl) cardEl.className = 'form-card p-4 space-y-3 text-xs';
+        if (rmRow) rmRow.classList.remove('hidden');
+      }
+    }
+
+    function cancelLiftLibEditMode() {
+      editingLiftLibId = null;
+      const nameEl = document.getElementById('liftLibNameInput');
+      const rmEl = document.getElementById('liftLib1RmInput');
+      if (nameEl) nameEl.value = '';
+      if (rmEl) rmEl.value = '';
+      updateLiftLibEditorHeader();
+      renderLiftLibraryPage();
+    }
+
+    function loadLiftIntoLibraryEditor(exId) {
+      const ex = (state.exercises || []).find(e => e.id === exId);
+      if (!ex) return;
+      editingLiftLibId = ex.id;
+      document.getElementById('liftLibNameInput').value = ex.name || '';
+      document.getElementById('liftLibMuscleSelect').value = ex.muscle || 'Chest';
+      document.getElementById('liftLibPatternSelect').value = ex.pattern || 'Horizontal Push';
+      document.getElementById('liftLibLateralitySelect').value = ex.laterality || 'bilateral';
+      document.getElementById('liftLibTypeSelect').value = ex.type || 'barbell';
+      updateLiftLibEditorHeader();
+      renderLiftLibraryPage();
+      const cardEl = document.getElementById('liftLibEditorCard');
+      if (cardEl && cardEl.scrollIntoView) cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderLiftLibraryPage() {
+      updateLiftLibEditorHeader();
+      const grid = document.getElementById('liftLibraryCardsGrid');
+      const countEl = document.getElementById('liftLibraryCountLabel');
+      const filterEl = document.getElementById('liftLibFilterMuscle');
+      if (!grid) return;
+      const u = getUnitStr();
+      const filterVal = filterEl ? filterEl.value : 'ALL';
+      const allSorted = getExercisesSortedByMuscleGroup();
+      const visible = filterVal === 'ALL' ? allSorted : allSorted.filter(e => e.muscle === filterVal);
+      if (countEl) countEl.textContent = String(allSorted.length);
+
+      grid.innerHTML = visible.map(ex => {
+        const isCustom = String(ex.id || '').startsWith('ex_custom_');
+        const isBeingEdited = editingLiftLibId === ex.id;
+        const isUni = ex.laterality === 'unilateral';
+        const disp1Rm = toDisplayWeight(getExerciseE1RmLbs(ex));
+        return `
+          <div class="${isBeingEdited ? 'form-card-active' : 'form-subcard'} p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="min-w-0 flex-1 space-y-0.5">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="font-bold text-white break-words">${ex.name}</span>
+                ${isCustom ? `<span class="px-1.5 py-0.5 rounded bg-limeform-400/20 text-limeform-300 font-mono text-[9px] font-bold">Custom</span>` : ''}
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono">${ex.muscle} · ${ex.pattern} · ${ex.type} · ${isUni ? 'Unilateral' : 'Bilateral'} · 1RM: ${disp1Rm} ${isUni ? `${u}/side` : u}</div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" data-edit-lift="${ex.id}" class="edit-lift-lib-btn btn-pill !py-1 !px-2.5 !text-[11px] !text-limeform-400">
+                ✎ Edit
+              </button>
+              ${allSorted.length > 1 ? `<button type="button" data-del-lift="${ex.id}" class="del-lift-lib-btn btn-danger !px-2 !py-1" title="Delete lift">🗑️</button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.edit-lift-lib-btn').forEach(btn => {
+        btn.addEventListener('click', () => loadLiftIntoLibraryEditor(btn.getAttribute('data-edit-lift')));
+      });
+
+      grid.querySelectorAll('.del-lift-lib-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const exId = btn.getAttribute('data-del-lift');
+          if ((state.exercises || []).length <= 1) {
+            showToast('Keep at least 1 lift in the database');
+            return;
+          }
+          const exObj = (state.exercises || []).find(e => e.id === exId);
+          if (!exObj) return;
+          requestRemovalConfirmation(
+            'Delete lift from database?',
+            `Are you sure you want to delete "${exObj.name}" from your Lift Library? Any routine slots using it will be removed.`,
+            '🗑️ Delete Lift',
+            () => {
+              state.exercises = (state.exercises || []).filter(e => e.id !== exId);
+              const fallbackExId = state.exercises[0].id;
+              (state.savedRoutines || []).forEach(r => {
+                r.blocks = (r.blocks || []).filter(b => b.exerciseId !== exId);
+                if (r.blocks.length === 0) r.blocks.push({ exerciseId: fallbackExId, schemeId: 'normal_3x8', dayIdx: 0 });
+              });
+              if (setupEditDraft && Array.isArray(setupEditDraft.blocks)) {
+                setupEditDraft.blocks = setupEditDraft.blocks.filter(b => b.exerciseId !== exId);
+                if (setupEditDraft.blocks.length === 0) setupEditDraft.blocks.push({ exerciseId: fallbackExId, schemeId: 'normal_3x8', dayIdx: 0 });
+              }
+              state.activeSessionExercises = (state.activeSessionExercises || []).filter(b => b.exerciseId !== exId);
+              if (state.activeSessionExercises.length === 0) {
+                state.activeSessionExercises.push(createSessionBlock(fallbackExId, 'normal_3x8', 0));
+              }
+              if (editingLiftLibId === exId) cancelLiftLibEditMode();
+              saveState();
+              renderAll();
+              renderLiftLibraryPage();
+              handleWriteToGoogleSheet(`Deleted lift ${exObj.name}`);
+              showToast(`Deleted "${exObj.name}" from Lift Library`);
+            }
+          );
         });
       });
     }
@@ -5613,7 +5900,6 @@ function doPost(e) {
       const cancelBtn = document.getElementById('cancelSetupEditBtn');
       const confirmBtn = document.getElementById('confirmSetupEditBtn');
       const addExBtn = document.getElementById('openAddExerciseModalBtn');
-      const customExBtn = document.getElementById('openCustomMovementModalBtn');
       const delRoutineBtn = document.getElementById('deleteSavedRoutineBtn');
       const nameInput = document.getElementById('setupSessionNameInput');
 
@@ -5640,7 +5926,7 @@ function doPost(e) {
       }
 
       const lockClass = isSetupEditMode ? '' : 'opacity-60 pointer-events-none cursor-not-allowed';
-      [addExBtn, customExBtn, delRoutineBtn, nameInput].forEach(el => {
+      [addExBtn, delRoutineBtn, nameInput].forEach(el => {
         if (!el) return;
         el.disabled = !isSetupEditMode;
         if (!isSetupEditMode) {
@@ -5676,7 +5962,7 @@ function doPost(e) {
           ? setupEditDraft.direct1RmByExId[ex.id]
           : getExerciseE1RmLbs(ex);
 
-        const exOptions = buildGroupedExerciseOptionsHtml(ex.id);
+        const exOptions = buildGroupedExerciseOptionsHtml(ex.id) + `<option value="__ADD_NEW_LIFT__" class="bg-forest-900 text-limeform-400 font-bold">+ Add New Custom Lift...</option>`;
 
         const schemeOptions = Object.values(allSchemes).map(sOpt =>
           `<option value="${sOpt.id}" ${sOpt.id === tplBlock.schemeId ? 'selected' : ''} class="bg-forest-900">${sOpt.name}</option>`
@@ -5792,6 +6078,12 @@ function doPost(e) {
         sel.addEventListener('change', e => {
           if (!isSetupEditMode || !setupEditDraft) return;
           const bIdx = parseInt(e.target.getAttribute('data-setup-block'), 10);
+          if (e.target.value === '__ADD_NEW_LIFT__') {
+            customLiftContext = { mode: 'setup_slot', blockIdx: bIdx };
+            renderWorkoutSetupScreen();
+            document.getElementById('customMovementModal').classList.remove('hidden');
+            return;
+          }
           const newEx = getExerciseById(e.target.value);
           if (setupEditDraft.blocks[bIdx]) {
             setupEditDraft.blocks[bIdx] = {
@@ -5810,6 +6102,7 @@ function doPost(e) {
           const bIdx = parseInt(e.target.getAttribute('data-setup-block'), 10);
           if (e.target.value === '__ADD_NEW_SCHEME__') {
             pendingSchemeAssignBlockIdx = bIdx;
+            pendingSchemeAssignMode = 'setup';
             renderSchemesPage();
             switchScreen('schemes');
             return;
@@ -6210,7 +6503,7 @@ function doPost(e) {
       if (scSelect) {
         scSelect.innerHTML = Object.values(allSchemes).map(sc =>
           `<option value="${sc.id}" ${sc.id === curBlock.schemeId ? 'selected' : ''} class="bg-forest-900">${sc.name}</option>`
-        ).join('');
+        ).join('') + `<option value="__ADD_NEW_SCHEME__" class="bg-forest-900 text-limeform-400 font-bold">+ Create New Scheme...</option>`;
       }
 
 
@@ -6810,12 +7103,117 @@ function doPost(e) {
 
       document.getElementById('openSchemesPageBtn').addEventListener('click', () => {
         pendingSchemeAssignBlockIdx = null;
+        pendingSchemeAssignMode = null;
         renderSchemesPage();
         switchScreen('schemes');
       });
 
       document.getElementById('backToWorkoutSetupBtn').addEventListener('click', () => {
+        const backTarget = pendingSchemeAssignMode === 'log_swap' ? 'workout' : 'programs';
+        pendingSchemeAssignBlockIdx = null;
+        pendingSchemeAssignMode = null;
+        switchScreen(backTarget);
+      });
+
+      document.getElementById('openLiftsPageBtn').addEventListener('click', () => {
+        editingLiftLibId = null;
+        renderLiftLibraryPage();
+        switchScreen('lifts');
+      });
+
+      document.getElementById('backFromLiftsToSetupBtn').addEventListener('click', () => {
+        editingLiftLibId = null;
         switchScreen('programs');
+      });
+
+      document.getElementById('cancelLiftLibEditBtn').addEventListener('click', () => {
+        cancelLiftLibEditMode();
+        showToast('Cancelled lift edit');
+      });
+
+      document.getElementById('liftLibFilterMuscle').addEventListener('change', () => {
+        renderLiftLibraryPage();
+      });
+
+      document.getElementById('saveLiftLibraryBtn').addEventListener('click', () => {
+        const name = (document.getElementById('liftLibNameInput').value || '').trim();
+        if (!name) {
+          showToast('Enter a lift name first');
+          return;
+        }
+        const muscle = document.getElementById('liftLibMuscleSelect').value;
+        const pattern = document.getElementById('liftLibPatternSelect').value;
+        const laterality = document.getElementById('liftLibLateralitySelect').value;
+        const type = document.getElementById('liftLibTypeSelect').value;
+        const carryover = laterality === 'unilateral' ? 0.42 : 0.88;
+
+        if (editingLiftLibId) {
+          const ex = (state.exercises || []).find(e => e.id === editingLiftLibId);
+          if (ex) {
+            ex.name = name;
+            ex.muscle = muscle;
+            ex.pattern = pattern;
+            ex.laterality = laterality;
+            ex.type = type;
+            ex.carryoverFactor = carryover;
+            ex.secondary = `${laterality === 'unilateral' ? 'Unilateral' : 'Bilateral'} · ${pattern}`;
+            delete ex.pushPullGroup;
+          }
+          editingLiftLibId = null;
+          document.getElementById('liftLibNameInput').value = '';
+          saveState();
+          renderAll();
+          renderLiftLibraryPage();
+          handleWriteToGoogleSheet(`Updated lift ${name}`);
+          showToast(`Updated "${name}" in Lift Library`);
+          return;
+        }
+
+        const raw1Rm = (document.getElementById('liftLib1RmInput').value || '').trim();
+        const provisionalFactor = 0.85;
+        let init1RmLbs = 0;
+        let isDeduced = true;
+        if (raw1Rm !== '') {
+          init1RmLbs = Math.max(0, fromDisplayWeight(raw1Rm));
+          isDeduced = false;
+        } else {
+          const refId = state.muscleGroupReferences && state.muscleGroupReferences[muscle];
+          const ref = (refId ? getExerciseById(refId) : null) || state.exercises.find(e => e.muscle === muscle && !e.isNewMovement);
+          const ref1Rm = ref ? getExerciseE1RmLbs(ref, 'gym_general') : 0;
+          if (ref && ref1Rm > 0) {
+            const fullGuessLbs = (ref1Rm / (ref.carryoverFactor || 1)) * carryover;
+            init1RmLbs = Math.round(fullGuessLbs * provisionalFactor * 10) / 10;
+          }
+        }
+
+        const newId = 'ex_custom_' + Date.now();
+        const map = {};
+        (state.gyms || []).forEach(g => { map[g.id] = init1RmLbs; });
+        state.exercises.push({
+          id: newId,
+          name,
+          muscle,
+          secondary: `${laterality === 'unilateral' ? 'Unilateral' : 'Bilateral'} · ${pattern}`,
+          pattern,
+          type,
+          laterality,
+          isNewMovement: isDeduced,
+          defaultScheme: 'normal_3x8',
+          defaultDayIdx: 0,
+          carryoverFactor: carryover,
+          stepLbs: 5.51155655,
+          e1rmByGym: map,
+          originalBaselineByGym: Object.assign({}, map),
+          history: [init1RmLbs]
+        });
+
+        document.getElementById('liftLibNameInput').value = '';
+        document.getElementById('liftLib1RmInput').value = '';
+        saveState();
+        renderAll();
+        renderLiftLibraryPage();
+        handleWriteToGoogleSheet(`Added lift ${name} to database`);
+        showToast(`Added "${name}" to Lift Library (Setup & Log unchanged)`);
       });
 
       // Setup Lock / Edit / Confirm mode listeners
@@ -6974,22 +7372,19 @@ function doPost(e) {
           });
         }
 
+        const returnToLogSwap = pendingSchemeAssignMode === 'log_swap';
         if (pendingSchemeAssignBlockIdx !== null) {
-          if (isSetupEditMode && setupEditDraft && setupEditDraft.blocks[pendingSchemeAssignBlockIdx]) {
+          if (returnToLogSwap && state.activeSessionExercises[pendingSchemeAssignBlockIdx]) {
+            const curBlk = state.activeSessionExercises[pendingSchemeAssignBlockIdx];
+            const newBlk = createSessionBlock(curBlk.exerciseId, targetId, 0);
+            newBlk.swappedToday = true;
+            state.activeSessionExercises[pendingSchemeAssignBlockIdx] = newBlk;
+          } else if (isSetupEditMode && setupEditDraft && setupEditDraft.blocks[pendingSchemeAssignBlockIdx]) {
             setupEditDraft.blocks[pendingSchemeAssignBlockIdx].schemeId = targetId;
             setupEditDraft.blocks[pendingSchemeAssignBlockIdx].dayIdx = 0;
-          } else {
-            const r = getActiveRoutineTemplate();
-            if (r && r.blocks[pendingSchemeAssignBlockIdx]) {
-              const ex = getExerciseById(r.blocks[pendingSchemeAssignBlockIdx].exerciseId);
-              ex.defaultScheme = targetId;
-              ex.defaultDayIdx = 0;
-              r.blocks[pendingSchemeAssignBlockIdx].schemeId = targetId;
-              r.blocks[pendingSchemeAssignBlockIdx].dayIdx = 0;
-              syncTemplateSlotToActiveSessionIfUntouched(pendingSchemeAssignBlockIdx, r.blocks[pendingSchemeAssignBlockIdx]);
-            }
           }
           pendingSchemeAssignBlockIdx = null;
+          pendingSchemeAssignMode = null;
         }
 
         editingSchemeId = null;
@@ -7000,7 +7395,9 @@ function doPost(e) {
         renderAll();
         renderSchemesPage();
         handleWriteToGoogleSheet(`${isEditingExisting ? 'Updated' : 'Saved'} scheme ${shortTagStr}`);
-        if (!isEditingExisting) {
+        if (returnToLogSwap) {
+          switchScreen('workout');
+        } else if (!isEditingExisting && isSetupEditMode) {
           switchScreen('programs');
         }
         showToast(`${isEditingExisting ? 'Updated' : 'Saved'} scheme "${shortTagStr}"!`);
@@ -7152,12 +7549,32 @@ function doPost(e) {
         document.getElementById('swapExerciseModal').classList.add('hidden');
       });
 
+      document.getElementById('swapModalSchemeSelect').addEventListener('change', e => {
+        if (e.target.value === '__ADD_NEW_SCHEME__') {
+          pendingSchemeAssignBlockIdx = activeSwapBlockIndex;
+          pendingSchemeAssignMode = 'log_swap';
+          document.getElementById('swapExerciseModal').classList.add('hidden');
+          editingSchemeId = null;
+          renderSchemesPage();
+          switchScreen('schemes');
+        }
+      });
+
+      document.getElementById('swapModalOpenNewSchemeBtn').addEventListener('click', () => {
+        pendingSchemeAssignBlockIdx = activeSwapBlockIndex;
+        pendingSchemeAssignMode = 'log_swap';
+        document.getElementById('swapExerciseModal').classList.add('hidden');
+        editingSchemeId = null;
+        renderSchemesPage();
+        switchScreen('schemes');
+      });
+
       document.getElementById('swapModalApplyCurrentBtn').addEventListener('click', () => {
         if (activeSwapBlockIndex === null || !state.activeSessionExercises[activeSwapBlockIndex]) return;
         const curBlock = state.activeSessionExercises[activeSwapBlockIndex];
         const curEx = getExerciseById(curBlock.exerciseId);
         const scSelect = document.getElementById('swapModalSchemeSelect');
-        const chosenSchemeId = scSelect ? scSelect.value : curBlock.schemeId;
+        const chosenSchemeId = (scSelect && scSelect.value !== '__ADD_NEW_SCHEME__') ? scSelect.value : curBlock.schemeId;
 
         const newBlk = createSessionBlock(curEx.id, chosenSchemeId, 0);
         newBlk.swappedToday = true;
@@ -7169,18 +7586,31 @@ function doPost(e) {
       });
 
       document.getElementById('swapModalOpenCustomMovementBtn').addEventListener('click', () => {
-        customMovementFromSwapSlot = activeSwapBlockIndex;
+        customLiftContext = { mode: 'log_swap', blockIdx: activeSwapBlockIndex };
         document.getElementById('swapExerciseModal').classList.add('hidden');
         document.getElementById('customMovementModal').classList.remove('hidden');
       });
 
       document.getElementById('openAddExerciseModalBtn').addEventListener('click', () => {
+        if (!isSetupEditMode || !setupEditDraft) {
+          showToast('Tap ✎ Edit Setup first');
+          return;
+        }
         const allSchemes = getAllSchemes();
-        document.getElementById('modalAddExerciseSelect').innerHTML = buildGroupedExerciseOptionsHtml('ex_bench');
+        document.getElementById('modalAddExerciseSelect').innerHTML = buildGroupedExerciseOptionsHtml('ex_bench') +
+          `<option value="__ADD_NEW_LIFT__" class="bg-forest-900 text-limeform-400 font-bold">+ Add New Custom Lift...</option>`;
         document.getElementById('modalAddSchemeSelect').innerHTML = Object.values(allSchemes).map(sc =>
           `<option value="${sc.id}" class="bg-forest-900">${sc.name}</option>`
         ).join('');
         document.getElementById('addExerciseModal').classList.remove('hidden');
+      });
+
+      document.getElementById('modalAddExerciseSelect').addEventListener('change', e => {
+        if (e.target.value === '__ADD_NEW_LIFT__') {
+          customLiftContext = { mode: 'add_modal', blockIdx: null };
+          document.getElementById('addExerciseModal').classList.add('hidden');
+          document.getElementById('customMovementModal').classList.remove('hidden');
+        }
       });
 
       document.getElementById('closeAddExerciseModalBtn').addEventListener('click', () => {
@@ -7188,31 +7618,21 @@ function doPost(e) {
       });
 
       document.getElementById('confirmAddExerciseToSessionBtn').addEventListener('click', () => {
-        const exId = document.getElementById('modalAddExerciseSelect').value;
-        const scId = document.getElementById('modalAddSchemeSelect').value;
-        if (isSetupEditMode && setupEditDraft) {
-          setupEditDraft.blocks.push({ exerciseId: exId, schemeId: scId, dayIdx: 0 });
-          document.getElementById('addExerciseModal').classList.add('hidden');
-          renderWorkoutSetupScreen();
-          showToast('Added movement to draft — tap ✓ Confirm to save');
+        if (!isSetupEditMode || !setupEditDraft) {
+          showToast('Tap ✎ Edit Setup first');
           return;
         }
-        const activeR = getActiveRoutineTemplate();
-        if (activeR) {
-          activeR.blocks.push({ exerciseId: exId, schemeId: scId, dayIdx: 0 });
-        }
-        state.activeSessionExercises.push(createSessionBlock(exId, scId, 0));
+        const exId = document.getElementById('modalAddExerciseSelect').value;
+        if (!exId || exId === '__ADD_NEW_LIFT__') return;
+        const scId = document.getElementById('modalAddSchemeSelect').value;
+        setupEditDraft.blocks.push({ exerciseId: exId, schemeId: scId, dayIdx: 0 });
         document.getElementById('addExerciseModal').classList.add('hidden');
-        saveState();
-        renderAll();
-        showToast('Added movement to routine');
-      });
-
-      document.getElementById('openCustomMovementModalBtn').addEventListener('click', () => {
-        document.getElementById('customMovementModal').classList.remove('hidden');
+        renderWorkoutSetupScreen();
+        showToast('Added movement to Setup draft — tap ✓ Confirm to save');
       });
 
       document.getElementById('closeCustomMovementModalBtn').addEventListener('click', () => {
+        customLiftContext = { mode: 'library', blockIdx: null };
         document.getElementById('customMovementModal').classList.add('hidden');
       });
 
@@ -7268,27 +7688,41 @@ function doPost(e) {
           originalBaselineByGym: Object.assign({}, map),
           history: [init1RmLbs]
         });
-        const swapScSelect = document.getElementById('swapModalSchemeSelect');
-        const pickedSchemeForCustom = (customMovementFromSwapSlot !== null && swapScSelect && swapScSelect.value) ? swapScSelect.value : 'normal_3x8';
-        if (customMovementFromSwapSlot !== null && state.activeSessionExercises[customMovementFromSwapSlot]) {
-          const swappedBlk = createSessionBlock(newId, pickedSchemeForCustom, 0);
+
+        const ctx = customLiftContext || { mode: 'library', blockIdx: null };
+        customLiftContext = { mode: 'library', blockIdx: null };
+
+        if (ctx.mode === 'log_swap' && ctx.blockIdx !== null && state.activeSessionExercises[ctx.blockIdx]) {
+          const swapScSelect = document.getElementById('swapModalSchemeSelect');
+          const pickedScheme = (swapScSelect && swapScSelect.value && swapScSelect.value !== '__ADD_NEW_SCHEME__')
+            ? swapScSelect.value
+            : 'normal_3x8';
+          const swappedBlk = createSessionBlock(newId, pickedScheme, 0);
           swappedBlk.swappedToday = true;
-          state.activeSessionExercises[customMovementFromSwapSlot] = swappedBlk;
-          customMovementFromSwapSlot = null;
-        } else {
-          const activeR = getActiveRoutineTemplate();
-          if (activeR) {
-            activeR.blocks.push({ exerciseId: newId, schemeId: 'normal_3x8', dayIdx: 0 });
-          }
-          state.activeSessionExercises.push(createSessionBlock(newId, 'normal_3x8', 1));
+          state.activeSessionExercises[ctx.blockIdx] = swappedBlk;
+        } else if (ctx.mode === 'setup_slot' && isSetupEditMode && setupEditDraft && setupEditDraft.blocks[ctx.blockIdx]) {
+          setupEditDraft.blocks[ctx.blockIdx].exerciseId = newId;
+          setupEditDraft.direct1RmByExId[newId] = init1RmLbs;
+        } else if (ctx.mode === 'add_modal' && isSetupEditMode && setupEditDraft) {
+          const scId = (document.getElementById('modalAddSchemeSelect')?.value) || 'normal_3x8';
+          setupEditDraft.blocks.push({ exerciseId: newId, schemeId: scId, dayIdx: 0 });
+          setupEditDraft.direct1RmByExId[newId] = init1RmLbs;
         }
+        // In 'library' mode, do NOT plug into Setup or 02 Log!
+
         document.getElementById('customExName').value = '';
         document.getElementById('customEx1Rm').value = '';
         document.getElementById('customMovementModal').classList.add('hidden');
         saveState();
         renderAll();
-        handleWriteToGoogleSheet(`Added custom movement ${name}`);
-        showToast(`Created ${name} (${isDeduced ? 'Provisional' : 'Direct'} 1RM: ${toDisplayWeight(init1RmLbs)} ${getUnitStr()})`);
+        handleWriteToGoogleSheet(`Added custom lift ${name}`);
+        showToast(
+          ctx.mode === 'log_swap'
+            ? `Added "${name}" & swapped for today's workout`
+            : (ctx.mode === 'setup_slot' || ctx.mode === 'add_modal')
+              ? `Added "${name}" to Setup draft — tap ✓ Confirm to save`
+              : `Added "${name}" to Lift Library`
+        );
       });
 
       const sessionNoteInputEl = document.getElementById('workoutSessionNoteInput');
