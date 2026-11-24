@@ -7418,13 +7418,10 @@ function doPost(e) {
           '↺ Unlock & Reset',
           () => {
             state.workoutInProgress = false;
-            (state.activeSessionExercises || []).forEach(b => {
-              (b.sets || []).forEach(s => {
-                s.completed = false;
-                s.userModified = false;
-              });
-            });
-            refreshActiveSessionWeights();
+            if (state.unfinishedSessionsByRoutine && state.unfinishedSessionsByRoutine[state.activeRoutineId]) {
+              delete state.unfinishedSessionsByRoutine[state.activeRoutineId];
+            }
+            loadRoutineIntoActiveSession(state.activeRoutineId, false, true);
             saveState();
             renderAll();
             showToast('Session unlocked — weights synced to Current 1RM');
@@ -7960,7 +7957,8 @@ function doPost(e) {
         syncLiveSessionDateTimeInputs();
         state.workoutInProgress = false;
         state.selectedCalendarDate = todayStr;
-        refreshActiveSessionWeights();
+        // Rebuild 02 Log cleanly from the saved 04 Setup routine template (clearing any today-only swaps or off-day toggles)
+        loadRoutineIntoActiveSession(state.activeRoutineId, false, true);
         handleWriteToGoogleSheet(`Finished ${routineName} (${committedSetsCount} sets)`);
         renderAll();
         switchScreen('progress');
