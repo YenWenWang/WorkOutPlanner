@@ -4246,7 +4246,7 @@ function doPost(e) {
         if (cancelBtn) cancelBtn.classList.add('hidden');
       }
 
-      const stepSmallDisp = state.unit === 'kg' ? 2.5 : 5;
+      const stepSmallDisp = state.unit === 'kg' ? 1 : 2.5;
       const stepLargeDisp = state.unit === 'kg' ? 5 : 10;
 
       container.innerHTML = state.activeSessionExercises.map((block, bIdx) => {
@@ -4496,7 +4496,21 @@ function doPost(e) {
           const ex = getExerciseById(blk.exerciseId);
           const setObj = blk.sets[sIdx];
           setObj.userModified = true;
-          const nextLbs = setObj.actualExternalLbs + fromDisplayWeight(stepDisp);
+
+          const grid = state.unit === 'kg' ? 1 : 2.5;
+          const curDisp = toDisplayWeight(setObj.actualExternalLbs);
+          const ratio = curDisp / grid;
+          const isOnGrid = Math.abs(ratio - Math.round(ratio)) < 1e-4;
+          let nextDisp;
+          if (stepDisp > 0) {
+            nextDisp = isOnGrid ? (Math.round(ratio) + 1) * grid : Math.ceil(ratio) * grid;
+          } else {
+            nextDisp = isOnGrid ? (Math.round(ratio) - 1) * grid : Math.floor(ratio) * grid;
+          }
+          nextDisp = Math.round(nextDisp * 10) / 10;
+          if (ex.type !== 'bodyweight') nextDisp = Math.max(0, nextDisp);
+
+          const nextLbs = fromDisplayWeight(nextDisp);
           setObj.actualExternalLbs = ex.type === 'bodyweight' ? nextLbs : Math.max(0, nextLbs);
           if (ex.type === 'bodyweight') {
             setObj.addedWeightLbs = nextLbs > 0 ? nextLbs : 0;
